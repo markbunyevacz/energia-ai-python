@@ -1,24 +1,25 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 import { EventEmitter } from 'events';
-import { AgentRegistry } from '../agents/AgentRegistry';
-import Redis from 'ioredis';
 
-type QueueMessagePayload = {
+type QueueMessage = {
+  id: string;
   type: 'document_processing' | 'domain_analysis' | 'hierarchy_update';
   payload: any;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  error?: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export class MessageQueue extends EventEmitter {
   private static instance: MessageQueue;
-  private redis: Redis;
   private processing: boolean = false;
-  private queueName = 'legal_ai_queue';
+  private batchSize: number = 10;
+  private processingInterval: number = 5000; // 5 seconds
 
   private constructor() {
     super();
-    // Assuming Redis is running on localhost:6379. This should be configurable.
-    this.redis = new Redis();
     this.startProcessing();
   }
 
@@ -33,38 +34,40 @@ export class MessageQueue extends EventEmitter {
     if (this.processing) return;
     this.processing = true;
 
-    console.log('Message queue worker started...');
-
     while (this.processing) {
       try {
-        // Use blocking pop to wait for messages
-        const result = await this.redis.brpop(this.queueName, 0);
-        if (result) {
-          const messageId = result[1];
-          this.processMessage(messageId);
-        }
+        await this.processNextBatch();
       } catch (error) {
-        console.error('Error processing message from Redis:', error);
+        console.error('Error processing message batch:', error);
         this.emit('error', error);
-        // Add a small delay before retrying to prevent a fast error loop
-        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+      await new Promise(resolve => setTimeout(resolve, this.processingInterval));
+    }
+  }
+
+  private async processNextBatch() {
+    const { data: messages, error } = await supabase
+      .from('queue_messages')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true })
+      .limit(this.batchSize);
+
+    if (error) throw error;
+    if (!messages?.length) return;
+
+    for (const message of messages) {
+      try {
+        await this.processMessage(message);
+      } catch (error) {
+        console.error(`Error processing message ${message.id}:`, error);
+        await this.updateMessageStatus(message.id, 'failed', error.message);
       }
     }
   }
 
-  private async processMessage(messageId: string) {
-    await this.updateMessageStatus(messageId, 'processing');
-
-    const { data: message, error } = await supabase
-      .from('queue_messages')
-      .select('*')
-      .eq('id', messageId)
-      .single();
-
-    if (error || !message) {
-      console.error(`Error retrieving message ${messageId} from Supabase:`, error);
-      return;
-    }
+  private async processMessage(message: QueueMessage) {
+    await this.updateMessageStatus(message.id, 'processing');
 
     try {
       switch (message.type) {
@@ -83,74 +86,89 @@ export class MessageQueue extends EventEmitter {
 
       await this.updateMessageStatus(message.id, 'completed');
       this.emit('messageProcessed', message);
-    } catch (err) {
-      await this.updateMessageStatus(message.id, 'failed', (err as Error).message);
+    } catch (error) {
+      throw error;
     }
   }
 
   private async updateMessageStatus(
     messageId: string,
-    status: 'pending' | 'processing' | 'completed' | 'failed',
-    errorMessage?: string
+    status: QueueMessage['status'],
+    error?: string
   ) {
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .from('queue_messages')
       .update({
         status,
-        error: errorMessage,
+        error,
         updated_at: new Date().toISOString(),
       })
       .eq('id', messageId);
 
-    if (error) {
-      console.error(`Failed to update status for message ${messageId}:`, error);
-    }
+    if (updateError) throw updateError;
   }
 
   private async processDocument(payload: any) {
-    const agentRegistry = AgentRegistry.getInstance();
-    const agent = agentRegistry.getAgent(payload.agentId);
-
-    if (!agent) {
-      throw new Error(`Agent with id ${payload.agentId} not found.`);
-    }
-
-    await agent.process({
-      document: payload.document,
-      domain: agent.getConfig().domainCode,
-      user: payload.user,
-    });
+    // Implement document processing logic
+    // This should be implemented by the specific agent
+    throw new Error('Document processing not implemented');
   }
 
   private async analyzeDomain(payload: any) {
-    console.log('Analyzing domain:', payload);
+    // Implement domain analysis logic
+    // This should be implemented by the specific agent
+    throw new Error('Domain analysis not implemented');
   }
 
   private async updateHierarchy(payload: any) {
-    console.log('Updating hierarchy:', payload);
+    // Implement hierarchy update logic
+    // This should be implemented by the specific agent
+    throw new Error('Hierarchy update not implemented');
   }
 
-  public async enqueueMessage(type: QueueMessagePayload['type'], payload: any): Promise<string> {
+  public async enqueueMessage(type: QueueMessage['type'], payload: any): Promise<string> {
     const { data, error } = await supabase
       .from('queue_messages')
       .insert({
         type,
         payload,
         status: 'pending',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       })
       .select('id')
       .single();
 
-    if (error || !data) {
-      throw new Error(`Failed to insert message into Supabase: ${error?.message}`);
-    }
-
-    await this.redis.lpush(this.queueName, data.id);
+    if (error) throw error;
     return data.id;
   }
 
   public stop() {
     this.processing = false;
-    this.redis.disconnect();
   }
 }
+
+async function mergeQueues() {
+  const [hierarchyResults, queueResults] = await Promise.allSettled([
+    import('./hierarchy/HierarchyManager'),
+    import('./queue/MessageQueue')
+  ]);
+  
+  return {
+    hierarchy: hierarchyResults.status === 'fulfilled' 
+      ? hierarchyResults.value 
+      : null,
+    queue: queueResults.value
+  };
+}
+
+// Local priority queue changes
+const PRIORITY_LEVELS = ['HIGH', 'MEDIUM', 'LOW'] as const;
+
+// Feature branch additions
+const LEGAL_PRIORITIES = [HierarchyLevel.Constitution];
+
+// Merged solution
+const PRIORITY_MAP = new Map([
+  [HierarchyLevel.Constitution, 'CRITICAL']
+]);

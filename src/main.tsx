@@ -27,10 +27,6 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { initializeAgents } from './core-legal-platform/agents/init.ts';
-
-// Initialize the agents
-initializeAgents();
 
 // Get the root DOM element where the React app will be mounted
 // The non-null assertion (!) is safe because the element is guaranteed to exist in index.html

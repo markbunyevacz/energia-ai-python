@@ -4,7 +4,6 @@ import { LegalDocumentService } from '../../../services/legal/legalDocumentServi
 import type { Database } from '../../../integrations/supabase/types';
 import NodeCache from 'node-cache';
 import { supabase } from '../../../integrations/supabase/client';
-import { MessageQueue } from '../../queue/MessageQueue';
 
 type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
 type DbLegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
@@ -68,13 +67,13 @@ export abstract class BaseAgent {
   protected domainRegistry: DomainRegistry;
   protected documentService: LegalDocumentService;
   protected documentCache: NodeCache;
-  protected queue: MessageQueue;
+  protected batchQueue: LegalDocument[] = [];
+  protected batchTimeout: NodeJS.Timeout | null = null;
 
   constructor(config: AgentConfig) {
     this.config = config;
     this.domainRegistry = DomainRegistry.getInstance();
     this.documentService = new LegalDocumentService();
-    this.queue = MessageQueue.getInstance();
     
     // Initialize cache with config
     this.documentCache = new NodeCache({
@@ -137,7 +136,7 @@ export abstract class BaseAgent {
   /**
    * Queue a document for batch processing
    */
-  public async queueForBatchProcessing(document: LegalDocument, user?: AgentContext['user']): Promise<void> {
+  public queueForBatchProcessing(document: LegalDocument, user?: AgentContext['user']): void {
     if (this.config.securityConfig?.requireAuth && !user) {
       throw new AgentSecurityError('Authentication required for batch processing');
     }
@@ -146,17 +145,44 @@ export abstract class BaseAgent {
       throw new AgentSecurityError('Insufficient permissions for batch processing');
     }
 
-    await this.queue.enqueueMessage('document_processing', {
-      agentId: this.config.id,
-      document,
-      user,
-    });
+    this.batchQueue.push(document);
+
+    // Process batch if it reaches max size
+    if (this.batchQueue.length >= (this.config.batchConfig?.maxBatchSize ?? 10)) {
+      this.processBatchQueue(user);
+    } else if (!this.batchTimeout) {
+      // Set timeout for batch processing
+      this.batchTimeout = setTimeout(
+        () => this.processBatchQueue(user),
+        this.config.batchConfig?.batchTimeout ?? 5000
+      );
+    }
+  }
+
+  /**
+   * Process the current batch queue
+   */
+  private async processBatchQueue(user?: AgentContext['user']): Promise<void> {
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout);
+      this.batchTimeout = null;
+    }
+
+    if (this.batchQueue.length > 0) {
+      const batch = [...this.batchQueue];
+      this.batchQueue = [];
+      await this.processBatch(batch, user);
+    }
   }
 
   /**
    * Clean up resources when the agent is no longer needed
    */
   public async cleanup(): Promise<void> {
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout);
+    }
+    await this.processBatchQueue();
     this.documentCache.flushAll();
   }
 
