@@ -64,6 +64,15 @@ export interface ImpactChain {
   }>;
 }
 
+// The actual structure returned by ImpactAnalyzer.analyzeImpact()
+export interface DetailedImpactChain {
+  id: string;
+  root_document_id: string;
+  affected_document_id: string;
+  impact_path: string[];
+  impact_level: ImpactLevel;
+}
+
 export interface CitationNode {
   id: string;
   documentId: string;

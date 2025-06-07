@@ -1,12 +1,14 @@
-import { LegalDomain } from '../types';
+import { LegalDomain, ProcessingRule, ComplianceRequirement } from '../types';
 import { DomainService } from './DomainService';
 import NodeCache from 'node-cache';
+
+type FullLegalDomain = LegalDomain & { processingRules: ProcessingRule[], complianceRequirements: ComplianceRequirement[] };
 
 export class DomainRegistry {
   private static instance: DomainRegistry;
   private domainService: DomainService;
   private cache: NodeCache;
-  private domains: Map<string, LegalDomain> = new Map();
+  private domains: Map<string, FullLegalDomain> = new Map();
 
   private constructor() {
     this.domainService = DomainService.getInstance();
@@ -25,13 +27,13 @@ export class DomainRegistry {
 
   async registerDomain(domain: Omit<LegalDomain, 'id' | 'metadata'>): Promise<LegalDomain> {
     const registered = await this.domainService.registerDomain(domain);
-    this.domains.set(domain.code, registered);
-    this.cache.set(domain.code, registered);
+    this.domains.set(domain.code, { ...registered, processingRules: [], complianceRequirements: [] });
+    this.cache.set(domain.code, { ...registered, processingRules: [], complianceRequirements: [] });
     return registered;
   }
 
-  async getDomain(code: string): Promise<LegalDomain | null> {
-    const cached = this.cache.get<LegalDomain>(code);
+  async getDomain(code: string): Promise<FullLegalDomain | null> {
+    const cached = this.cache.get<FullLegalDomain>(code);
     if (cached) {
       return cached;
     }
@@ -43,7 +45,7 @@ export class DomainRegistry {
     return domain;
   }
 
-  async listDomains(): Promise<LegalDomain[]> {
+  async listDomains(): Promise<FullLegalDomain[]> {
     const domains = await this.domainService.listDomains();
     domains.forEach(domain => {
       this.domains.set(domain.code, domain);
@@ -54,8 +56,11 @@ export class DomainRegistry {
 
   async updateDomain(code: string, updates: Partial<LegalDomain>): Promise<LegalDomain> {
     const updated = await this.domainService.updateDomain(code, updates);
-    this.domains.set(code, updated);
-    this.cache.set(code, updated);
+    const fullDomain = await this.domainService.getDomain(code);
+    if(fullDomain){
+      this.domains.set(code, fullDomain);
+      this.cache.set(code, fullDomain);
+    }
     return updated;
   }
 
@@ -71,14 +76,6 @@ export class DomainRegistry {
 
     if (!Array.isArray(domain.documentTypes)) {
       throw new Error('Document types must be an array');
-    }
-
-    if (!Array.isArray(domain.processingRules)) {
-      throw new Error('Processing rules must be an array');
-    }
-
-    if (!Array.isArray(domain.complianceRequirements)) {
-      throw new Error('Compliance requirements must be an array');
     }
   }
 } 

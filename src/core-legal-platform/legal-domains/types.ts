@@ -6,14 +6,13 @@ export interface ProcessingRule {
   description: string;
   pattern: string;
   priority: number;
-  action: (document: LegalDocument) => Promise<void>;
 }
 
 export interface ComplianceRequirement {
   id: string;
   name: string;
   description: string;
-  deadlineType: 'immediate' | 'standard' | 'custom';
+  deadlineType: string;
   standardPeriod?: number; // in days
   gracePeriod?: number; // in days
   affectedEntities: string[];
@@ -28,13 +27,12 @@ export interface LegalDomain {
   metadata?: Record<string, any>;
   active: boolean;
   documentTypes: DocumentType[];
-  processingRules: ProcessingRule[];
-  complianceRequirements: ComplianceRequirement[];
 }
 
 // Extend existing DocumentType enum
 export type DocumentType = Database['public']['Enums']['document_type'];
 export type LegalHierarchyLevel = Database['public']['Enums']['legal_hierarchy_level'];
+export type ImpactLevel = Database['public']['Enums']['impact_level'];
 
 export interface LegalDocument {
   id: string;
@@ -61,4 +59,12 @@ export interface LegalHierarchy {
   childDocumentId: string;
   relationshipType: string;
   metadata?: Record<string, any>;
+}
+
+interface ImpactChain {
+  id: string;
+  root_document_id: string;
+  affected_document_id: string;
+  impact_path: string[];
+  impact_level: ImpactLevel;
 } 

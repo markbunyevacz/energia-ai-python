@@ -1,5 +1,5 @@
 import { supabase } from '../../../integrations/supabase/client';
-import { LegalDomain } from '../types';
+import { LegalDomain, ProcessingRule, ComplianceRequirement } from '../types';
 import { Database } from '../../../integrations/supabase/types';
 
 export class DomainService {
@@ -15,31 +15,17 @@ export class DomainService {
   }
 
   async registerDomain(domain: Omit<LegalDomain, 'id' | 'metadata'>): Promise<LegalDomain> {
-    const { data, error } = await supabase
-      .from('legal_domains')
-      .insert({
-        code: domain.code,
-        name: domain.name,
-        description: domain.description,
-        active: domain.active,
-        document_types: domain.documentTypes,
-        processing_rules: JSON.stringify(domain.processingRules),
-        compliance_requirements: JSON.stringify(domain.complianceRequirements),
-      })
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(`Failed to register domain: ${error.message}`);
-    }
-
-    return this.mapToDomain(data);
+    throw new Error('registerDomain is not implemented for normalized schema');
   }
 
-  async getDomain(code: string): Promise<LegalDomain | null> {
+  async getDomain(code: string): Promise<(LegalDomain & { processingRules: ProcessingRule[], complianceRequirements: ComplianceRequirement[] }) | null> {
     const { data, error } = await supabase
       .from('legal_domains')
-      .select()
+      .select(`
+        *,
+        processing_rules (*),
+        compliance_requirements (*)
+      `)
       .eq('code', code)
       .single();
 
@@ -53,10 +39,14 @@ export class DomainService {
     return this.mapToDomain(data);
   }
 
-  async listDomains(): Promise<LegalDomain[]> {
+  async listDomains(): Promise<(LegalDomain & { processingRules: ProcessingRule[], complianceRequirements: ComplianceRequirement[] })[]> {
     const { data, error } = await supabase
       .from('legal_domains')
-      .select()
+      .select(`
+        *,
+        processing_rules (*),
+        compliance_requirements (*)
+      `)
       .eq('active', true);
 
     if (error) {
@@ -67,28 +57,10 @@ export class DomainService {
   }
 
   async updateDomain(code: string, updates: Partial<LegalDomain>): Promise<LegalDomain> {
-    const { data, error } = await supabase
-      .from('legal_domains')
-      .update({
-        name: updates.name,
-        description: updates.description,
-        active: updates.active,
-        document_types: updates.documentTypes,
-        processing_rules: updates.processingRules ? JSON.stringify(updates.processingRules) : undefined,
-        compliance_requirements: updates.complianceRequirements ? JSON.stringify(updates.complianceRequirements) : undefined,
-      })
-      .eq('code', code)
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(`Failed to update domain: ${error.message}`);
-    }
-
-    return this.mapToDomain(data);
+    throw new Error('updateDomain is not implemented for normalized schema');
   }
 
-  private mapToDomain(data: Database['public']['Tables']['legal_domains']['Row']): LegalDomain {
+  private mapToDomain(data: any): (LegalDomain & { processingRules: ProcessingRule[], complianceRequirements: ComplianceRequirement[] }) {
     return {
       id: data.id,
       code: data.code,
@@ -96,8 +68,22 @@ export class DomainService {
       description: data.description,
       active: data.active,
       documentTypes: data.document_types,
-      processingRules: JSON.parse(data.processing_rules as string),
-      complianceRequirements: JSON.parse(data.compliance_requirements as string),
+      processingRules: data.processing_rules.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        pattern: r.pattern,
+        priority: r.priority,
+      })),
+      complianceRequirements: data.compliance_requirements.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        deadlineType: r.deadline_type,
+        standardPeriod: r.standard_period_days,
+        gracePeriod: r.grace_period_days,
+        affectedEntities: r.affected_entities,
+      })),
       metadata: {
         created_at: data.created_at,
         updated_at: data.updated_at,

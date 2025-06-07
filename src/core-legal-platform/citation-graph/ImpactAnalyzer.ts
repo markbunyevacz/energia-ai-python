@@ -1,13 +1,13 @@
-import { ImpactChain, CitationRelationship, ImpactLevel } from './types';
+import { ImpactChain, DetailedImpactChain, CitationRelationship, ImpactLevel } from './types';
 import { CitationError } from './errors';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class ImpactAnalyzer {
   constructor(private readonly supabase: SupabaseClient) {}
 
-  async analyzeImpact(documentId: string): Promise<ImpactChain[]> {
+  async analyzeImpact(documentId: string): Promise<DetailedImpactChain[]> {
     const visited = new Set<string>();
-    const impactChains: ImpactChain[] = [];
+    const impactChains: DetailedImpactChain[] = [];
     
     await this.traverseImpactChain(documentId, visited, impactChains);
     return impactChains;
@@ -16,7 +16,7 @@ export class ImpactAnalyzer {
   private async traverseImpactChain(
     documentId: string,
     visited: Set<string>,
-    chains: ImpactChain[],
+    chains: DetailedImpactChain[],
     currentPath: string[] = []
   ): Promise<void> {
     if (visited.has(documentId)) return;
