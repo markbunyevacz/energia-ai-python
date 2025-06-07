@@ -25,7 +25,7 @@ async function createTestData() {
       }),
       service.createLegalChange({
         document_id: document.id,
-        change_type: "new",
+        change_type: "new_legislation",
         description: "New reporting requirements for energy providers",
         impact_level: "medium"
       })
@@ -44,7 +44,7 @@ async function createTestData() {
       service.createContract({
         contract_name: "Renewable Energy Purchase Agreement",
         content: "Agreement for purchasing renewable energy...",
-        contract_type: "sales",
+        contract_type: "service",
         risk_level: "medium"
       })
     ]);

@@ -2,7 +2,8 @@ import { Browser, BrowserContext, Page } from 'playwright';
 import { chromium } from 'playwright-extra';
 import stealth from 'puppeteer-extra-plugin-stealth';
 import { supabase } from '../../integrations/supabase/client.js';
-import type { CrawlerConfig, CrawlerResult, CrawlerProxy } from './types.js';
+import type { CrawlerConfig, CrawlerResult } from './types.js';
+// import type { CrawlerProxy } from './types.js'; // Unused import
 import { RateLimiter } from './rate-limiter.js';
 import { ProxyManager } from './proxy-manager.js';
 
@@ -64,7 +65,7 @@ export abstract class BaseCrawler {
     }
   }
 
-  protected async logCrawlResult(url: string, status: 'success' | 'error', error?: string): Promise<void> {
+  protected async logCrawlResult(_url: string, status: 'success' | 'error', error?: string): Promise<void> {
     try {
       const { error: dbError } = await supabase
         .from('system_health')

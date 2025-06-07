@@ -1,7 +1,7 @@
 import { BaseCrawler } from './base-crawler';
 import type { CrawlerResult, DocumentMetadata } from './types';
 import { supabase } from '@/integrations/supabase/client';
-import { PDFDocument } from 'pdf-lib';
+// import { PDFDocument } from 'pdf-lib'; // Unused import
 
 export class MagyarKozlonyCrawler extends BaseCrawler {
   private readonly baseUrl = 'https://magyarkozlony.hu';
@@ -101,13 +101,21 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
 
       return {
         success: true,
-        documents
+        documents,
+        errors: [],
+        startTime: new Date(),
+        endTime: new Date(),
+        source: { id: '', name: '', url: '', type: '', crawlFrequency: 0 }
       };
     } catch (error) {
       console.error('Error crawling Magyar Közlöny:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        documents: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error occurred'],
+        startTime: new Date(),
+        endTime: new Date(),
+        source: { id: '', name: '', url: '', type: '', crawlFrequency: 0 }
       };
     } finally {
       await this.cleanup();

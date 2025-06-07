@@ -1,9 +1,9 @@
 export class DocumentUpdater {
   constructor(
-    private readonly hierarchyManager: HierarchyManager
+    private readonly hierarchyManager: import('@/types').HierarchyManager
   ) {}
 
-  public async updateDocument(doc: Document): Promise<void> {
+  public async updateDocument(doc: import('@/types').Document): Promise<void> {
     // ... existing update logic
     
     // Trigger cascade invalidation

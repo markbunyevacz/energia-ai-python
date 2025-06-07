@@ -218,7 +218,7 @@ export class CitationExtractor {
   private async findSimilarDocuments(embeddings: number[]): Promise<Array<{ id: string; similarity: number }>> {
     try {
       const results = await this.vectorStore.similaritySearchWithScore(
-        embeddings,
+        JSON.stringify(embeddings),
         5 // Return top 5 most similar documents
       );
 

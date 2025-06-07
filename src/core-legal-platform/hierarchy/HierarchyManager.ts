@@ -48,10 +48,10 @@ export interface ConflictReport {
 
 // REAL IMPLEMENTATION: Legal text conflict analysis
 export class LegalConflictAnalyzer {
-  private readonly legalKeywords = [
-    'obligation', 'prohibition', 'permission', 'requirement', 
-    'entitlement', 'liability', 'sanction', 'jurisdiction'
-  ];
+  // private readonly legalKeywords = [ // Unused variable
+  //   'obligation', 'prohibition', 'permission', 'requirement', 
+  //   'entitlement', 'liability', 'sanction', 'jurisdiction'
+  // ];
   
   private readonly contradictionPatterns = [
     { positive: /shall|must|required/gi, negative: /shall not|must not|prohibited/gi },
@@ -310,15 +310,15 @@ export class HierarchyManager {
 
   // invalidateDocument is now effectively part of cascadeInvalidation logic to update internal state.
   // It's not called directly from outside in this refactor but kept if direct invalidation becomes a feature.
-  private invalidateDocument(docId: string, causedBy: LegalDocument): void {
-    const document = this.documents.get(docId);
-    if (document && document.isValid) { // Only act if document exists and is currently valid
-      document.isValid = false;
-      document.lastModified = new Date();
-      console.log(`Document ${docId} has been programmatically invalidated by ${causedBy.id}.`);
-      // No notification from here; cascadeInvalidation handles notifications.
-    }
-  }
+  // private invalidateDocument(docId: string, causedBy: LegalDocument): void { // Unused method
+  //   const document = this.documents.get(docId);
+  //   if (document && document.isValid) { // Only act if document exists and is currently valid
+  //     document.isValid = false;
+  //     document.lastModified = new Date();
+  //     console.log(`Document ${docId} has been programmatically invalidated by ${causedBy.id}.`);
+  //     // No notification from here; cascadeInvalidation handles notifications.
+  //   }
+  // }
   
   // Removed hasConflictingProvisions as its logic is now directly in checkConflicts with conflictAnalyzer
 
@@ -394,12 +394,12 @@ export class HierarchyManager {
 
 // This function seems like a utility for a broader state management, possibly unrelated to the core HierarchyManager internal logic.
 // Providing 'any' types to satisfy linter for now, as its specific structure is external to this file's main concern.
-const mergeLegalState = (hierarchyState: any, queueState: any) => ({
-  legalHierarchy: {
-    ...hierarchyState,
-    validationQueue: queueState.priorityQueue
-  }
-});
+// const mergeLegalState = (hierarchyState: any, queueState: any) => ({ // Unused function
+//   legalHierarchy: {
+//     ...hierarchyState,
+//     validationQueue: queueState.priorityQueue
+//   }
+// });
 
 // Removed problematic imports from the end of the file as definitions are local or should be properly managed at the top.
 // import { MessageQueue } from '../queue/MessageQueue';

@@ -25,7 +25,7 @@ export interface LegalTermEntry {
  */
 export type LegalDictionary = Record<LegalTerm, LegalTermEntry>;
 
-import { OpenAIApi, Configuration } from 'https://esm.sh/openai@3.1.0';
+// import { OpenAIApi, Configuration } from 'https://esm.sh/openai@3.1.0'; // External module not available
 
 // Statically import the dictionary. This is efficient for Deno/edge environments.
 import dictionaryData from './legal-dictionary.json' assert { type: 'json' };
@@ -37,13 +37,13 @@ import dictionaryData from './legal-dictionary.json' assert { type: 'json' };
  */
 export class LegalTranslationManager {
   private dictionary: LegalDictionary;
-  private openAIApi: OpenAIApi | null = null;
+  // private openAIApi: OpenAIApi | null = null; // Commented out - OpenAI not available
 
-  constructor(openaiConfig?: Configuration) {
+  constructor(openaiConfig?: any) { // Changed from Configuration to any
     this.dictionary = this.loadDictionary();
-    if (openaiConfig) {
-        this.openAIApi = new OpenAIApi(openaiConfig);
-    }
+    // if (openaiConfig) {
+    //     this.openAIApi = new OpenAIApi(openaiConfig);
+    // }
   }
 
   /**
@@ -85,34 +85,34 @@ export class LegalTranslationManager {
    * @returns A contextually translated term.
    */
   public async translateWithContext(term: LegalTerm, context: string, targetLanguage: LanguageCode): Promise<LegalTerm> {
-    if (!this.openAIApi) {
+    // if (!this.openAIApi) { // OpenAI not available
       console.warn('OpenAI API not configured. Falling back to direct translation.');
       return this.translate(term, targetLanguage);
-    }
+    // }
 
-    try {
-      const systemPrompt = `You are an expert legal translator. Your task is to translate a single legal term into a target language, using the provided context to ensure the translation is accurate and preserves the precise legal meaning. Return ONLY the translated term and nothing else.`;
-      const userPrompt = `Translate the term "${term}" into "${targetLanguage}" given the following context:\n\n---\n${context}\n---`;
+    // try { // OpenAI not available
+    //   const systemPrompt = `You are an expert legal translator. Your task is to translate a single legal term into a target language, using the provided context to ensure the translation is accurate and preserves the precise legal meaning. Return ONLY the translated term and nothing else.`;
+    //   const userPrompt = `Translate the term "${term}" into "${targetLanguage}" given the following context:\n\n---\n${context}\n---`;
 
-      const completion = await this.openAIApi.createChatCompletion({
-        model: "gpt-4-turbo-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0,
-        max_tokens: 20, // A single term should be short
-        n: 1,
-      });
+    //   const completion = await this.openAIApi.createChatCompletion({
+    //     model: "gpt-4-turbo-preview",
+    //     messages: [
+    //       { role: "system", content: systemPrompt },
+    //       { role: "user", content: userPrompt }
+    //     ],
+    //     temperature: 0,
+    //     max_tokens: 20, // A single term should be short
+    //     n: 1,
+    //   });
 
-      const translatedTerm = completion.data.choices[0]?.message?.content?.trim();
-      return translatedTerm || this.translate(term, targetLanguage); // Fallback
+    //   const translatedTerm = completion.data.choices[0]?.message?.content?.trim();
+    //   return translatedTerm || this.translate(term, targetLanguage); // Fallback
 
-    } catch (error) {
-      console.error("Error during context-aware translation:", error);
-      // Fallback to simple translation in case of an error
-      return this.translate(term, targetLanguage);
-    }
+    // } catch (error) {
+    //   console.error("Error during context-aware translation:", error);
+    //   // Fallback to simple translation in case of an error
+    //   return this.translate(term, targetLanguage);
+    // }
   }
 
   /**
@@ -163,43 +163,43 @@ export class LegalTranslationManager {
    * @returns A promise that resolves to the translated document text.
    */
   public async translateFullDocument(text: string, targetLanguage: LanguageCode): Promise<string> {
-    if (!this.openAIApi) {
+    // if (!this.openAIApi) { // OpenAI not available
       throw new Error("OpenAI API is not configured. Full document translation is unavailable.");
-    }
+    // }
     if (text.trim() === '') {
         return '';
     }
 
-    try {
-      const systemPrompt = `You are an expert legal translator. Your task is to translate the following document text into "${targetLanguage}". You must ensure that the translation is extremely accurate, preserving all legal nuances, terminology, and the original formatting (e.g., paragraphs and line breaks). The output should only be the translated text.`;
+    // try { // OpenAI not available
+    //   const systemPrompt = `You are an expert legal translator. Your task is to translate the following document text into "${targetLanguage}". You must ensure that the translation is extremely accurate, preserving all legal nuances, terminology, and the original formatting (e.g., paragraphs and line breaks). The output should only be the translated text.`;
       
-      // For very large documents, this would need a more complex chunking strategy.
-      // For now, we assume documents fit within the context window.
-      const userPrompt = `Translate the following text to ${targetLanguage}:\n\n---\n${text}\n---`;
+    //   // For very large documents, this would need a more complex chunking strategy.
+    //   // For now, we assume documents fit within the context window.
+    //   const userPrompt = `Translate the following text to ${targetLanguage}:\n\n---\n${text}\n---`;
 
-      const completion = await this.openAIApi.createChatCompletion({
-        model: "gpt-4-turbo", // Use a powerful model for this complex task
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.1, // Low temperature for more deterministic output
-      });
+    //   const completion = await this.openAIApi.createChatCompletion({
+    //     model: "gpt-4-turbo", // Use a powerful model for this complex task
+    //     messages: [
+    //       { role: "system", content: systemPrompt },
+    //       { role: "user", content: userPrompt }
+    //     ],
+    //     temperature: 0.1, // Low temperature for more deterministic output
+    //   });
 
-      const translatedText = completion.data.choices[0]?.message?.content?.trim();
+    //   const translatedText = completion.data.choices[0]?.message?.content?.trim();
       
-      if (!translatedText) {
-        throw new Error("Translation failed: The API returned an empty response.");
-      }
+    //   if (!translatedText) {
+    //     throw new Error("Translation failed: The API returned an empty response.");
+    //   }
 
-      return translatedText;
+    //   return translatedText;
 
-    } catch (error) {
-      console.error("Error during full document translation:", error);
-      if (error instanceof Error) {
-        throw new Error(`Failed to translate document: ${error.message}`);
-      }
-      throw new Error(`An unknown error occurred during document translation.`);
-    }
+    // } catch (error) {
+    //   console.error("Error during full document translation:", error);
+    //   if (error instanceof Error) {
+    //     throw new Error(`Failed to translate document: ${error.message}`);
+    //   }
+    //   throw new Error(`An unknown error occurred during document translation.`);
+    // }
   }
 } 

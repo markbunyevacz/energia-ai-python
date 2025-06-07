@@ -57,22 +57,22 @@ export class LegalCitationParser {
     return citations;
   }
   
-  private normalizeCitation(raw: string, jurisdiction: string): string {
-    // Jurisdiction-specific normalization
-    const normalizers: Record<string, (citation: string) => string> = {
-      'US': (citation) => {
-        return citation
-          .replace(/\s+/g, ' ')
-          .replace(/F\.\s*3d/gi, 'F.3d')
-          .replace(/F\.\s*2d/gi, 'F.2d')
-          .replace(/U\.\s*S\.\s*C\./gi, 'U.S.C.')
-          .replace(/C\.\s*F\.\s*R\./gi, 'C.F.R.')
-          .toUpperCase()
-          .trim();
-      }
-    };
-    
-    const normalizer = normalizers[jurisdiction] || normalizers['US'];
-    return normalizer(raw);
-  }
+  // private normalizeCitation(raw: string, jurisdiction: string): string { // Unused method
+  //   // Jurisdiction-specific normalization
+  //   const normalizers: Record<string, (citation: string) => string> = {
+  //     'US': (citation) => {
+  //       return citation
+  //         .replace(/\s+/g, ' ')
+  //         .replace(/F\.\s*3d/gi, 'F.3d')
+  //         .replace(/F\.\s*2d/gi, 'F.2d')
+  //         .replace(/U\.\s*S\.\s*C\./gi, 'U.S.C.')
+  //         .replace(/C\.\s*F\.\s*R\./gi, 'C.F.R.')
+  //         .toUpperCase()
+  //         .trim();
+  //     }
+  //   };
+  //   
+  //   const normalizer = normalizers[jurisdiction] || normalizers['US'];
+  //   return normalizer(raw);
+  // }
 } 

@@ -19,7 +19,7 @@ const cache = new LRU<string, any>({
     // A cache méretét a memóriahasználat alapján számoljuk
     return JSON.stringify(value).length;
   },
-  dispose: (key, value) => {
+  dispose: (key, _value) => {
     // Cache törléskor felszabadítjuk a memóriát
     console.log(`Cache entry removed: ${key}`);
   }
@@ -50,7 +50,7 @@ interface PerformanceMetrics {
 }
 
 export class LegalAnalysisService {
-  private documentService: typeof optimizedDocumentService;
+  private documentService = optimizedDocumentService;
   private readonly CHUNK_SIZE = 2000; // Optimalizált chunk méret
   private readonly BATCH_SIZE = 10; // Optimalizált batch méret
   private readonly MIN_CHUNK_SIZE = 500; // Minimális chunk méret
@@ -64,7 +64,7 @@ export class LegalAnalysisService {
     this.documentService = optimizedDocumentService;
   }
 
-  private chunkDocument(text: string, maxChunkSize: number = this.CHUNK_SIZE): string[] {
+  private chunkDocument(text: string, _maxChunkSize: number = this.CHUNK_SIZE): string[] {
     // Use sentence boundaries for better context
     const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
     const chunks: string[] = [];

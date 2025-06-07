@@ -11,7 +11,7 @@ export function ResetPassword() {
   const [error, setError] = useState<Error | null>(null);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [_searchParams] = useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

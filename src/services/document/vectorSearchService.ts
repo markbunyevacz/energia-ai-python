@@ -30,14 +30,14 @@ export class VectorSearchService {
 
       // Filter by document ID if specified
       if (request.documentId) {
-        chunks = chunks.filter(chunk => chunk.document_id === request.documentId);
+        chunks = chunks.filter((chunk: any) => chunk.document_id === request.documentId);
       }
 
       // Apply limit after filtering
       chunks = chunks.slice(0, request.limit || 10);
 
       const avgSimilarity = chunks.length > 0 
-        ? chunks.reduce((sum, chunk) => sum + (chunk.similarity || 0), 0) / chunks.length 
+        ? chunks.reduce((sum: number, chunk: any) => sum + (chunk.similarity || 0), 0) / chunks.length 
         : 0;
 
       return {

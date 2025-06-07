@@ -21,7 +21,7 @@ export interface Document {
   analysis_error?: string;
 }
 
-export type DocumentType = 'szerződés' | 'rendelet' | 'szabályzat' | 'törvény' | 'határozat' | 'egyéb';
+export type DocumentType = 'law' | 'regulation' | 'policy' | 'decision' | 'other';
 
 export interface DocumentMetadata {
   source: string;
@@ -30,6 +30,10 @@ export interface DocumentMetadata {
   author?: string;
   version?: string;
   category?: string;
+  documentType?: DocumentType;
+  legalAreas?: string[];
+  jurisdiction?: string;
+  [key: string]: any;
 }
 
 export interface SearchResult {
@@ -102,4 +106,53 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+}
+
+// Re-export from integrations
+export type { Database } from '@/integrations/supabase/types';
+
+// Export domain types
+export type Domain = 'legal' | 'regulatory' | 'contract' | 'policy' | 'other';
+export type LegalHierarchyLevel = 'constitutional' | 'statutory' | 'regulatory' | 'administrative' | 'judicial' | 'other';
+export type ImpactLevel = 'low' | 'medium' | 'high' | 'critical';
+
+// Agent context for legal operations
+export interface AgentContext {
+  user?: {
+    id: string;
+    role: string;
+  };
+  sessionId?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface AgentResult {
+  success: boolean;
+  data?: any;
+  error?: string;
+  metadata?: Record<string, any>;
+}
+
+// Legal document interface
+export interface LegalDocument {
+  id: string;
+  title: string;
+  content: string;
+  documentType: DocumentType;
+  domainId?: string;
+  hierarchyLevel?: LegalHierarchyLevel;
+  crossReferences?: {
+    documentId: string;
+    relationshipType: string;
+    metadata?: Record<string, any>;
+  }[];
+  metadata: {
+    created_at: string;
+    updated_at: string;
+    [key: string]: any;
+  };
+}
+
+export interface HierarchyManager {
+  cascadeInvalidation(documentId: string): Promise<void>;
 }

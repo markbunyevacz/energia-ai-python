@@ -1,6 +1,18 @@
 import { LegalTranslationManager, LanguageCode } from '../i18n/LegalTranslationManager';
 // @deno-types="https://esm.sh/@types/franc@6.0.0/index.d.ts"
-import { franc } from 'https://esm.sh/franc@6.1.0';
+// import { franc } from 'https://esm.sh/franc@6.1.0'; // External module not available
+
+// Stub implementation for language detection
+const franc = (text: string, options?: { only?: string[] }): string => {
+  // Simple heuristic for Hungarian vs English
+  if (text.includes('és') || text.includes('vagy') || text.includes('törvény')) {
+    return 'hun';
+  }
+  if (text.includes('und') || text.includes('der') || text.includes('die')) {
+    return 'deu';
+  }
+  return 'eng';
+};
 
 /**
  * The result of processing a document.

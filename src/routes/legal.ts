@@ -13,7 +13,7 @@ router.use(verifyToken);
 router.use(auditLog);
 
 // Get all legal documents (viewer access)
-router.get('/documents', checkPermission('read'), async (req: Request, res: Response) => {
+router.get('/documents', checkPermission('read'), async (_req: Request, res: Response) => {
   try {
     const { data, error } = await supabase
       .from('legal_documents')

@@ -19,7 +19,7 @@ export interface ProcessedDocument {
 
 export class ClaudeService {
   private anthropic: Anthropic;
-  private readonly MAX_TOKENS = 100000;
+  // private readonly MAX_TOKENS = 100000; // Unused constant
   private readonly CHUNK_SIZE = 4000;
 
   constructor(apiKey: string) {

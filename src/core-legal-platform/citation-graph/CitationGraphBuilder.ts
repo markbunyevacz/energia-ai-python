@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js';
+// import { SupabaseClient } from '@supabase/supabase-js'; // Unused import
 import { Graph } from './Graph';
 import { CitationDB } from './CitationDB';
 import { LegalCitationParser } from '../../lib/legal-citation-parser';
@@ -24,23 +24,24 @@ interface Document {
 // Proper EmbeddingService interface
 interface EmbeddingService {
   findSimilarDocuments(embedding: number[], threshold: number, limit: number): Promise<Document[]>;
+  findSimilar(embedding: number[], threshold: number, limit: number, options?: { excludeDomainId?: string }): Promise<Array<{ id: string; similarity: number; content: string }>>;
 }
 
 // Proper Domain type
 type Domain = 'energy' | 'tax' | 'labor' | 'general';
 
-interface CitationEdge {
-  source: string;
-  target: string;
-  citationType: 'explicit' | 'implicit';
-}
+// interface CitationEdge { // Unused interface
+//   source: string;
+//   target: string;
+//   citationType: 'explicit' | 'implicit';
+// }
 
 /**
  * Final real implementation - no mock/dummy code
  */
 export class CitationGraphBuilder {
   private static readonly SEMANTIC_SIMILARITY_THRESHOLD = 0.85;
-  private static readonly CONFIDENCE_THRESHOLD = 0.7;
+  // private static readonly CONFIDENCE_THRESHOLD = 0.7; // Unused constant
 
   private graph: Graph;
   private documents: Map<string, Document> = new Map();
@@ -170,15 +171,15 @@ export class CitationGraphBuilder {
   /**
    * Real domain-specific similarity thresholds
    */
-  private getSimilarityThreshold(domain: Domain): number {
-    const thresholds: Record<Domain, number> = {
-      'energy': 0.82,
-      'tax': 0.85,
-      'labor': 0.80,
-      'general': 0.75
-    };
-    return thresholds[domain] || 0.80;
-  }
+  // private getSimilarityThreshold(domain: Domain): number { // Unused method
+  //   const thresholds: Record<Domain, number> = {
+  //     'energy': 0.82,
+  //     'tax': 0.85,
+  //     'labor': 0.80,
+  //     'general': 0.75
+  //   };
+  //   return thresholds[domain] || 0.80;
+  // }
 
   /**
    * Real impact chain analysis - BFS traversal

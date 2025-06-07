@@ -163,7 +163,7 @@ export class DataCollectionAgent {
     for (const doc of result.documents) {
       try {
         // Map document type to Hungarian document type
-        const documentType: DocumentType = this.mapDocumentType(doc.metadata.source_type);
+        const documentType: DocumentType = this.determineDocumentType(doc.content);
 
         // Check if document already exists
         const { data: existingDoc } = await supabase
@@ -205,17 +205,17 @@ export class DataCollectionAgent {
   /**
    * Maps crawler source type to Hungarian document type
    */
-  private mapDocumentType(sourceType: LegalSourceType): DocumentType {
-    switch (sourceType) {
-      case 'magyar_kozlony':
-      case 'official_journal':
-        return 'törvény';
-      case 'legislation':
-        return 'rendelet';
-      case 'court_decision':
-        return 'határozat';
-      default:
-        return 'egyéb';
+  private determineDocumentType(content: string): DocumentType {
+    if (content.includes('tv.') || content.includes('törvény') || content.toLowerCase().includes('law')) {
+      return 'law';
+    } else if (content.includes('rendelet') || content.toLowerCase().includes('regulation')) {
+      return 'regulation';
+    } else if (content.includes('határozat') || content.toLowerCase().includes('decision')) {
+      return 'decision';
+    } else if (content.toLowerCase().includes('policy')) {
+      return 'policy';
+    } else {
+      return 'other';
     }
   }
 

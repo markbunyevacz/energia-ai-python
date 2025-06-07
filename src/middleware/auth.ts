@@ -91,11 +91,14 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
       user_agent: req.headers['user-agent']
     };
 
-    supabase
-      .from('audit_log')
-      .insert(logData)
-      .then(() => {})
-      .catch((error: Error) => console.error('Audit log error:', error));
+    // Log audit trail asynchronously
+    (async () => {
+      try {
+        await supabase.from('audit_log').insert(logData);
+      } catch (error) {
+        console.error('Audit log error:', error);
+      }
+    })();
 
     return originalSend.call(this, body);
   };

@@ -62,7 +62,7 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 // Protected routes
-router.post('/protected/logout', async (req: Request, res: Response) => {
+router.post('/protected/logout', async (_req: Request, res: Response) => {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
@@ -72,7 +72,7 @@ router.post('/protected/logout', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/protected/session', async (req: Request, res: Response) => {
+router.get('/protected/session', async (_req: Request, res: Response) => {
   try {
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error) throw error;
@@ -82,7 +82,7 @@ router.get('/protected/session', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/protected/refresh', async (req: Request, res: Response) => {
+router.post('/protected/refresh', async (_req: Request, res: Response) => {
   try {
     const { data: { session }, error } = await supabase.auth.refreshSession();
     if (error) throw error;
@@ -112,7 +112,7 @@ router.post('/protected/users/:userId/role', checkPermission('admin'), async (re
   }
 });
 
-router.get('/protected/users', checkPermission('admin'), async (req: Request, res: Response) => {
+router.get('/protected/users', checkPermission('admin'), async (_req: Request, res: Response) => {
   try {
     const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
     if (usersError) throw usersError;

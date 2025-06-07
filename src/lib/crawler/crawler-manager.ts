@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { MagyarKozlonyCrawler } from './magyar-kozlony-crawler';
-import type { LegalSource, CrawlerJob } from './types';
+import type { LegalSource, CrawlerJob, CrawlerConfig } from './types';
 
 export class CrawlerManager {
   private static instance: CrawlerManager;
@@ -120,7 +120,7 @@ export class CrawlerManager {
           })
           .eq('id', source.id);
       } else {
-        throw new Error(result.error || 'Unknown error occurred');
+        throw new Error(result.errors?.[0] || 'Unknown error occurred');
       }
     } catch (error) {
       console.error('Error crawling source:', error);
@@ -140,7 +140,19 @@ export class CrawlerManager {
   private createCrawler(source: LegalSource) {
     switch (source.type) {
       case 'magyar_kozlony':
-        return new MagyarKozlonyCrawler(source);
+        const config = {
+          name: source.name,
+          baseUrl: source.url,
+          maxRequestsPerMinute: 30,
+          minDelayBetweenRequests: 2000,
+          retryConfig: { 
+            maxAttempts: 3, 
+            initialDelay: 1000,
+            maxDelay: 5000,
+            backoffFactor: 2
+          }
+        };
+        return new MagyarKozlonyCrawler(config);
       // Add more crawler implementations here
       default:
         throw new Error(`No crawler implementation for source type: ${source.type}`);

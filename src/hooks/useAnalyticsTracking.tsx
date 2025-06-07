@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import React from 'react';
+
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
