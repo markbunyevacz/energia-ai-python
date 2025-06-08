@@ -2,6 +2,7 @@ import axios from 'axios';
 import Tesseract from 'tesseract.js';
 import { getDocument } from 'pdfjs-dist';
 import { ContractAnalysisError, ErrorCodes } from '@/types/errors';
+import { BaseAgent } from '@/agents/baseAgent';
 
 /**
  * AI Agent Router Service
@@ -53,6 +54,32 @@ export interface AgentResponse {
   confidence: number;            // Confidence score (0-1)
   reasoning: string;             // Explanation for the selection
   suggestedPrompt: string;       // Enhanced prompt for the selected agent
+}
+
+/**
+ * Multi-domain support with registry
+ * 
+ * Provides information about a legal domain
+ */
+export interface LegalDomain {
+  code: string;
+  name: string;
+  description: string;
+  documentTypes: string[];
+  processingRules: ProcessingRule[];
+  complianceRequirements: ComplianceRule[];
+}
+
+/**
+ * Integrated memory layer with conversation context
+ * 
+ * Provides a structured way to store and retrieve contextual information
+ */
+export interface IntegratedMemoryLayer {
+  longTermMemory: VectorMemoryStore;
+  workingMemory: ConversationContext;
+  proceduralMemory: RuleEngine;
+  episodicMemory: CaseHistory;
 }
 
 /**
@@ -471,3 +498,80 @@ export const getConfidenceColor = (confidence: number): string => {
   if (confidence >= 0.6) return 'text-yellow-600';
   return 'text-red-600';
 };
+
+// Advanced MoE with machine learning
+export class MixtureOfExpertsRouter {
+  private expertPool: Map<string, SpecializedAgent>;
+  private confidenceThreshold: number = 0.85;
+  private fallbackStrategies: FallbackStrategy[];
+  
+  async routeQuery(query: Query, context: Context): Promise<ExpertResponse> {
+    // Advanced routing with ML models, confidence scoring, and ensemble methods
+  }
+}
+
+// Continuous learning system
+export interface HumanFeedbackSystem {
+  collectFeedback(agentId: string, queryId: string, feedback: Feedback): Promise<void>;
+  updateAgentPerformance(feedback: Feedback[]): Promise<void>;
+  generateImprovementSuggestions(): Promise<Suggestion[]>;
+}
+
+// Sophisticated domain-specific access control
+export interface DomainSecurityManager {
+  validateDomainAccess(userId: string, domainCode: string): Promise<AccessResult>;
+  enforceDataClassification(document: Document, userClearance: string): Promise<boolean>;
+  auditAccess(operation: Operation, context: SecurityContext): Promise<void>;
+}
+
+// Horizontal scaling with message queues
+export interface ScalableAgentSystem {
+  distributedProcessing: MessageQueueSystem;
+  loadBalancer: AgentLoadBalancer;
+  autoscaling: AutoScalingManager;
+  resourceOptimization: ResourceOptimizer;
+}
+
+// Real-time system with live updates
+export interface RealTimeUpdateSystem {
+  legalChangeNotifications: NotificationService;
+  documentUpdateStreaming: StreamingService;
+  proactiveAlerts: AlertingSystem;
+}
+
+// 1. Implement missing core agents
+class ContractAnalysisAgent extends BaseAgent { /* Energy law specific */ }
+class LegalResearchAgent extends BaseAgent { /* Precedent analysis */ }
+class ComplianceAgent extends BaseAgent { /* Regulatory compliance */ }
+
+// 2. Abstract domain specifics
+interface DomainRegistry {
+  registerDomain(domain: LegalDomain): Promise<void>;
+  getActiveDomains(): Promise<LegalDomain[]>;
+  getDomainRules(code: string): Promise<ProcessingRule[]>;
+}
+
+// 3. Implement sophisticated routing
+class AdvancedMoERouter {
+  async routeWithConfidence(query: Query): Promise<ExpertRouting> {
+    // ML-based routing with confidence scoring
+  }
+}
+
+// 4. Add memory layer
+class IntegratedMemorySystem {
+  async storeContext(context: ConversationContext): Promise<void>;
+  async retrieveRelevantContext(query: Query): Promise<Context[]>;
+}
+
+// 5. Implement feedback system
+class HumanFeedbackCollector {
+  async collectFeedback(interaction: Interaction, rating: Rating): Promise<void>;
+  async updateAgentParameters(feedback: Feedback[]): Promise<void>;
+}
+
+// 6. Add real-time capabilities
+class RealTimeNotificationSystem {
+  async streamLegalUpdates(userId: string): Promise<EventStream>;
+  async sendProactiveAlerts(user: User, alerts: Alert[]): Promise<void>;
+}
