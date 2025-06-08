@@ -9,6 +9,17 @@ import mammoth from 'mammoth';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/lib/supabase';
 
+// Domain and Agent imports
+import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
+import { energyDomain } from '@/core-legal-platform/domains/energy/energy.domain';
+import { generalDomain } from '@/core-legal-platform/domains/general/general.domain';
+import { ContractAnalysisAgent } from '@/core-legal-platform/agents/contract-analysis/ContractAnalysisAgent';
+import { GeneralPurposeAgent } from '@/core-legal-platform/agents/general-purpose/GeneralPurposeAgent';
+import { MixtureOfExpertsRouter, AgentScore, MoEContext } from '@/core-legal-platform/routing/MixtureOfExpertsRouter';
+import { BaseAgent, AgentContext, AgentResult } from '@/core-legal-platform/agents/base-agents/BaseAgent';
+import { conversationContextManager } from '@/core-legal-platform/common/conversationContext';
+import { LegalDocument } from '@/core-legal-platform/legal-domains/types';
+
 // Configure the worker for PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.mjs`;
 
@@ -151,10 +162,56 @@ export function LovableFrontend() {
   const [progress, setProgress] = useState<string | null>(null);
   
   /** 
+   * MoE Router state
+   */
+  const [moeRouter, setMoeRouter] = useState<MixtureOfExpertsRouter | null>(null);
+  const [recommendedAgents, setRecommendedAgents] = useState<AgentScore[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState<BaseAgent | null>(null);
+  
+  /** 
    * Error state for user feedback and debugging
    * Displays localized error messages in Hungarian
    */
   const [error, setError] = useState<string | null>(null);
+
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+  useEffect(() => {
+    // Initialize the core components of the legal platform
+    const initializePlatform = async () => {
+      try {
+        const domainRegistry = DomainRegistry.getInstance();
+        
+        // Register domains if not already registered
+        if (!domainRegistry.getDomain('energy')) {
+          await domainRegistry.registerDomain(energyDomain);
+        }
+        if (!domainRegistry.getDomain('general')) {
+          await domainRegistry.registerDomain(generalDomain);
+        }
+
+        // Initialize agents
+        const contractAgent = new ContractAnalysisAgent(domainRegistry);
+        await contractAgent.initialize();
+        
+        const generalAgent = new GeneralPurposeAgent(domainRegistry);
+        await generalAgent.initialize();
+
+        const agentPool = [contractAgent, generalAgent];
+
+        // Initialize router
+        const router = new MixtureOfExpertsRouter(agentPool, domainRegistry);
+        setMoeRouter(router);
+
+      } catch (err) {
+        console.error("Failed to initialize the legal platform:", err);
+        setError("A platform inicializálása sikertelen volt. Kérjük, frissítse az oldalt.");
+      }
+    };
+
+    initializePlatform();
+  }, []);
 
   // ============================================================================
   // EVENT HANDLERS
@@ -247,224 +304,145 @@ export function LovableFrontend() {
   };
 
   /**
-   * Document Analysis Handler - Main Processing Function
-   * 
-   * This is the core function that orchestrates the document analysis workflow.
-   * It handles file validation, API communication, and result processing with
-   * comprehensive error handling and user feedback.
-   * 
-   * WORKFLOW STEPS:
-   * 1. Input validation (file selection, type checking)
-   * 2. State management (loading, error clearing)
-   * 3. File preparation and FormData creation
-   * 4. API communication with backend services
-   * 5. Response processing and result display
-   * 6. Error handling with localized messages
-   * 
-   * CURRENT IMPLEMENTATION ISSUES:
-   * - Uses REST API endpoint '/api/analyze' which doesn't exist
-   * - Should be updated to use Supabase edge functions
-   * - Missing file type and size validation
-   * - No progress tracking for long-running analyses
-   * 
-   * RECOMMENDED IMPROVEMENTS:
-   * - Integrate with Supabase functions: supabase.functions.invoke('analyze-contract')
-   * - Add file validation before processing
-   * - Implement progress tracking with real-time updates
-   * - Add retry logic for failed requests
-   * - Enhance error categorization and handling
-   * 
-   * @async
-   * @function handleAnalyze
-   * @returns {Promise<void>} Resolves when analysis is complete or fails
-   * 
-   * @example
-   * // Typical usage flow:
-   * // 1. User selects file
-   * // 2. User chooses analysis type
-   * // 3. User adds optional notes
-   * // 4. User clicks "Elemzés indítása" button
-   * // 5. handleAnalyze() processes the request
+   * Routes the query to find the best agents.
    */
-  const handleAnalyze = async () => {
-    // ========================================================================
-    // INITIALIZATION AND VALIDATION
-    // ========================================================================
+  const handleFindAgents = async () => {
+    if (!file) {
+      setError('Kérlek, válassz egy fájlt az elemzéshez.');
+      return;
+    }
+    if (!moeRouter) {
+      setError('Az útválasztó még nem áll készen. Kérjük, várjon egy pillanatot.');
+      return;
+    }
     
-    // Set loading state and clear previous results/errors
     setLoading(true);
     setError(null);
     setResult(null);
-    
+    setRecommendedAgents([]);
+    setSelectedAgent(null);
+
     try {
-      // Validate file selection - required for analysis
-      if (!file) {
-        setError('Kérlek, válassz ki egy fájlt!');
-        setLoading(false);
-        return;
-      }
-      
-      // TODO: Add comprehensive file validation
-      // - Check file type (PDF, DOC, DOCX)
-      // - Validate file size (max 10MB)
-      // - Check file integrity
-      // - Scan for malicious content
-      
-      // ======================================================================
-      // API REQUEST PREPARATION
-      // ======================================================================
-      
-      // Prepare form data for file upload and analysis parameters
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('analysisType', analysisType);
-      formData.append('notes', notes);
-
-      // TODO: Add additional metadata
-      // formData.append('userId', user.id);
-      // formData.append('timestamp', new Date().toISOString());
-      // formData.append('clientVersion', APP_VERSION);
-
-      // ======================================================================
-      // API COMMUNICATION (UPDATED TO USE SUPABASE)
-      // ======================================================================
-
-      const textContent = await extractTextFromFile(file);
-      if (!textContent) {
-        throw new Error('Could not extract text from the file. Supported format is PDF.');
-      }
-
-      const { data, error: supabaseError } = await supabase.functions.invoke('analyze-contract', {
-        body: {
-          // Using crypto.randomUUID() for a simple unique ID.
-          documentId: crypto.randomUUID(),
-          content: textContent,
-          userId: user?.id,
-          analysisType,
-          notes,
-          metadata: {
-            fileName: file.name,
-            fileSize: file.size,
-            timestamp: new Date().toISOString()
-          }
+      // For routing, we don't need the full text, just some metadata.
+      // We'll create a dummy document. Full text extraction can happen after agent selection.
+      const dummyDocument: LegalDocument = {
+        id: file.name,
+        title: file.name,
+        content: '', // Keep content empty for routing performance
+        documentType: 'other', // TODO: The schema doesn't have a 'contract' type. Using 'other' as a workaround.
+        domainId: '', // Router will figure this out
+        metadata: {
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type
         }
-      });
+      };
+      
+      const userContext = conversationContextManager.getContext(user?.id || 'anonymous');
 
-      if (supabaseError) {
-        throw new Error(supabaseError.message);
+      const moeContext: MoEContext = {
+        document: dummyDocument,
+        domain: '', // Let router decide
+        conversation: userContext
+      };
+
+      const agents = await moeRouter.routeQuery(notes || "Elemezze a dokumentumot.", moeContext);
+      
+      if (agents.length === 0) {
+        setError("Nem található megfelelő ügynök a feladathoz.");
+      } else {
+        setRecommendedAgents(agents);
       }
-      
-      // ======================================================================
-      // RESPONSE PROCESSING
-      // ======================================================================
-      
-      if (!data.success) {
-        throw new Error(data.error || 'A szerver hibát jelzett.');
-      }
-      
-      // Check for HTTP errors
-      if (supabaseError) {
-        throw new Error(supabaseError.message);
-      }
-      
-      // Parse JSON response
-      const { data: responseData, error: responseError } = data;
-      if (responseError) {
-        throw new Error(responseError.message);
-      }
-      
-      // Update state with analysis results
-      if (responseData) {
-        setResult(responseData);
-        setAnalysisId(responseData.id);
-      }
-      
-      // TODO: Add success tracking and analytics
-      // analytics.track('document_analysis_completed', {
-      //   analysisType,
-      //   fileType: file.type,
-      //   processingTime: Date.now() - startTime
-      // });
-      
-    } catch (e: any) {
-      // ======================================================================
-      // ERROR HANDLING
-      // ======================================================================
-      
-      // Log error for debugging and monitoring
-      console.error('Document analysis error:', e);
-      
-      // TODO: Integrate with error correlation service
-      // errorCorrelationService.logError(e, {
-      //   component: 'LovableFrontend',
-      //   action: 'document-analysis',
-      //   userId: user?.id,
-      //   fileType: file?.type,
-      //   analysisType
-      // });
-      
-      // Display user-friendly error message in Hungarian
-      const errorMessage = e.message || 'Hiba történt az elemzés során.';
-      setError(errorMessage);
-      
-      // TODO: Add specific error handling for different error types
-      // - Network errors: 'Hálózati hiba. Kérlek, próbáld újra.'
-      // - File format errors: 'Nem támogatott fájlformátum.'
-      // - Size limit errors: 'A fájl túl nagy. Maximum 10MB engedélyezett.'
-      // - Server errors: 'Szerver hiba. Kérlek, próbáld újra később.'
-      
+
+    } catch (err: any) {
+      setError(`Hiba történt az ügynökök keresése közben: ${err.message}`);
+      console.error(err);
     } finally {
-      // ======================================================================
-      // CLEANUP
-      // ======================================================================
-      
-      // Always clear loading state, regardless of success or failure
       setLoading(false);
-      
-      // TODO: Add cleanup for any temporary resources
-      // - Clear temporary file references
-      // - Cancel any pending requests
-      // - Reset progress indicators
     }
   };
 
-  useEffect(() => {
-    if (!analysisId) return;
+  /**
+   * Executes the analysis with the selected agent.
+   * @param agent The agent chosen by the user.
+   */
+  const handleExecuteAnalysis = async (agent: BaseAgent) => {
+    if (!file) return; // Should not happen if we have a selected agent
 
-    const channel = supabase.channel(`analysis-progress:${analysisId}`);
+    setSelectedAgent(agent);
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    setProgress('Dokumentum szövegének kinyerése...');
 
-    channel
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'contract_analyses',
-          filter: `id=eq.${analysisId}`,
-        },
-        (payload) => {
-          const newRecord = payload.new as any as AnalysisResult;
-          if (newRecord.status === 'completed') {
-            setResult(newRecord);
-            setProgress('Elemzés befejezve.');
-            setLoading(false);
-            channel.unsubscribe();
-          } else if (newRecord.status === 'failed') {
-            setError('Hiba történt az elemzés során.');
-            setProgress('Az elemzés sikertelen.');
-            setLoading(false);
-            channel.unsubscribe();
-          } else {
-            setProgress(`Folyamatban: ${newRecord.status}`);
-          }
+    try {
+      const textContent = await extractTextFromFile(file);
+      setProgress('Elemzés folyamatban...');
+
+      const legalDocument: LegalDocument = {
+        id: file.name, // Using file name as a temporary ID
+        title: file.name,
+        content: textContent,
+        documentType: 'other', // TODO: Make this dynamic and align with schema
+        domainId: agent.getConfig().domainCode,
+        metadata: {
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }
-      )
-      .subscribe();
+      };
+      
+      const agentContext: AgentContext = {
+        document: legalDocument,
+        domain: agent.getConfig().domainCode,
+        user: user ? { id: user.id, role: 'jogász', permissions: [] } : undefined
+      };
 
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [analysisId]);
+      const analysisResult: AgentResult = await agent.process(agentContext);
+
+      if (analysisResult.success) {
+        // Adapt the agent result to the format the UI expects
+        const uiResult: AnalysisResult = {
+          id: new Date().toISOString(),
+          risk_level: analysisResult.data.risk_level || 'low',
+          summary: analysisResult.data.summary || 'Nincs összegzés.',
+          recommendations: analysisResult.data.recommendations || [],
+          risks: analysisResult.data.risks || [],
+          status: 'completed'
+        };
+        setResult(uiResult);
+
+        // Update conversation context
+        conversationContextManager.updateContext(user?.id || 'anonymous', {
+          id: uiResult.id,
+          question: notes,
+          answer: uiResult.summary,
+          agentType: agent.getConfig().id,
+          timestamp: new Date(),
+          sources: [file.name]
+        });
+
+      } else {
+        throw analysisResult.error || new Error(analysisResult.message);
+      }
+
+    } catch (err: any) {
+      setError(`Hiba történt az elemzés során: ${err.message}`);
+      console.error(err);
+      setResult({
+        id: 'error',
+        risk_level: 'low',
+        summary: 'Hiba történt.',
+        recommendations: [],
+        risks: [],
+        status: 'failed'
+      });
+    } finally {
+      setLoading(false);
+      setProgress(null);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -491,63 +469,115 @@ export function LovableFrontend() {
                   <option value="summary">Összefoglaló</option>
                 </select>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="notes">Megjegyzések</Label>
-                <Textarea id="notes" placeholder="További megjegyzések vagy követelmények..." value={notes} onChange={handleNotesChange} />
+              <div className="space-y-2">
+                <Label htmlFor="notes">Megjegyzések (opcionális)</Label>
+                <Textarea
+                  id="notes"
+                  placeholder="Például: 'Fókuszálj a felmondási feltételekre' vagy 'Ellenőrizd a GDPR-megfelelést'"
+                  value={notes}
+                  onChange={handleNotesChange}
+                  className="min-h-[100px]"
+                />
               </div>
-              <Button className="w-full" onClick={handleAnalyze} disabled={loading || !file}>
-                {loading ? 'Elemzés folyamatban...' : 'Elemzés indítása'}
+              <Button onClick={handleFindAgents} disabled={loading || !file} className="w-full">
+                {loading && !recommendedAgents.length ? 'Ügynökök keresése...' : 'Elemzés indítása'}
               </Button>
-              {progress && <div className="text-blue-500 text-sm mt-2">{progress}</div>}
-              {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Eredmények</CardTitle>
-            <CardDescription>
-              Az AI által generált elemzés és javaslatok
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {result ? (
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded">
-                  <h3 className="font-semibold mb-2">Kockázati értékelés</h3>
-                  <p className="text-sm text-gray-600">
-                    A dokumentum áttekintése alapján a kockázati szint: <b>{result.risk_level}</b>
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">Összefoglaló: {result.summary}</p>
-                </div>
-                {result.recommendations && result.recommendations.length > 0 && (
-                <div className="p-4 bg-gray-50 rounded">
-                  <h3 className="font-semibold mb-2">Javaslatok</h3>
-                  <ul className="list-disc list-inside text-sm text-gray-600">
-                      {result.recommendations.map((s: string, i: number) => (
-                      <li key={i}>{s}</li>
-                    ))}
-                  </ul>
-                </div>
-                )}
-                {result.risks && result.risks.length > 0 && (
-                  <div className="p-4 bg-gray-50 rounded">
-                    <h3 className="font-semibold mb-2">Kockázatok</h3>
-                    <ul className="list-disc list-inside text-sm text-gray-600">
-                      {result.risks.map((risk: AnalysisRisk, i: number) => (
-                        <li key={i}>
-                          <b>{risk.type} ({risk.severity}):</b> {risk.description}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+
+        {loading && !recommendedAgents.length && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Folyamatban...</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{progress || 'Elemzés folyamatban, kérjük várjon...'}</p>
+            </CardContent>
+          </Card>
+        )}
+        
+        {recommendedAgents.length > 0 && !result && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Javasolt Szakértők</CardTitle>
+              <CardDescription>Válassza ki a legmegfelelőbb szakértőt a feladathoz.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-2">
+              {recommendedAgents.map(({ agent, score }) => (
+                <Button
+                  key={agent.getConfig().id}
+                  onClick={() => handleExecuteAnalysis(agent)}
+                  variant="outline"
+                  disabled={loading}
+                >
+                  {agent.getConfig().name} (Relevancia: {Math.round(score * 100)}%)
+                </Button>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {error && (
+          <Card className="mt-6 bg-destructive/10 border-destructive">
+            <CardHeader>
+              <CardTitle>Hiba</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{error}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {result && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Elemzési eredmény</CardTitle>
+              <CardDescription>
+                A(z) "{selectedAgent?.getConfig().name || 'AI'}" ügynök által végzett elemzés eredménye.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Kockázati szint</Label>
+                <p className={`font-bold ${
+                  result.risk_level === 'high' ? 'text-red-500' :
+                  result.risk_level === 'medium' ? 'text-yellow-500' :
+                  'text-green-500'
+                }`}>
+                  {result.risk_level === 'high' ? 'Magas' : result.risk_level === 'medium' ? 'Közepes' : 'Alacsony'}
+                </p>
               </div>
-            ) : (
-              <div className="text-muted-foreground text-sm">Nincs még eredmény.</div>
-            )}
-          </CardContent>
-        </Card>
+              <div>
+                <Label>Összefoglaló</Label>
+                <p>{result.summary}</p>
+              </div>
+              <div>
+                <Label>Javaslatok</Label>
+                <ul className="list-disc list-inside text-sm text-gray-600">
+                  {result.recommendations.map((recommendation: string, index: number) => (
+                    <li key={index}>{recommendation}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <Label>Kockázatok</Label>
+                <ul className="list-disc list-inside text-sm text-gray-600">
+                  {result.risks.map((risk: AnalysisRisk, index: number) => (
+                    <div key={index} className="border-t pt-4">
+                      <h4 className="font-semibold">{risk.type} (Súlyosság: {risk.severity})</h4>
+                      <p className="text-sm text-muted-foreground">Érintett szakasz: {risk.section}</p>
+                      <p>{risk.description}</p>
+                      <p className="mt-2 text-sm">
+                        <span className="font-semibold">Javaslat:</span> {risk.recommendation}
+                      </p>
+                    </div>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

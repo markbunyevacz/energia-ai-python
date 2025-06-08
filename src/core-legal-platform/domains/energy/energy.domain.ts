@@ -1,49 +1,18 @@
-import { LegalDomain } from "../../../legal-domains/types";
+import { LegalDomain } from './types';
 
 export const energyDomain: LegalDomain = {
   code: 'energy',
   name: 'Energiajog',
-  description: 'Az energiaágazat szabályozásával, szerződéseivel és megfelelőségével kapcsolatos jogi terület.',
-  active: true,
-  documentTypes: [
-    'villamosenergia-kereskedelmi_szerződés',
-    'hálózathasználati_szerződés',
-    'csatlakozási_szerződés',
-    'szállítói_keretszerződés'
-  ],
+  description: 'Az energiajoggal kapcsolatos szerződések és megfeleőségi kérdések.',
+  // TODO: Align with the actual document types in the database schema
+  documentTypes: ['other'], 
   agentConfig: {
     contract: {
-      keywords: [
-        'szerződés',
-        'megállapodás',
-        'feltétel',
-        'felmondás',
-        'módosítás',
-        'kötelezettség',
-        'jog',
-        'kártérítés',
-        'garancia',
-        'szavatosság',
-        'hálózathasználati',
-        'villamosenergia',
-        'földgáz',
-        'ellátási',
-        'kereskedelmi'
-      ]
+      keywords: ['szerződés', 'megállapodás', 'villamosenergia', 'földgáz', 'ellátás', 'vásárlás'],
     },
     compliance: {
-      keywords: [
-        'megfelelőség',
-        'előírás',
-        'szabályozás',
-        'ellenőrzés',
-        'audit',
-        'kockázat',
-        'biztonság',
-        'mekh',
-        'magyar energia és közmű-szabályozási hivatal',
-        'adatszolgáltatás'
-      ]
-    }
-  }
+      keywords: ['megfelelőség', 'jogszabály', 'MEKH', 'rendelet', 'engedély'],
+    },
+  },
+  active: true,
 }; 

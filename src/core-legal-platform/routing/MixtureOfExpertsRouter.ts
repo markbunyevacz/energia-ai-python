@@ -1,0 +1,114 @@
+import { BaseAgent, AgentContext } from '../agents/base-agents/BaseAgent';
+import { DomainRegistry } from '../legal-domains/registry/DomainRegistry';
+import { LegalDomain } from '../legal-domains/types';
+import { conversationContextManager, ConversationContext } from '../common/conversationContext';
+
+export interface AgentScore {
+  agent: BaseAgent;
+  score: number;
+}
+
+// The context for the MoE router will be a combination of agent and conversation contexts
+export interface MoEContext extends AgentContext {
+    conversation: ConversationContext | null;
+}
+
+export class MixtureOfExpertsRouter {
+  private agentPool: BaseAgent[];
+  private domainRegistry: DomainRegistry;
+
+  constructor(agentPool: BaseAgent[], domainRegistry: DomainRegistry) {
+    this.agentPool = agentPool;
+    this.domainRegistry = domainRegistry;
+  }
+
+  public async routeQuery(question: string, context: MoEContext): Promise<AgentScore[]> {
+    const scores: AgentScore[] = [];
+
+    for (const agent of this.agentPool) {
+      if (!agent.isEnabled()) {
+        continue;
+      }
+
+      const agentDomain = await agent.getDomain();
+      if (!agentDomain) {
+        continue;
+      }
+
+      const keywordScore = this.calculateKeywordScore(question, agentDomain);
+      const contextScore = this.calculateContextScore(context, agentDomain);
+      const historyScore = this.calculateHistoryScore(context); // Placeholder
+
+      // Weighted average of scores
+      const finalScore = (keywordScore * 0.5) + (contextScore * 0.3) + (historyScore * 0.2);
+
+      if (finalScore > 0) { // Only consider agents with some relevance
+        scores.push({ agent, score: finalScore });
+      }
+    }
+
+    // Sort agents by score in descending order
+    scores.sort((a, b) => b.score - a.score);
+
+    // Return top 1-3 agents
+    return scores.slice(0, 3);
+  }
+
+  private calculateKeywordScore(question: string, domain: LegalDomain): number {
+    const questionLower = question.toLowerCase();
+    let score = 0;
+
+    const allKeywords = [
+        ...(domain.agentConfig.contract?.keywords || []),
+        ...(domain.agentConfig.compliance?.keywords || []),
+        ...(domain.agentConfig.legal_research?.keywords || [])
+    ];
+
+    for (const keyword of allKeywords) {
+      if (questionLower.includes(keyword.toLowerCase())) {
+        score += 1;
+      }
+    }
+
+    // Normalize score
+    return allKeywords.length > 0 ? score / allKeywords.length : 0;
+  }
+
+  private calculateContextScore(context: MoEContext, domain: LegalDomain): number {
+    let score = 0;
+    let factors = 0;
+
+    // Score based on document type
+    if (context.document?.documentType) {
+        factors++;
+        if (domain.documentTypes.includes(context.document.documentType)) {
+            score += 1;
+        }
+    }
+
+    // Score based on user role
+    if (context.conversation?.userRole) {
+        factors++;
+        // This is a simple check. A more advanced implementation could have role-to-domain mappings.
+        // For now, we assume certain roles are more aligned with certain domains implicitly.
+        // Let's give a small boost if a user role is present.
+        // A better implementation would be to check domain.relevantRoles or something similar.
+        if (context.conversation.userRole === 'jogász' && (domain.code === 'energy' || domain.code === 'general')) {
+             score += 0.5;
+        }
+    }
+    
+    return factors > 0 ? score / factors : 0;
+  }
+
+  private calculateHistoryScore(context: MoEContext): number {
+    // Placeholder for history-based scoring.
+    // This will be implemented once the persistent memory layer is in place.
+    if (context.conversation) {
+        // Example: Boost agents that were recently used
+        const recentAgents = context.conversation.messages.slice(-3).map(m => m.agentType);
+        // This logic is incomplete. We'd need to know which agent corresponds to which agentType string.
+    }
+    return 0;
+  }
+} 

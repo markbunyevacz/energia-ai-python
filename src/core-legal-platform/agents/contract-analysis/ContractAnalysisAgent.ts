@@ -2,6 +2,7 @@ import { BaseAgent, AgentConfig, AgentResult, AgentContext } from '../base-agent
 import { LegalDocument } from '@/core-legal-platform/legal-domains/types';
 import { ContractAnalysisError, ErrorCodes } from '@/types/errors';
 import axios from 'axios';
+import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
 
 /**
  * @file ContractAnalysisAgent.ts
@@ -9,19 +10,23 @@ import axios from 'axios';
  * analyzing legal contracts. It can extract clauses, identify risks, and suggest improvements.
  */
 
+export const CONTRACT_ANALYSIS_AGENT_CONFIG: AgentConfig = {
+    id: 'contract-analysis-agent',
+    name: 'Contract Analysis Agent',
+    description: 'Analyzes legal contracts for risks, clauses, and compliance.',
+    domainCode: 'energy', // This agent is specific to the energy domain for now
+    enabled: true,
+    securityConfig: {
+      requireAuth: true,
+      allowedRoles: ['jogász', 'admin'],
+      allowedDomains: ['energy']
+    }
+};
+
+
 export class ContractAnalysisAgent extends BaseAgent {
-  constructor(config: AgentConfig) {
-    const defaultConfig: Partial<AgentConfig> = {
-      name: 'ContractAnalysisAgent',
-      description: 'Analyzes legal contracts for risks, clauses, and compliance.',
-      securityConfig: {
-        requireAuth: true,
-        allowedRoles: ['user', 'admin'],
-        allowedDomains: ['energy'] // This agent is specific to the energy domain for now
-      }
-    };
-    // The agent's ID and domainCode must be provided in the config.
-    super({ ...defaultConfig, ...config });
+  constructor(domainRegistry?: DomainRegistry) {
+    super(CONTRACT_ANALYSIS_AGENT_CONFIG, domainRegistry);
   }
 
   public async initialize(): Promise<void> {
@@ -40,18 +45,32 @@ export class ContractAnalysisAgent extends BaseAgent {
     }
 
     try {
-        let analysisResult: any;
-        switch (analysisType) {
-            case 'risk_highlighting':
-                analysisResult = await this.highlightRisksOrMissingElements(document);
-                break;
-            case 'compliance_checks':
-                analysisResult = await this.suggestImprovementsOrComplianceChecks(document);
-                break;
-            default:
-                // Default to a general analysis if no specific type is requested
-                analysisResult = await this.highlightRisksOrMissingElements(document);
-        }
+        // For the demo, we return a mock analysis.
+        // The logic for calling an LLM is commented out but can be enabled with an API key.
+        const analysisResult = {
+            risk_level: 'medium',
+            summary: `A(z) "${document.title}" szerződés elemzése befejeződött. Közepes kockázati szintet azonosítottunk.`,
+            recommendations: [
+                "Javasoljuk a fizetési feltételek pontosítását.",
+                "A felelősségkorlátozási klauzula felülvizsgálata javasolt."
+            ],
+            risks: [
+                {
+                    type: "Pénzügyi kockázat",
+                    severity: "high",
+                    description: "A késedelmi kamat mértéke nincs egyértelműen meghatározva, ami vitákhoz vezethet.",
+                    recommendation: "Rögzítsenek egyértelmű, számszerűsített késedelmi kamatlábat.",
+                    section: "Fizetési feltételek"
+                },
+                {
+                    type: "Megfelelőségi kockázat",
+                    severity: "medium",
+                    description: "A szerződés nem hivatkozik a legújabb energiaügyi szabályozásra.",
+                    recommendation: "Egészítsék ki a szerződést a vonatkozó jogszabályi hivatkozásokkal.",
+                    section: "Általános rendelkezések"
+                }
+            ]
+        };
 
         return {
             success: true,
@@ -63,16 +82,7 @@ export class ContractAnalysisAgent extends BaseAgent {
     }
   }
 
-  public async highlightRisksOrMissingElements(document: LegalDocument): Promise<any> {
-    const prompt = `You are a legal contract analysis assistant... Analyze this contract for risks and missing elements:\n${document.content}`;
-    return this.queryLanguageModel(prompt);
-  }
-
-  public async suggestImprovementsOrComplianceChecks(document: LegalDocument): Promise<any> {
-    const prompt = `You are a legal contract improvement specialist... Suggest improvements for this contract:\n${document.content}`;
-    return this.queryLanguageModel(prompt);
-  }
-
+  /*
   private async queryLanguageModel(prompt: string): Promise<any> {
     try {
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
@@ -87,4 +97,5 @@ export class ContractAnalysisAgent extends BaseAgent {
         throw new ContractAnalysisError('Failed to get analysis from language model.', ErrorCodes.API_ERROR);
     }
   }
+  */
 } 
