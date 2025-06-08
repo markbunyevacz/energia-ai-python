@@ -1,10 +1,10 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { optimizedDocumentService } from '@/services/optimizedDocumentService';
+import optimizedDocumentService from '@/core-legal-platform/document/optimizedDocumentService';
 import { Activity, Database, Clock, Zap } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export function PerformanceMetrics() {
   const [stats, setStats] = useState<any>(null);

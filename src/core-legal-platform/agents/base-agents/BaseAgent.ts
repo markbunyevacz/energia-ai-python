@@ -1,9 +1,10 @@
-import { LegalDocument, DocumentType } from '../../legal-domains/types';
-import { DomainRegistry } from '../../legal-domains/registry/DomainRegistry';
-import { LegalDocumentService } from '../../../services/legal/legalDocumentService';
-import type { Database } from '../../../integrations/supabase/types';
+import { LegalDocument, DocumentType } from '@/core-legal-platform/legal-domains/types';
+import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
+import { LegalDocumentService } from '@/core-legal-platform/legal/legalDocumentService';
+import type { Database } from '@/integrations/supabase/types';
 import NodeCache from 'node-cache';
-import { supabase } from '../../../integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
+import { AgentSecurityError } from '@/core-legal-platform/agents/example/ExampleAgent';
 
 type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
 type DbLegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
@@ -55,13 +56,6 @@ export interface BatchProcessingResult {
   results: AgentResult[];
 }
 
-export class AgentSecurityError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AgentSecurityError';
-  }
-}
-
 export abstract class BaseAgent {
   protected config: AgentConfig;
   protected domainRegistry: DomainRegistry;
@@ -70,9 +64,9 @@ export abstract class BaseAgent {
   protected batchQueue: LegalDocument[] = [];
   protected batchTimeout: NodeJS.Timeout | null = null;
 
-  constructor(config: AgentConfig) {
+  constructor(config: AgentConfig, domainRegistry?: DomainRegistry) {
     this.config = config;
-    this.domainRegistry = DomainRegistry.getInstance();
+    this.domainRegistry = domainRegistry || DomainRegistry.getInstance();
     this.documentService = new LegalDocumentService();
     
     // Initialize cache with config

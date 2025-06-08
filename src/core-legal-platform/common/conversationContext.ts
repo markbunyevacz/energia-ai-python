@@ -1,3 +1,14 @@
+/**
+ * @file conversationContext.ts
+ * @description This file defines the ConversationContextManager, a service responsible for
+ * managing the state of user conversations. It provides a simple in-memory store
+ * for tracking message history, current topics, and other contextual data for each
+ * user session.
+ *
+ * This service is implemented as a singleton to ensure all parts of the application
+ * share the same conversation state.
+ */
+
 export interface ConversationMessage {
   id: string;
   question: string;

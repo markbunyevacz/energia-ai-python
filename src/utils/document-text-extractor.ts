@@ -1,23 +1,13 @@
+import Tesseract from 'tesseract.js';
 import { getDocument } from 'pdfjs-dist';
-import { extractTextFromImage } from '@/utils/document-text-extractor';
 
-export const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+export const extractTextFromImage = async (imageDataUrl: string): Promise<string> => {
+    const { data: { text } } = await Tesseract.recognize(imageDataUrl, 'eng+hun');
+    return text;
 };
-
-export const extractTextFromFile = async (file: File): Promise<string> => {
-  try {
-    // Handle text files
-    if (file.type === 'text/plain') {
-      return await file.text();
-    }
-
-    // Handle PDF files
-    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+  
+export const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
       const arrayBuffer = await file.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
       const pdf = await getDocument({ data: uint8Array }).promise;
@@ -33,12 +23,12 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
         textMatches.push(pageText);
         text += pageText + '\n';
       }
-
+ 
       // Check if text extraction was successful
       const isMostlyNonText = (text: string) => {
         return (text.replace(/[^A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű0-9]/g, '').length < 30);
       };
-
+ 
       if (isMostlyNonText(text)) {
         // Fallback to OCR for image-based PDFs
         const numPages = Math.min(pdf.numPages, 3); // Limit to first 3 pages for performance
@@ -59,30 +49,10 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
         
         return ocrText.trim() || '[PDF OCR feldolgozás sikertelen vagy üres.]';
       }
-
+ 
       return textMatches.join(' ').slice(0, 50000); // Limit to 50KB of text
+    } catch (error) {
+      console.error('PDF text extraction error:', error);
+      return `Dokumentum: ${file.name}. Szöveg kivonás sikertelen, de a fájl feltöltve.`;
     }
-
-    // Handle image files
-    if (file.type.startsWith('image/')) {
-      const imageDataUrl = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.readAsDataURL(file);
-      });
-      return await extractTextFromImage(imageDataUrl);
-    }
-
-    // For unsupported file types
-    throw new Error(`Nem támogatott fájltípus: ${file.type}`);
-  } catch (error: unknown) {
-    console.error('Error extracting text from file:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba';
-    throw new Error(`Hiba történt a fájl feldolgozása során: ${errorMessage}`);
-  }
-};
-
-export const processFile = async (file: File, setPreview: (preview: string | null) => void, setTextContent: (text: string) => void) => {
-    const fileType = file.type;
-    // ... existing code ...
-};
+}; 

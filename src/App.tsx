@@ -10,6 +10,9 @@ import { LovableFrontend } from './components/LovableFrontend';
 import { Session } from '@supabase/supabase-js';
 import NotFoundPage from './pages/NotFound';
 import './App.css';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { DomainRegistry } from './core-legal-platform/legal-domains/registry/DomainRegistry';
+import { energyDomain } from './core-legal-platform/domains/energy/energy.domain';
 
 /**
  * Main App Component
@@ -55,6 +58,14 @@ export function App() {
 
     // Cleanup subscription on component unmount
     return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    // Register the core domains when the application starts.
+    // In a real application, this might be a more sophisticated process,
+    // but for now, we register the energy domain directly.
+    const domainRegistry = DomainRegistry.getInstance();
+    domainRegistry.registerDomain(energyDomain);
   }, []);
 
   // Show loading spinner while checking authentication status

@@ -1,9 +1,9 @@
 // import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { websocketService } from '@/services/websocketService';
+import { websocketService } from '@/core-legal-platform/common/websocketService';
 import { useAnalyticsTracking } from '@/hooks/useAnalyticsTracking';
 import { Activity, AlertTriangle, CheckCircle, Clock, Zap } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

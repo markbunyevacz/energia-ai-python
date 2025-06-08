@@ -1,5 +1,17 @@
+/**
+ * @file loggingService.ts
+ * @description This file provides a centralized logging service for the application.
+ * It supports multiple logging levels (info, warn, error, debug) and can be configured
+ * to output logs to different channels, such as the browser console or a remote
+ * logging service (e.g., Supabase).
+ *
+ * This service is implemented as a singleton to ensure consistent logging configuration
+ * and to prevent multiple instances from being created.
+ */
+
 import { ContractAnalysisError, ErrorCode, ErrorCodes } from '@/types/errors';
 import { LogLevel } from '@/types/logging';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface LogEntry {
   level: LogLevel;

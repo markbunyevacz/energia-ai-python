@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import optimizedDocumentService from '@/services/optimizedDocumentService';
+import optimizedDocumentService from '@/core-legal-platform/document/optimizedDocumentService';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface SearchResult {

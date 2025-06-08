@@ -1,35 +1,18 @@
 import type { Database } from '@/integrations/supabase/types';
 
-export interface ProcessingRule {
-  id: string;
-  name: string;
-  description: string;
-  pattern: string;
-  priority: number;
-  action: (document: LegalDocument) => Promise<void>;
-}
-
-export interface ComplianceRequirement {
-  id: string;
-  name: string;
-  description: string;
-  deadlineType: 'immediate' | 'standard' | 'custom';
-  standardPeriod?: number; // in days
-  gracePeriod?: number; // in days
-  affectedEntities: string[];
-}
+export type LegalDomainRow = Database['public']['Tables']['legal_domains']['Row'];
 
 export interface LegalDomain {
-  id: string;
   code: string;
   name: string;
-  description?: string;
-  parentDomainId?: string;
-  metadata?: Record<string, any>;
+  description: string;
+  documentTypes: string[];
+  agentConfig: {
+    contract?: { keywords: string[] };
+    legal_research?: { keywords: string[] };
+    compliance?: { keywords: string[] };
+  };
   active: boolean;
-  documentTypes: DocumentType[];
-  processingRules: ProcessingRule[];
-  complianceRequirements: ComplianceRequirement[];
 }
 
 // Extend existing DocumentType enum
@@ -61,12 +44,4 @@ export interface LegalHierarchy {
   childDocumentId: string;
   relationshipType: string;
   metadata?: Record<string, any>;
-}
-
-interface ImpactChain {
-  id: string;
-  root_document_id: string;
-  affected_document_id: string;
-  impact_path: string[];
-  impact_level: ImpactLevel;
 } 

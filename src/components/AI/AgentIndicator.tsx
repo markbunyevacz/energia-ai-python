@@ -1,7 +1,7 @@
-// import React from 'react';
+import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Brain, FileText, Search, Shield } from 'lucide-react';
-import { AgentType } from '@/services/aiAgentRouter';
+import { AgentType } from '@/core-legal-platform/routing/AIAgentRouter';
 
 interface AgentIndicatorProps {
   agentType: AgentType;

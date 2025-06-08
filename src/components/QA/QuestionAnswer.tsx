@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useOptimizedSearch } from '@/hooks/useOptimizedSearch';
-import { optimizedDocumentService } from '@/services/optimizedDocumentService';
-import { conversationContextManager } from '@/services/conversationContext';
+import optimizedDocumentService from '@/core-legal-platform/document/optimizedDocumentService';
+import { conversationContextManager } from '@/core-legal-platform/common/conversationContext';
 import { toast } from 'sonner';
 import { QuestionInput } from './QuestionInput';
 import { SuggestedQuestions } from './SuggestedQuestions';
 import { QAHistory } from './QAHistory';
+import { Button } from '@/components/ui/button';
+import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
 
 interface QASession {
   id: string;

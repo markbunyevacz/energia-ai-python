@@ -257,3 +257,16 @@ The real implementation provides comprehensive performance tracking:
 - Graceful error handling with meaningful messages
 - Resource limits on embedding service calls
 - Transaction safety for database operations 
+
+export interface ProcessingRule {
+  type: 'keyword_extraction' | 'risk_assessment';
+  parameters: Record<string, any>;
+}
+
+export interface LegalDomain {
+  code: string; // e.g., 'energy', 'tax', 'labor'
+  name: string;
+  description: text;
+  documentTypes: string[]; // e.g., 'contract', 'regulation'
+  processingRules: ProcessingRule[];
+} 

@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Send, Loader2 } from 'lucide-react';
-import { aiAgentRouter, AgentContext } from '@/services/aiAgentRouter';
-import { conversationContextManager } from '@/services/conversationContext';
+import AIAgentRouter, { AgentContext, AgentResponse } from '@/core-legal-platform/routing/AIAgentRouter';
+import { conversationContextManager } from '@/core-legal-platform/common/conversationContext';
 import { AgentIndicator } from '@/components/AI/AgentIndicator';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/components/ui/use-toast';
 
 interface QuestionInputProps {
   onSubmit: (question: string, agentType?: string, conversationContext?: any) => void;
@@ -26,10 +27,11 @@ export function QuestionInput({
   placeholder
 }: QuestionInputProps) {
   const [question, setQuestion] = useState('');
-  const [agentAnalysis, setAgentAnalysis] = useState<any>(null);
+  const [agentAnalysis, setAgentAnalysis] = useState<AgentResponse | null>(null);
   const { user, profile } = useAuth();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalQuestion = selectedQuestion || question;
     if (finalQuestion.trim() && user) {
@@ -48,21 +50,32 @@ export function QuestionInput({
         sessionHistory: currentContext?.messages || []
       };
 
-      const analysis = aiAgentRouter.analyzeQuestion(finalQuestion, context);
-      setAgentAnalysis(analysis);
-      
-      // Prepare conversation context for the API
-      const conversationContext = {
-        sessionId: sessionId,
-        currentTopic: currentContext?.currentTopic,
-        recentQuestions: recentQuestions,
-        userRole: profile?.role || 'jogász',
-        messageCount: currentContext?.messages.length || 0
-      };
+      try {
+        const analysis = await AIAgentRouter.analyzeQuestion(finalQuestion, context);
+        setAgentAnalysis(analysis);
+        
+        // Prepare conversation context for the API
+        const conversationContext = {
+          sessionId: sessionId,
+          currentTopic: currentContext?.currentTopic,
+          recentQuestions: recentQuestions,
+          userRole: profile?.role || 'jogász',
+          messageCount: currentContext?.messages.length || 0
+        };
 
-      onSubmit(analysis.suggestedPrompt, analysis.agentType, conversationContext);
-      setQuestion('');
-      onQuestionChange('');
+        onSubmit(analysis.suggestedPrompt, analysis.agentType, conversationContext);
+        setQuestion('');
+        onQuestionChange('');
+      } catch (error) {
+        console.error("Error analyzing question:", error);
+        toast({
+          title: "Hiba a kérdés elemzése során",
+          description: "Nem sikerült meghatározni a megfelelő AI ágenst. Kérjük, próbálja újra.",
+          variant: "destructive",
+        });
+        // Fallback to sending the raw question
+        onSubmit(finalQuestion);
+      }
     }
   };
 

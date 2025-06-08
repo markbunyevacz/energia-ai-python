@@ -1,20 +1,11 @@
-import { LegalDomain } from '../types';
-import { DomainService } from './DomainService';
-import NodeCache from 'node-cache';
+import { supabase } from '@/integrations/supabase/client';
+import { LegalDomain, LegalDomainRow } from '../types';
 
 export class DomainRegistry {
   private static instance: DomainRegistry;
-  private domainService: DomainService;
-  private cache: NodeCache;
   private domains: Map<string, LegalDomain> = new Map();
 
-  private constructor() {
-    this.domainService = DomainService.getInstance();
-    this.cache = new NodeCache({
-      stdTTL: 300, // 5 minutes
-      checkperiod: 60, // Check for expired keys every minute
-    });
-  }
+  private constructor() {}
 
   public static getInstance(): DomainRegistry {
     if (!DomainRegistry.instance) {
@@ -23,45 +14,48 @@ export class DomainRegistry {
     return DomainRegistry.instance;
   }
 
-  async registerDomain(domain: Omit<LegalDomain, 'id' | 'metadata'>): Promise<LegalDomain> {
-    const registered = await this.domainService.registerDomain(domain);
-    this.domains.set(domain.code, registered);
-    this.cache.set(domain.code, registered);
-    return registered;
-  }
+  public async loadDomainsFromDb(): Promise<void> {
+    const { data, error } = await supabase
+      .from('legal_domains')
+      .select('*')
+      .eq('active', true);
 
-  async getDomain(code: string): Promise<LegalDomain | null> {
-    const cached = this.cache.get<LegalDomain>(code);
-    if (cached) {
-      return cached;
+    if (error) {
+      console.error('Error loading domains:', error);
+      throw new Error('Could not load legal domains from the database.');
     }
 
-    const domain = await this.domains.get(code) || await this.domainService.getDomain(code);
-    if (domain) {
-      this.cache.set(code, domain);
-    }
-    return domain;
-  }
+    this.domains.clear();
+    data.forEach((row: LegalDomainRow) => {
+        // The 'agent_config' is not a direct column. We'll assume it's part of the metadata.
+        const metadata = row.metadata as Record<string, any> | null;
+        const agentConfig = metadata?.agent_config ?? {};
 
-  async listDomains(): Promise<LegalDomain[]> {
-    const domains = await this.domainService.listDomains();
-    domains.forEach(domain => {
-      this.domains.set(domain.code, domain);
-      this.cache.set(domain.code, domain);
+        const domain: LegalDomain = {
+            code: row.code,
+            name: row.name,
+            description: row.description ?? '',
+            documentTypes: row.document_types ?? [],
+            agentConfig: agentConfig,
+            active: row.active ?? true,
+        };
+        this.domains.set(domain.code, domain);
     });
-    return domains;
   }
 
-  async updateDomain(code: string, updates: Partial<LegalDomain>): Promise<LegalDomain> {
-    const updated = await this.domainService.updateDomain(code, updates);
-    this.domains.set(code, updated);
-    this.cache.set(code, updated);
-    return updated;
+  public getDomain(code: string): LegalDomain | null {
+    return this.domains.get(code) || null;
   }
 
-  async unregisterDomain(code: string): Promise<void> {
-    await this.domainService.unregisterDomain(code);
-    this.domains.delete(code);
-    this.cache.del(code);
+  public getActiveDomains(): LegalDomain[] {
+    return Array.from(this.domains.values());
+  }
+
+  public registerDomain(domain: LegalDomain): void {
+    if (this.domains.has(domain.code)) {
+        console.warn(`Domain with code "${domain.code}" is already registered. Overwriting.`);
+    }
+    this.domains.set(domain.code, domain);
+    console.log(`Domain "${domain.name}" registered successfully.`);
   }
 } 

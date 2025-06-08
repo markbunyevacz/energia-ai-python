@@ -1,5 +1,19 @@
+/**
+ * @file errorHandlingService.ts
+ * @description This file defines the centralized error handling service for the core legal platform.
+ * It provides a consistent way to process, classify, and log errors that occur anywhere
+ * in the application.
+ *
+ * This service is responsible for:
+ * - Normalizing different error types into a standard format.
+ * - Correlating related errors to identify root causes.
+ * - Determining if an error is retryable.
+ * - Logging errors to the appropriate sinks (e.g., console, remote logging service).
+ */
+
 import { ContractAnalysisError, ErrorCodes, ErrorCode } from '@/types/errors';
 import { LoggingService } from './loggingService';
+import { LegalDomain } from '@/core-legal-platform/legal-domains/types';
 
 /**
  * Error Handling Service
@@ -377,4 +391,14 @@ export class ErrorHandlingService {
   public getErrorStats() {
     return this.logger.getErrorStats();
   }
-} 
+}
+
+export const energyDomain: LegalDomain = {
+  code: 'energy',
+  name: 'Energiajog',
+  description: 'Az energia szektorra vonatkozó jogi szabályozások.',
+  documentTypes: ['contract', 'policy', 'regulation'],
+  processingRules: [
+    { type: 'risk_assessment', parameters: { riskKeywords: ['bírság', 'kötelezettségszegés'] } }
+  ]
+}; 
