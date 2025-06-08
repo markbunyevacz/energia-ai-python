@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './lib/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Login } from './pages/Login';
 import { ResetPasswordRequest } from './pages/ResetPasswordRequest';
 import { ResetPassword } from './pages/ResetPassword';
-import { AuthPage } from '@/pages/AuthPage';
 import { supabase } from '@/lib/supabase';
 import { LovableFrontend } from './components/LovableFrontend';
 import { Session } from '@supabase/supabase-js';
+import NotFoundPage from './pages/NotFound';
+import './App.css';
 
 /**
  * Main App Component
@@ -25,7 +26,7 @@ import { Session } from '@supabase/supabase-js';
  */
 export function App() {
   // Authentication state - stores current user session
-  const [session, setSession] = useState<Session | null>(null);
+  const [_session, setSession] = useState<Session | null>(null);
   
   // Loading state - prevents rendering routes until auth check is complete
   const [loading, setLoading] = useState<boolean>(true);
@@ -40,8 +41,8 @@ export function App() {
    */
   useEffect(() => {
     // Get current session on app initialization
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    supabase.auth.getSession().then(({ data: { session: _session } }) => {
+      setSession(_session);
       setLoading(false);
     });
 

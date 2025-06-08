@@ -60,25 +60,8 @@ export class DomainRegistry {
   }
 
   async unregisterDomain(code: string): Promise<void> {
+    await this.domainService.unregisterDomain(code);
     this.domains.delete(code);
     this.cache.del(code);
-  }
-
-  private validateDomain(domain: Omit<LegalDomain, 'id' | 'metadata'>): void {
-    if (!domain.code || !domain.name || !domain.description) {
-      throw new Error('Domain must have a code, name, and description');
-    }
-
-    if (!Array.isArray(domain.documentTypes)) {
-      throw new Error('Document types must be an array');
-    }
-
-    if (!Array.isArray(domain.processingRules)) {
-      throw new Error('Processing rules must be an array');
-    }
-
-    if (!Array.isArray(domain.complianceRequirements)) {
-      throw new Error('Compliance requirements must be an array');
-    }
   }
 } 

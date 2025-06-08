@@ -1,6 +1,7 @@
 import { DomainService } from '../registry/DomainService';
 import { LegalDomain } from '../types';
 import { supabase } from '../../../integrations/supabase/client';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockDomainData = {
   id: '1',
@@ -15,29 +16,29 @@ const mockDomainData = {
   updated_at: '2024-03-23T00:00:00Z',
 };
 
-jest.mock('../../../integrations/supabase/client', () => ({
+vi.mock('../../../integrations/supabase/client', () => ({
   supabase: {
-    from: jest.fn(() => ({
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(() => ({
+    from: vi.fn(() => ({
+      insert: vi.fn(() => ({
+        select: vi.fn(() => ({
+          single: vi.fn(() => ({
             data: mockDomainData,
             error: null,
           })),
         })),
       })),
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn(() => ({
             data: mockDomainData,
             error: null,
           })),
         })),
       })),
-      update: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          select: jest.fn(() => ({
-            single: jest.fn(() => ({
+      update: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          select: vi.fn(() => ({
+            single: vi.fn(() => ({
               data: mockDomainData,
               error: null,
             })),
@@ -68,7 +69,7 @@ describe('DomainService', () => {
 
   beforeEach(() => {
     service = DomainService.getInstance();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should register a new domain', async () => {
@@ -94,9 +95,9 @@ describe('DomainService', () => {
   });
 
   it('should list all domains', async () => {
-    (supabase.from as jest.Mock).mockImplementationOnce(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
+    (supabase.from as ReturnType<typeof vi.fn>).mockImplementationOnce(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
           data: [mockDomainData],
           error: null,
         })),
@@ -121,10 +122,10 @@ describe('DomainService', () => {
 
   it('should handle errors when registering a domain', async () => {
     const error = new Error('Database error');
-    (supabase.from as jest.Mock).mockImplementationOnce(() => ({
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(() => ({
+    (supabase.from as ReturnType<typeof vi.fn>).mockImplementationOnce(() => ({
+      insert: vi.fn(() => ({
+        select: vi.fn(() => ({
+          single: vi.fn(() => ({
             data: null,
             error,
           })),

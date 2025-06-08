@@ -1,4 +1,4 @@
-import { CrossDomainImpactAnalyzer } from '../impact-analysis/CrossDomainImpactAnalyzer';
+import { CrossDomainImpactAnalyzer, CrossDomainImpact } from '../impact-analysis/CrossDomainImpactAnalyzer';
 import { AgentConfig, AgentContext } from '../base-agents/BaseAgent';
 import { LegalDocument } from '../../legal-domains/types';
 import { supabase } from '../../../integrations/supabase/client';
@@ -18,12 +18,8 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
         id: 'cross-domain-analyzer',
         name: 'Cross-Domain Impact Analyzer',
         description: 'Integration test configuration',
-        maxConcurrentTasks: 1,
-        timeout: 30000,
-        retryConfig: {
-            maxRetries: 2,
-            delayMs: 1000
-        }
+        domainCode: 'cross-domain',
+        enabled: true,
     };
 
     beforeAll(async () => {
@@ -56,6 +52,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         const context: AgentContext = {
             document: energyDocument,
+            domain: 'energy',
             metadata: { domain: 'energy' }
         };
 
@@ -72,7 +69,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         // Verify cross-domain detection
         if (analysisResult.impacts.length > 0) {
-            const crossDomainImpact = analysisResult.impacts.find(impact => 
+            const crossDomainImpact = analysisResult.impacts.find((impact: CrossDomainImpact) => 
                 impact.domain !== 'energy'
             );
             expect(crossDomainImpact).toBeDefined();
@@ -96,6 +93,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         const context: AgentContext = {
             document: regulatoryDocument,
+            domain: 'regulatory',
             metadata: { domain: 'regulatory' }
         };
 
@@ -111,7 +109,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         // Verify contract analysis integration
         if (analysisResult.impacts.length > 0) {
-            const impactWithContractAnalysis = analysisResult.impacts.find(impact => 
+            const impactWithContractAnalysis = analysisResult.impacts.find((impact: CrossDomainImpact) => 
                 impact.contractAnalysis !== undefined
             );
             
@@ -140,6 +138,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         const context: AgentContext = {
             document: laborDocument,
+            domain: 'labor',
             metadata: { domain: 'labor' }
         };
 
@@ -151,14 +150,14 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
             const impacts = result.data.impacts;
             
             // Verify risk scores are realistic
-            impacts.forEach(impact => {
+            impacts.forEach((impact: CrossDomainImpact) => {
                 expect(impact.riskScore).toBeGreaterThanOrEqual(0);
                 expect(impact.riskScore).toBeLessThanOrEqual(1);
                 expect(typeof impact.riskScore).toBe('number');
             });
 
             // Verify impact chain structure
-            impacts.forEach(impact => {
+            impacts.forEach((impact: CrossDomainImpact) => {
                 expect(Array.isArray(impact.impactChain)).toBe(true);
                 expect(impact.impactChain.length).toBeGreaterThan(0);
             });
@@ -182,6 +181,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         const context: AgentContext = {
             document: invalidDocument,
+            domain: 'test',
             metadata: { domain: 'test' }
         };
 
@@ -234,12 +234,11 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
         // Also create some citation relationships for impact chain testing
         if (testDocumentIds.length >= 2) {
             await supabase
-                .from('citation_relationships')
+                .from('citation_edges')
                 .insert({
                     source_document_id: testDocumentIds[0],
                     target_document_id: testDocumentIds[1],
                     citation_type: 'explicit',
-                    confidence_score: 0.8,
                     metadata: { test: true }
                 });
         }
@@ -248,10 +247,10 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
     async function cleanupTestDocuments(): Promise<void> {
         // Clean up test citation relationships
         await supabase
-            .from('citation_relationships')
+            .from('citation_edges')
             .delete()
             .in('source_document_id', testDocumentIds);
-
+        
         // Clean up test documents
         await supabase
             .from('legal_documents')

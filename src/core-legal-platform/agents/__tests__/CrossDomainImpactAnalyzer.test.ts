@@ -2,6 +2,16 @@ import { CrossDomainImpactAnalyzer } from '../impact-analysis/CrossDomainImpactA
 import { AgentConfig, AgentContext } from '../base-agents/BaseAgent';
 import { LegalDocument } from '../../legal-domains/types';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { supabase } from '../../../integrations/supabase/client';
+
+// Mock the supabase client
+vi.mock('../../../integrations/supabase/client', () => ({
+  supabase: {
+    from: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    in: vi.fn().mockResolvedValue({ data: [], error: null }),
+  },
+}));
 
 // NOTE: These are unit tests that heavily rely on mocking external services.
 // For a complete validation of the agent's functionality, integration tests
@@ -28,6 +38,10 @@ describe('CrossDomainImpactAnalyzer', () => {
     beforeEach(() => {
         analyzer = new CrossDomainImpactAnalyzer(config);
         vi.clearAllMocks();
+        vi.spyOn(supabase, 'from').mockReturnValue({
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockResolvedValue({ data: [], error: null }),
+        } as any);
     });
 
     describe('Domain Independence Tests', () => {
@@ -116,7 +130,7 @@ describe('CrossDomainImpactAnalyzer', () => {
             const result = await processDocumentWithMocks(doc, 'regulatory');
 
             expect(result.data.visualization).toContain('graph TD');
-            expect(result.data.visualization).toContain('cross-domain');
+            expect(result.data.visualization).toContain('regulatory');
             expect(result.data.visualization).toContain('-->');
         });
 

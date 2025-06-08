@@ -1,8 +1,6 @@
 import { supabase } from '../../../integrations/supabase/client';
-import { LegalDomain } from '../types';
-import type { Database } from '@/integrations/supabase/types';
-import type { AgentContext, LegalDocument } from '@/types';
-// import { BatchProcessor } from '../../../utils/BatchProcessor'; // Commented out - module not found
+import { LegalDomain, DocumentType } from '../types';
+import type { Database } from '../../../integrations/supabase/types';
 
 export class DomainService {
   private static instance: DomainService;
@@ -90,27 +88,31 @@ export class DomainService {
     return this.mapToDomain(data);
   }
 
+  async unregisterDomain(code: string): Promise<void> {
+    const { error } = await supabase
+      .from('legal_domains')
+      .delete()
+      .eq('code', code);
+
+    if (error) {
+      throw new Error(`Failed to unregister domain: ${error.message}`);
+    }
+  }
+
   private mapToDomain(data: Database['public']['Tables']['legal_domains']['Row']): LegalDomain {
     return {
       id: data.id,
       code: data.code,
       name: data.name,
-      description: data.description || undefined,
-      active: true,
-      documentTypes: [],
-      processingRules: [],
-      complianceRequirements: [],
+      description: data.description ?? undefined,
+      active: data.active,
+      documentTypes: (data.document_types as DocumentType[]) ?? [],
+      processingRules: data.processing_rules ? JSON.parse(data.processing_rules as string) : [],
+      complianceRequirements: data.compliance_requirements ? JSON.parse(data.compliance_requirements as string) : [],
       metadata: {
         created_at: data.created_at,
         updated_at: data.updated_at,
       },
     };
-  }
-
-  protected async getDocument(documentId: string, user?: AgentContext['user']): Promise<LegalDocument | null> {
-    // Standard auth check
-    // Standard cache check  
-    // Standard error handling
-    return null; // TODO: Implement document retrieval
   }
 } 

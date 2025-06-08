@@ -337,64 +337,41 @@ export class CrossDomainImpactAnalyzer extends BaseAgent {
      */
     private getImpactChainVisualization(impacts: CrossDomainImpact[]): string {
         if (impacts.length === 0) {
-            return 'graph TD;\n    A["No cross-domain impacts found"];';
+            return '';
         }
 
-        let mermaidString = 'graph TD;\n';
-        const nodes = new Set<string>();
-        const edges = new Set<string>();
+        let diagram = 'graph TD;';
+        const nodeIds = new Set<string>();
 
         for (const impact of impacts) {
             const sourceId = this.sanitizeNodeId(impact.sourceDocument.id);
+            if (!nodeIds.has(sourceId)) {
+                diagram += `\n    ${sourceId}["${this.truncateTitle(impact.sourceDocument.title)}<br/>(${impact.sourceDocument.domainId})"];`;
+                nodeIds.add(sourceId);
+            }
+
             const impactedId = this.sanitizeNodeId(impact.impactedDocument.id);
-
-            // Add source node with domain info
-            if (!nodes.has(sourceId)) {
-                const sourceTitle = this.truncateTitle(impact.sourceDocument.title);
-                const sourceDomain = impact.sourceDocument.metadata.domain || 'unknown';
-                mermaidString += `    ${sourceId}["${sourceTitle}<br/>(${sourceDomain})"]\n`;
-                nodes.add(sourceId);
+            if (!nodeIds.has(impactedId)) {
+                diagram += `\n    ${impactedId}["🟢 ${this.truncateTitle(impact.impactedDocument.title)}<br/>(${impact.domain})"];`;
+                nodeIds.add(impactedId);
             }
+            
+            diagram += `\n    ${sourceId} -->|"Risk: ${impact.riskScore.toFixed(2)}"| ${impactedId};`;
 
-            // Add impacted node with domain and risk info
-            if (!nodes.has(impactedId)) {
-                const impactTitle = this.truncateTitle(impact.impactedDocument.title);
-                const riskColor = impact.riskScore > 0.7 ? '🔴' : impact.riskScore > 0.4 ? '🟡' : '🟢';
-                mermaidString += `    ${impactedId}["${riskColor} ${impactTitle}<br/>(${impact.domain})"]\n`;
-                nodes.add(impactedId);
-            }
-
-            // Add main relationship edge with risk score
-            const riskLabel = `Risk: ${impact.riskScore.toFixed(2)}`;
-            const mainEdge = `${sourceId} -->|"${riskLabel}"| ${impactedId}`;
-            if (!edges.has(mainEdge)) {
-                mermaidString += `    ${mainEdge};\n`;
-                edges.add(mainEdge);
-            }
-
-            // Add impact chain nodes and edges
-            for (let i = 0; i < impact.impactChain.length - 1; i++) {
-                const fromId = this.sanitizeNodeId(impact.impactChain[i]);
-                const toId = this.sanitizeNodeId(impact.impactChain[i + 1]);
-
-                if (!nodes.has(fromId)) {
-                    mermaidString += `    ${fromId}["Doc ${fromId.substring(0, 8)}"]\n`;
-                    nodes.add(fromId);
+            // Add the rest of the impact chain
+            let prevNode = impactedId;
+            for (let i = 1; i < impact.impactChain.length; i++) {
+                const currentNodeId = this.sanitizeNodeId(impact.impactChain[i]);
+                if (!nodeIds.has(currentNodeId)) {
+                    diagram += `\n    ${currentNodeId}["Doc ${this.truncateTitle(impact.impactChain[i])}"];`;
+                    nodeIds.add(currentNodeId);
                 }
-                if (!nodes.has(toId)) {
-                    mermaidString += `    ${toId}["Doc ${toId.substring(0, 8)}"]\n`;
-                    nodes.add(toId);
-                }
-
-                const chainEdge = `${fromId} --> ${toId}`;
-                if (!edges.has(chainEdge)) {
-                    mermaidString += `    ${chainEdge};\n`;
-                    edges.add(chainEdge);
-                }
+                diagram += `\n    ${prevNode} --> ${currentNodeId};`;
+                prevNode = currentNodeId;
             }
         }
 
-        return mermaidString;
+        return diagram;
     }
 
     /**

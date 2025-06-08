@@ -26,7 +26,10 @@
 
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
-import './index.css'
+// import './index.css'
+import { ClerkProvider } from '@clerk/clerk-react';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Get the root DOM element where the React app will be mounted
 // The non-null assertion (!) is safe because the element is guaranteed to exist in index.html

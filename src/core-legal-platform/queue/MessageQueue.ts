@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
+import { supabase } from '../../integrations/supabase/client';
+import type { Database } from '../../integrations/supabase/types';
 import { EventEmitter } from 'events';
 
 type QueueMessage = {
@@ -59,7 +59,7 @@ export class MessageQueue extends EventEmitter {
     for (const message of messages) {
       try {
         await this.processMessage(message);
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Error processing message ${message.id}:`, error);
         await this.updateMessageStatus(message.id, 'failed', error.message);
       }

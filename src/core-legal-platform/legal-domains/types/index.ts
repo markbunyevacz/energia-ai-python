@@ -16,7 +16,11 @@ export interface LegalDomain {
   id: string;
   code: string;
   name: string;
-  description: string;
+  description?: string;
+  active: boolean;
+  documentTypes: DocumentType[];
+  processingRules: any[];
+  complianceRequirements: any[];
   metadata: {
     created_at: string;
     updated_at: string;

@@ -3,29 +3,30 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { ProcessedDocument, Domain } from '../types';
 import { CitationError } from '../errors';
 import { DocumentMetadata } from '@/lib/claude';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // Mock Supabase client
 const mockSupabase = {
-  from: jest.fn().mockReturnThis(),
-  select: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
-  insert: jest.fn().mockReturnThis(),
-  update: jest.fn().mockReturnThis(),
-  rpc: jest.fn().mockReturnThis(),
-  then: jest.fn().mockResolvedValue({ data: [], error: null })
+  from: vi.fn().mockReturnThis(),
+  select: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  rpc: vi.fn().mockReturnThis(),
+  then: vi.fn().mockResolvedValue({ data: [], error: null })
 } as unknown as SupabaseClient;
 
 // Mock OpenAI embeddings
-jest.mock('@langchain/openai', () => ({
-  OpenAIEmbeddings: jest.fn().mockImplementation(() => ({
-    embedQuery: jest.fn().mockResolvedValue([0.1, 0.2, 0.3])
+vi.mock('@langchain/openai', () => ({
+  OpenAIEmbeddings: vi.fn().mockImplementation(() => ({
+    embedQuery: vi.fn().mockResolvedValue([0.1, 0.2, 0.3])
   }))
 }));
 
 // Mock vector store
-jest.mock('@langchain/community/vectorstores/supabase', () => ({
-  SupabaseVectorStore: jest.fn().mockImplementation(() => ({
-    similaritySearchWithScore: jest.fn().mockResolvedValue([
+vi.mock('@langchain/community/vectorstores/supabase', () => ({
+  SupabaseVectorStore: vi.fn().mockImplementation(() => ({
+    similaritySearchWithScore: vi.fn().mockResolvedValue([
       [{ metadata: { id: 'doc1' } }, 0.8],
       [{ metadata: { id: 'doc2' } }, 0.6]
     ])
@@ -47,7 +48,7 @@ describe('CitationExtractor', () => {
 
   beforeEach(() => {
     extractor = new CitationExtractor(mockSupabase, mockOpenAiKey);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('extractCitations', () => {
@@ -65,7 +66,7 @@ describe('CitationExtractor', () => {
     });
 
     it('should handle extraction errors gracefully', async () => {
-      jest.spyOn(extractor as any, 'extractExplicitCitations')
+      vi.spyOn(extractor as any, 'extractExplicitCitations')
         .mockRejectedValue(new Error('Test error'));
 
       await expect(extractor.extractCitations(mockDocument))

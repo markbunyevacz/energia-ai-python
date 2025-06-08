@@ -679,6 +679,10 @@ export type Database = {
           code: string
           name: string
           description: string | null
+          active: boolean
+          document_types: string[]
+          processing_rules: Json | null
+          compliance_requirements: Json | null
           parent_domain_id: string | null
           metadata: Json | null
           created_at: string
@@ -689,6 +693,10 @@ export type Database = {
           code: string
           name: string
           description?: string | null
+          active?: boolean
+          document_types?: string[]
+          processing_rules?: Json | null
+          compliance_requirements?: Json | null
           parent_domain_id?: string | null
           metadata?: Json | null
           created_at?: string
@@ -699,6 +707,10 @@ export type Database = {
           code?: string
           name?: string
           description?: string | null
+          active?: boolean
+          document_types?: string[]
+          processing_rules?: Json | null
+          compliance_requirements?: Json | null
           parent_domain_id?: string | null
           metadata?: Json | null
           created_at?: string
