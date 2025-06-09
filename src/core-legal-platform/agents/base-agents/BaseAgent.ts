@@ -92,7 +92,7 @@ export abstract class BaseAgent {
   public async processWithTelemetry(context: AgentContext): Promise<AgentResult & { interactionId: string }> {
     const startTime = Date.now();
     const interactionId = context.document?.id || uuidv4();
-
+    
     try {
       const result = await this.process(context);
       const responseTimeMs = Date.now() - startTime;
