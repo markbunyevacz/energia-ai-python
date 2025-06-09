@@ -4,13 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useMoE } from '@/contexts/MoEProvider';
-
-// Domain and Agent imports
+import { ThumbsUp, ThumbsDown, MessageSquarePlus } from 'lucide-react';
+import { FeedbackService } from '@/core-legal-platform/feedback/FeedbackService';
+import { UserFeedback, FeedbackCategory } from '@/core-legal-platform/feedback/types';
+import { v4 as uuidv4 } from 'uuid';
 import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
 import { energyDomain } from '@/core-legal-platform/domains/energy/energy.domain';
 import { generalDomain } from '@/core-legal-platform/domains/general/general.domain';
@@ -169,12 +173,19 @@ export function LovableFrontend() {
   const [recommendedAgents, setRecommendedAgents] = useState<AgentScore[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<BaseAgent | null>(null);
   const [confidenceThreshold, setConfidenceThreshold] = useState(0.7);
+  const [currentInteractionId, setCurrentInteractionId] = useState<string | null>(null);
+  const [feedbackService] = useState(() => new FeedbackService(supabase));
   
   /** 
    * Error state for user feedback and debugging
    * Displays localized error messages in Hungarian
    */
   const [error, setError] = useState<string | null>(null);
+  const [feedbackGiven, setFeedbackGiven] = useState<'up' | 'down' | null>(null);
+  const [detailedFeedbackOpen, setDetailedFeedbackOpen] = useState(false);
+  const [feedbackCategory, setFeedbackCategory] = useState<FeedbackCategory | ''>('');
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [feedbackSuggestion, setFeedbackSuggestion] = useState('');
 
   // ============================================================================
   // INITIALIZATION
@@ -242,6 +253,8 @@ export function LovableFrontend() {
       }
 
       setFile(selectedFile);
+      setResult(null);
+      setFeedbackGiven(null);
     }
   };
 
@@ -303,6 +316,8 @@ export function LovableFrontend() {
     setResult(null);
     setRecommendedAgents([]);
     setSelectedAgent(null);
+    setCurrentInteractionId(null);
+    setFeedbackGiven(null);
 
     try {
       // For routing, we don't need the full text, just some metadata.
@@ -351,88 +366,121 @@ export function LovableFrontend() {
    * @param agent The agent chosen by the user.
    */
   const handleExecuteAnalysis = async (agent: BaseAgent) => {
-    if (!file) return; // Should not happen if we have a selected agent
-
-    setSelectedAgent(agent);
+    if (!file) {
+      setError('Kérlek, válassz egy fájlt az elemzéshez.');
+      return;
+    }
     setLoading(true);
     setError(null);
     setResult(null);
-    setProgress('Dokumentum szövegének kinyerése...');
+    setSelectedAgent(agent);
+    setFeedbackGiven(null); // Reset feedback state for new analysis
+    setCurrentInteractionId(null); // Reset interaction ID
 
     try {
-      const textContent = await extractTextFromFile(file);
-      setProgress('Elemzés folyamatban...');
+      const fileContent = await extractTextFromFile(file);
 
-      const legalDocument: LegalDocument = {
-        id: file.name, // Using file name as a temporary ID
+      const doc: LegalDocument = {
+        id: file.name,
         title: file.name,
-        content: textContent,
-        documentType: 'other', // TODO: Make this dynamic and align with schema
+        content: fileContent,
+        documentType: 'other',
         domainId: agent.getConfig().domainCode,
         metadata: {
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
         }
       };
-      
+
       const userContext = await conversationContextManager.getContext(user?.id || 'anonymous');
       
       const agentContext: AgentContext = {
-        document: legalDocument,
-        domain: agent.getConfig().domainCode,
-        user: user ? { id: user.id, role: 'jogász', permissions: [] } : undefined,
-        conversationHistory: userContext?.messages || []
+          document: doc,
+          domain: agent.getConfig().domainCode,
+          user: user ? { id: user.id, role: user.role || 'user', permissions: [] } : undefined,
+          conversationHistory: userContext?.messages,
+          metadata: { sessionId: user?.id || 'anonymous' }
       };
 
-      const analysisResult: AgentResult = await agent.process(agentContext);
+      // Use the new telemetry wrapper
+      const agentResult = await agent.processWithTelemetry(agentContext);
 
-      if (analysisResult.success) {
-        // Adapt the agent result to the format the UI expects
-        const uiResult: AnalysisResult = {
-          id: new Date().toISOString(),
-          risk_level: analysisResult.data.risk_level || 'low',
-          summary: analysisResult.data.summary || 'Nincs összegzés.',
-          recommendations: analysisResult.data.recommendations || [],
-          risks: analysisResult.data.risks || [],
-          status: 'completed'
-        };
-        setResult(uiResult);
-
-        // Update conversation context
+      if (agentResult.success) {
+        setResult(agentResult.data);
+        setCurrentInteractionId(agentResult.data.interactionId); // Capture interaction ID
+        
         await conversationContextManager.updateContext(
-          user?.id || 'anonymous', 
+          user?.id || 'anonymous',
           {
-            question: notes,
-            answer: uiResult.summary,
+            question: notes || `Analyze: ${file.name}`,
+            answer: agentResult.data.summary || 'Analysis complete.',
             agentType: agent.getConfig().id,
             sources: [file.name]
           },
-          user?.id
+          user?.id,
+          user?.role || 'user'
         );
 
       } else {
-        throw analysisResult.error || new Error(analysisResult.message);
+        setError(agentResult.message);
       }
-
     } catch (err: any) {
-      setError(`Hiba történt az elemzés során: ${err.message}`);
-      console.error(err);
-      setResult({
-        id: 'error',
-        risk_level: 'low',
-        summary: 'Hiba történt.',
-        recommendations: [],
-        risks: [],
-        status: 'failed'
-      });
+      console.error("Analysis execution error:", err);
+      setError(err.message || 'Ismeretlen hiba történt az elemzés során.');
     } finally {
       setLoading(false);
-      setProgress(null);
+    }
+  };
+
+  const handleFeedback = async (rating: 'up' | 'down') => {
+    if (!currentInteractionId || !selectedAgent) return;
+
+    setFeedbackGiven(rating);
+
+    const feedback: UserFeedback = {
+      interactionId: currentInteractionId,
+      agentId: selectedAgent.getConfig().id,
+      userId: user?.id,
+      timestamp: new Date(),
+      rating: rating,
+    };
+    try {
+      await feedbackService.collectFeedback(feedback);
+    } catch (err) {
+      // Log the error, but don't bother the user as the primary action (rating) is visually complete.
+      console.error("Failed to submit simple feedback:", err);
+    }
+  };
+
+  const handleDetailedFeedbackSubmit = async () => {
+    if (!currentInteractionId || !selectedAgent || !feedbackCategory) return;
+
+    const feedback: UserFeedback = {
+        interactionId: currentInteractionId,
+        agentId: selectedAgent.getConfig().id,
+        timestamp: new Date(),
+        rating: feedbackGiven ?? undefined,
+        category: feedbackCategory,
+        comments: feedbackComment,
+        suggestedCorrection: feedbackSuggestion,
+    };
+
+    try {
+        await feedbackService.collectFeedback(feedback);
+        console.log('Detailed feedback collected successfully');
+        // Reset and close the modal
+        setDetailedFeedbackOpen(false);
+        setFeedbackCategory('');
+        setFeedbackComment('');
+        setFeedbackSuggestion('');
+    } catch (err) {
+        console.error("Error submitting detailed feedback:", err);
+        // Optionally show an error message within the modal
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 max-w-4xl">
       <div className="grid gap-6">
         <Card>
           <CardHeader>
@@ -516,51 +564,121 @@ export function LovableFrontend() {
           </Card>
         )}
 
-        {result && (
-          <Card className="mt-6">
+        {result && result.status === 'completed' && (
+          <Card className="mt-6 bg-slate-50">
             <CardHeader>
-              <CardTitle>Elemzési eredmény</CardTitle>
-              <CardDescription>
-                A(z) "{selectedAgent?.getConfig().name || 'AI'}" ügynök által végzett elemzés eredménye.
-              </CardDescription>
+              <CardTitle>Elemzési Eredmények</CardTitle>
+              <CardDescription>{result.summary}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Kockázati szint</Label>
-                <p className={`font-bold ${
-                  result.risk_level === 'high' ? 'text-red-500' :
-                  result.risk_level === 'medium' ? 'text-yellow-500' :
-                  'text-green-500'
-                }`}>
-                  {result.risk_level === 'high' ? 'Magas' : result.risk_level === 'medium' ? 'Közepes' : 'Alacsony'}
-                </p>
-              </div>
-              <div>
-                <Label>Összefoglaló</Label>
-                <p>{result.summary}</p>
-              </div>
-              <div>
-                <Label>Javaslatok</Label>
-                <ul className="list-disc list-inside text-sm text-gray-600">
-                  {result.recommendations.map((recommendation: string, index: number) => (
-                    <li key={index}>{recommendation}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <Label>Kockázatok</Label>
-                <ul className="list-disc list-inside text-sm text-gray-600">
-                  {result.risks.map((risk: AnalysisRisk, index: number) => (
-                    <div key={index} className="border-t pt-4">
-                      <h4 className="font-semibold">{risk.type} (Súlyosság: {risk.severity})</h4>
-                      <p className="text-sm text-muted-foreground">Érintett szakasz: {risk.section}</p>
-                      <p>{risk.description}</p>
-                      <p className="mt-2 text-sm">
-                        <span className="font-semibold">Javaslat:</span> {risk.recommendation}
-                      </p>
-                    </div>
-                  ))}
-                </ul>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold">Kockázati Szint:</h3>
+                  <p className={`font-bold ${
+                    result.risk_level === 'high' ? 'text-red-600' :
+                    result.risk_level === 'medium' ? 'text-yellow-600' :
+                    'text-green-600'
+                  }`}>
+                    {result.risk_level.toUpperCase()}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Összefoglaló:</h3>
+                  <p className="text-sm">{result.summary}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Javaslatok:</h3>
+                  <ul className="list-disc pl-5 text-sm">
+                    {result.recommendations.map((rec, index) => (
+                      <li key={index}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+                {/* Feedback Section */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-semibold text-center mb-2">Hasznos volt ez a válasz?</h4>
+                  <div className="flex justify-center items-center space-x-4">
+                    <Button
+                      variant={feedbackGiven === 'up' ? 'default' : 'outline'}
+                      size="icon"
+                      onClick={() => handleFeedback('up')}
+                      disabled={!!feedbackGiven}
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={feedbackGiven === 'down' ? 'destructive' : 'outline'}
+                      size="icon"
+                      onClick={() => handleFeedback('down')}
+                      disabled={!!feedbackGiven}
+                    >
+                      <ThumbsDown className="h-4 w-4" />
+                    </Button>
+                    <Dialog open={detailedFeedbackOpen} onOpenChange={setDetailedFeedbackOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <MessageSquarePlus className="h-4 w-4 mr-2" /> Részletes visszajelzés
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Részletes visszajelzés</DialogTitle>
+                          <DialogDescription>
+                            Segítsen nekünk jobban teljesíteni. Adja meg, mi volt a probléma.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="category" className="text-right">
+                              Kategória
+                            </Label>
+                            <Select onValueChange={(value) => setFeedbackCategory(value as FeedbackCategory)} value={feedbackCategory}>
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Válasszon egy kategóriát" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Inaccurate Information">Pontatlan információ</SelectItem>
+                                <SelectItem value="Unhelpful Response">Nem segítőkész válasz</SelectItem>
+                                <SelectItem value="Formatting Issue">Formázási probléma</SelectItem>
+                                <SelectItem value="Other">Egyéb</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="comment" className="text-right">
+                              Megjegyzés
+                            </Label>
+                            <Textarea
+                              id="comment"
+                              value={feedbackComment}
+                              onChange={(e) => setFeedbackComment(e.target.value)}
+                              className="col-span-3"
+                              placeholder="Kérjük, fejtse ki bővebben..."
+                            />
+                          </div>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="suggestion" className="text-right">
+                              Javaslat
+                            </Label>
+                            <Textarea
+                              id="suggestion"
+                              value={feedbackSuggestion}
+                              onChange={(e) => setFeedbackSuggestion(e.target.value)}
+                              className="col-span-3"
+                              placeholder="Hogyan nézett volna ki egy jobb válasz?"
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button type="button" variant="secondary">Mégse</Button>
+                          </DialogClose>
+                          <Button type="submit" onClick={handleDetailedFeedbackSubmit} disabled={!feedbackCategory}>Küldés</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

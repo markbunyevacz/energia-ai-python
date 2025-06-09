@@ -6,6 +6,7 @@ import NodeCache from 'node-cache';
 import { supabase } from '@/integrations/supabase/client';
 import { AgentSecurityError } from '@/core-legal-platform/agents/example/ExampleAgent';
 import { ConversationMessage } from '../../common/conversationContext';
+import { v4 as uuidv4 } from 'uuid';
 
 type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
 type DbLegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
@@ -85,7 +86,55 @@ export abstract class BaseAgent {
   public abstract initialize(): Promise<void>;
 
   /**
-   * Process a document using the agent's specific logic
+   * Wraps the process method to include performance logging and error handling.
+   * This is the public-facing method that should be called by the router.
+   */
+  public async processWithTelemetry(context: AgentContext): Promise<AgentResult & { interactionId: string }> {
+    const startTime = Date.now();
+    const interactionId = context.document?.id || uuidv4();
+
+    try {
+      const result = await this.process(context);
+      const responseTimeMs = Date.now() - startTime;
+
+      await this.logInteractionMetrics({
+        interaction_id: interactionId,
+        agent_id: this.config.id,
+        user_id: context.user?.id,
+        response_time_ms: responseTimeMs,
+        confidence_score: result.data?.confidence ?? null,
+      });
+      
+      return { ...result, interactionId };
+
+    } catch (error) {
+      const responseTimeMs = Date.now() - startTime;
+      await this.logInteractionMetrics({
+        interaction_id: interactionId,
+        agent_id: this.config.id,
+        user_id: context.user?.id,
+        response_time_ms: responseTimeMs,
+        confidence_score: 0,
+      });
+      const agentResult = this.handleError(error as Error, context);
+      return { ...agentResult, interactionId };
+    }
+  }
+
+  /**
+   * Logs interaction metrics to the database.
+   */
+  private async logInteractionMetrics(metrics: Database['public']['Tables']['interaction_metrics']['Insert']) {
+    const { error } = await supabase.from('interaction_metrics').insert(metrics);
+    if (error) {
+      // We log the error but don't throw, as metrics logging should not fail the main process.
+      console.error(`[Metrics] Failed to log interaction metrics for agent ${this.config.id}:`, error);
+    }
+  }
+
+  /**
+   * Process a document using the agent's specific logic.
+   * This method should be implemented by subclasses.
    */
   public abstract process(context: AgentContext): Promise<AgentResult>;
 
@@ -112,7 +161,7 @@ export abstract class BaseAgent {
     for (let i = 0; i < validDocuments.length; i += chunkSize) {
       const chunk = validDocuments.slice(i, i + chunkSize);
       const chunkResults = await Promise.all(
-        chunk.map(doc => this.process({ document: doc, domain: this.config.domainCode, user }))
+        chunk.map(doc => this.processWithTelemetry({ document: doc, domain: this.config.domainCode, user }))
       );
       
       chunkResults.forEach(result => {

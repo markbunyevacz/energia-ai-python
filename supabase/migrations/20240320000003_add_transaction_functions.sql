@@ -5,8 +5,9 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- Start a new transaction
-  BEGIN;
+  -- This is a placeholder as transactions are implicit in functions.
+  -- The function exists for conceptual clarity in the application layer.
+  PERFORM 1;
 END;
 $$;
 
@@ -16,8 +17,8 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- Commit the current transaction
-  COMMIT;
+  -- This is a placeholder as transactions are implicit in functions.
+  PERFORM 1;
 END;
 $$;
 
@@ -27,8 +28,8 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- Rollback the current transaction
-  ROLLBACK;
+  -- This is a placeholder as transactions are implicit in functions.
+  PERFORM 1;
 END;
 $$;
 

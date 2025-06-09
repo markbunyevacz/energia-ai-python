@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- Create improved cross-domain similarity search function
 CREATE OR REPLACE FUNCTION find_cross_domain_similar_documents(
   query_embedding vector(1536),

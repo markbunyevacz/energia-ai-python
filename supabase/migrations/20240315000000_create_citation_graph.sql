@@ -1,7 +1,7 @@
 -- Create citation_nodes table
 CREATE TABLE IF NOT EXISTS citation_nodes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    document_id UUID NOT NULL REFERENCES documents(id),
+    document_id UUID NOT NULL REFERENCES legal_documents(id),
     title TEXT NOT NULL,
     type TEXT NOT NULL,
     date TIMESTAMP WITH TIME ZONE,
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS citation_edges (
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_citation_nodes_document_id ON citation_nodes(document_id);
 CREATE INDEX IF NOT EXISTS idx_citation_nodes_type ON citation_nodes(type);
-CREATE INDEX IF NOT EXISTS idx_citation_edges_source_id ON citation_edges(source_id);
-CREATE INDEX IF NOT EXISTS idx_citation_edges_target_id ON citation_edges(target_id);
-CREATE INDEX IF NOT EXISTS idx_citation_edges_type ON citation_edges(type);
+CREATE INDEX IF NOT EXISTS idx_citation_edges_source_id ON citation_edges(source_document_id);
+CREATE INDEX IF NOT EXISTS idx_citation_edges_target_id ON citation_edges(target_document_id);
+-- CREATE INDEX IF NOT EXISTS idx_citation_edges_type ON citation_edges(type);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

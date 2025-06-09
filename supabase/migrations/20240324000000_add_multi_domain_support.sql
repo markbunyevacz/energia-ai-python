@@ -1,14 +1,19 @@
--- Create legal_domains table
-CREATE TABLE IF NOT EXISTS legal_domains (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  code TEXT NOT NULL UNIQUE,
-  name TEXT NOT NULL,
-  description TEXT,
-  parent_domain_id UUID REFERENCES legal_domains(id),
-  metadata JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+-- Add parent_domain_id and metadata columns for hierarchical domains
+ALTER TABLE legal_domains
+ADD COLUMN IF NOT EXISTS parent_domain_id UUID REFERENCES legal_domains(id),
+ADD COLUMN IF NOT EXISTS metadata JSONB;
+
+-- Update column types to be more flexible
+ALTER TABLE legal_domains
+ALTER COLUMN code TYPE TEXT,
+ALTER COLUMN name TYPE TEXT;
+
+-- Drop columns that are not part of the multi-domain design
+ALTER TABLE legal_domains
+DROP COLUMN IF EXISTS active,
+DROP COLUMN IF EXISTS document_types,
+DROP COLUMN IF EXISTS processing_rules,
+DROP COLUMN IF EXISTS compliance_requirements;
 
 -- Create legal_hierarchy_level enum
 DO $$

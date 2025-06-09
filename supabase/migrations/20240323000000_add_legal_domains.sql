@@ -27,9 +27,10 @@ CREATE POLICY "Enable read access for authenticated users" ON legal_domains
 CREATE POLICY "Enable insert for admins" ON legal_domains
   FOR INSERT
   TO authenticated
-  USING (auth.role() = 'admin');
+  WITH CHECK (auth.role() = 'admin');
 
 CREATE POLICY "Enable update for admins" ON legal_domains
   FOR UPDATE
   TO authenticated
-  USING (auth.role() = 'admin'); 
+  USING (auth.role() = 'admin')
+  WITH CHECK (auth.role() = 'admin'); 

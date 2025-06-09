@@ -36,4 +36,16 @@ The `src` directory is organized to enforce a clean separation of concerns betwe
 4.  **Agent Execution**: The selected agent processes the request, potentially using other core services for document analysis, embedding generation, or database access.
 5.  **Response to UI**: The result is returned to the UI component, which then displays it to the user.
 
-This architecture ensures that the UI layer is completely decoupled from the core business logic, which in turn is decoupled from specific legal domains, creating a robust, maintainable, and extensible system. 
+This architecture ensures that the UI layer is completely decoupled from the core business logic, which in turn is decoupled from specific legal domains, creating a robust, maintainable, and extensible system.
+
+- **Security**: A robust security model to protect sensitive data. See [SECURITY_MODEL.md](./SECURITY_MODEL.md).
+
+## Human Feedback and Continuous Improvement
+
+To ensure the system learns and improves over time, a comprehensive human feedback loop is integrated into the agent pipeline. This system collects user feedback, analyzes agent performance, and automatically tunes agent behavior.
+
+- **For a detailed breakdown, see [Human Feedback System Architecture](./HUMAN_FEEDBACK_SYSTEM.md).**
+
+## Future Work
+
+To be determined. 
