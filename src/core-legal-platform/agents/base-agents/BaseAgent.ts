@@ -5,6 +5,7 @@ import type { Database } from '@/integrations/supabase/types';
 import NodeCache from 'node-cache';
 import { supabase } from '@/integrations/supabase/client';
 import { AgentSecurityError } from '@/core-legal-platform/agents/example/ExampleAgent';
+import { ConversationMessage } from '../../common/conversationContext';
 
 type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
 type DbLegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
@@ -40,6 +41,7 @@ export interface AgentContext {
     role: string;
     permissions: string[];
   };
+  conversationHistory?: ConversationMessage[];
 }
 
 export interface AgentResult {
@@ -272,13 +274,12 @@ export abstract class BaseAgent {
     return {
       id: dbDoc.id,
       title: dbDoc.title,
-      content: dbDoc.content,
+      content: dbDoc.content ?? '',
       documentType: dbDoc.document_type as DocumentType,
-      domainId: this.config.domainCode,
-      metadata: {
-        created_at: dbDoc.created_at,
-        updated_at: dbDoc.updated_at,
-      },
+      domainId: dbDoc.domain_id ?? '',
+      hierarchyLevel: dbDoc.hierarchy_level ?? undefined,
+      crossReferences: (dbDoc.cross_references as any) ?? [],
+      metadata: (dbDoc.metadata as any) ?? {},
     };
   }
 
@@ -291,7 +292,10 @@ export abstract class BaseAgent {
       content: doc.content,
       document_type: doc.documentType as 'law' | 'regulation' | 'policy' | 'decision' | 'other',
       source_url: null,
-      publication_date: null,
+      publication_date: new Date().toISOString(),
+      domain_id: doc.domainId,
+      hierarchy_level: doc.hierarchyLevel,
+      cross_references: doc.crossReferences,
     };
   }
 
@@ -321,6 +325,9 @@ export abstract class BaseAgent {
     try {
       const dbDoc = await this.documentService.getLegalDocument(documentId);
       const document = this.convertDbToLegalDocument(dbDoc);
+      if (dbDoc.content === null) {
+        dbDoc.content = '';
+      }
       this.documentCache.set(documentId, document);
       return document;
     } catch (error) {

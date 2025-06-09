@@ -340,7 +340,7 @@ export function LovableFrontend() {
         }
       };
       
-      const userContext = conversationContextManager.getContext(user?.id || 'anonymous');
+      const userContext = await conversationContextManager.getContext(user?.id || 'anonymous');
 
       const moeContext: MoEContext = {
         document: dummyDocument,
@@ -393,10 +393,13 @@ export function LovableFrontend() {
         }
       };
       
+      const userContext = await conversationContextManager.getContext(user?.id || 'anonymous');
+      
       const agentContext: AgentContext = {
         document: legalDocument,
         domain: agent.getConfig().domainCode,
-        user: user ? { id: user.id, role: 'jogász', permissions: [] } : undefined
+        user: user ? { id: user.id, role: 'jogász', permissions: [] } : undefined,
+        conversationHistory: userContext?.messages || []
       };
 
       const analysisResult: AgentResult = await agent.process(agentContext);
@@ -414,14 +417,16 @@ export function LovableFrontend() {
         setResult(uiResult);
 
         // Update conversation context
-        conversationContextManager.updateContext(user?.id || 'anonymous', {
-          id: uiResult.id,
-          question: notes,
-          answer: uiResult.summary,
-          agentType: agent.getConfig().id,
-          timestamp: new Date(),
-          sources: [file.name]
-        });
+        await conversationContextManager.updateContext(
+          user?.id || 'anonymous', 
+          {
+            question: notes,
+            answer: uiResult.summary,
+            agentType: agent.getConfig().id,
+            sources: [file.name]
+          },
+          user?.id
+        );
 
       } else {
         throw analysisResult.error || new Error(analysisResult.message);

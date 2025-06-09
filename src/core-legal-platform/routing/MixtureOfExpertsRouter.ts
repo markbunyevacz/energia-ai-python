@@ -37,7 +37,7 @@ export class MixtureOfExpertsRouter {
 
       const keywordScore = this.calculateKeywordScore(question, agentDomain);
       const contextScore = this.calculateContextScore(context, agentDomain);
-      const historyScore = this.calculateHistoryScore(context); // Placeholder
+      const historyScore = this.calculateHistoryScore(context, agent.getConfig().id);
 
       // Weighted average of scores
       const finalScore = (keywordScore * 0.5) + (contextScore * 0.3) + (historyScore * 0.2);
@@ -101,14 +101,16 @@ export class MixtureOfExpertsRouter {
     return factors > 0 ? score / factors : 0;
   }
 
-  private calculateHistoryScore(context: MoEContext): number {
-    // Placeholder for history-based scoring.
-    // This will be implemented once the persistent memory layer is in place.
-    if (context.conversation) {
-        // Example: Boost agents that were recently used
-        const recentAgents = context.conversation.messages.slice(-3).map(m => m.agentType);
-        // This logic is incomplete. We'd need to know which agent corresponds to which agentType string.
+  private calculateHistoryScore(context: MoEContext, agentId: string): number {
+    if (!context.conversation || context.conversation.messages.length === 0) {
+      return 0;
     }
-    return 0;
+
+    const recentMessages = context.conversation.messages.slice(-5);
+    const agentMentions = recentMessages.filter(m => m.agentType === agentId).length;
+
+    // Give a score boost if the agent was used in the last 5 messages.
+    // The more it was used, the higher the score.
+    return (agentMentions / recentMessages.length) * 0.5; // Max score of 0.5 for this factor
   }
 } 
