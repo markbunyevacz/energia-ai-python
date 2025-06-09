@@ -8,6 +8,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { useMoE } from '@/contexts/MoEProvider';
 
 // Domain and Agent imports
 import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
@@ -124,6 +125,7 @@ async function extractTextFromFile(file: File): Promise<string> {
  */
 export function LovableFrontend() {
   const { user } = useAuth();
+  const { router: moeRouter, agentPool, isInitialized } = useMoE();
   // ============================================================================
   // STATE MANAGEMENT
   // ============================================================================
@@ -164,9 +166,9 @@ export function LovableFrontend() {
   /** 
    * MoE Router state
    */
-  const [moeRouter, setMoeRouter] = useState<MixtureOfExpertsRouter | null>(null);
   const [recommendedAgents, setRecommendedAgents] = useState<AgentScore[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<BaseAgent | null>(null);
+  const [confidenceThreshold, setConfidenceThreshold] = useState(0.7);
   
   /** 
    * Error state for user feedback and debugging
@@ -178,44 +180,24 @@ export function LovableFrontend() {
   // INITIALIZATION
   // ============================================================================
   useEffect(() => {
-    // Initialize the core components of the legal platform
-    const initializePlatform = async () => {
-      try {
-        const domainRegistry = DomainRegistry.getInstance();
-        
-        // Register domains if not already registered
-        if (!domainRegistry.getDomain('energy')) {
-          await domainRegistry.registerDomain(energyDomain);
-        }
-        if (!domainRegistry.getDomain('general')) {
-          await domainRegistry.registerDomain(generalDomain);
-        }
-
-        // Initialize agents
-        const contractAgent = new ContractAnalysisAgent(domainRegistry);
-        await contractAgent.initialize();
-        
-        const generalAgent = new GeneralPurposeAgent(domainRegistry);
-        await generalAgent.initialize();
-
-        const agentPool = [contractAgent, generalAgent];
-
-        // Initialize router
-        const router = new MixtureOfExpertsRouter(agentPool, domainRegistry);
-        setMoeRouter(router);
-
-      } catch (err) {
-        console.error("Failed to initialize the legal platform:", err);
-        setError("A platform inicializálása sikertelen volt. Kérjük, frissítse az oldalt.");
-      }
-    };
-
-    initializePlatform();
-  }, []);
+    if (!isInitialized) {
+      setError("A platform inicializálása sikertelen volt. Kérjük, frissítse az oldalt.");
+    } else {
+      setError(null);
+    }
+  }, [isInitialized]);
 
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
+
+  const handleThresholdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const threshold = parseFloat(e.target.value);
+    setConfidenceThreshold(threshold);
+    if (moeRouter) {
+      moeRouter.setConfidenceThreshold(threshold);
+    }
+  };
 
   /**
    * File Input Change Handler
@@ -583,6 +565,29 @@ export function LovableFrontend() {
             </CardContent>
           </Card>
         )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Confidence Threshold</CardTitle>
+            <CardDescription>
+              Adjust the confidence threshold for the Mixture of Experts router.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Label htmlFor="confidence-threshold">Threshold: {confidenceThreshold}</Label>
+              <Input
+                id="confidence-threshold"
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={confidenceThreshold}
+                onChange={handleThresholdChange}
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

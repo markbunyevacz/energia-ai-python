@@ -1,17 +1,17 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Send, Loader2 } from 'lucide-react';
-import AIAgentRouter, { AgentContext, AgentResponse } from '@/core-legal-platform/routing/AIAgentRouter';
 import { conversationContextManager } from '@/core-legal-platform/common/conversationContext';
 import { AgentIndicator } from '@/components/AI/AgentIndicator';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/use-toast';
+import { useMoE } from '@/contexts/MoEProvider';
+import { AgentScore, MoEContext } from '@/core-legal-platform/routing/MixtureOfExpertsRouter';
 
 interface QuestionInputProps {
-  onSubmit: (question: string, agentType?: string, conversationContext?: any) => void;
+  onSubmit: (question: string, agentId?: string, conversationContext?: any) => void;
   isLoading: boolean;
   results?: any;
   selectedQuestion: string;
@@ -27,43 +27,50 @@ export function QuestionInput({
   placeholder
 }: QuestionInputProps) {
   const [question, setQuestion] = useState('');
-  const [agentAnalysis, setAgentAnalysis] = useState<AgentResponse | null>(null);
+  const [agentAnalysis, setAgentAnalysis] = useState<AgentScore | null>(null);
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const { router } = useMoE();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalQuestion = selectedQuestion || question;
-    if (finalQuestion.trim() && user) {
-      // Get conversation context for this session
+    if (finalQuestion.trim() && user && router) {
       const sessionId = user.id;
-      const currentContext = conversationContextManager.getContext(sessionId);
+      const conversation = await conversationContextManager.getContext(sessionId, user.id);
       
-      // Get recent questions for context
-      const recentQuestions = conversationContextManager.getRecentQuestions(sessionId, 3);
-      
-      // Analyze question with AI agent router
-      const context: AgentContext = {
-        previousQuestions: recentQuestions,
-        documentTypes: [], // This would come from uploaded documents
-        userRole: profile?.role || 'jogász',
-        sessionHistory: currentContext?.messages || []
+      const context: MoEContext = {
+        document: null, // This would come from uploaded documents
+        conversation: conversation,
+        user: {
+            id: user.id,
+            role: profile?.role || 'jogász',
+            permissions: []
+        },
+        // @ts-ignore
+        previousQuestions: conversation?.messages.slice(-3).map(m => m.question) || []
       };
 
       try {
-        const analysis = await AIAgentRouter.analyzeQuestion(finalQuestion, context);
-        setAgentAnalysis(analysis);
+        const analysis = await router.routeQuery(finalQuestion, context);
         
-        // Prepare conversation context for the API
-        const conversationContext = {
-          sessionId: sessionId,
-          currentTopic: currentContext?.currentTopic,
-          recentQuestions: recentQuestions,
-          userRole: profile?.role || 'jogász',
-          messageCount: currentContext?.messages.length || 0
-        };
+        if (analysis.length > 0) {
+            const bestAgent = analysis[0];
+            setAgentAnalysis(bestAgent);
+            
+            const conversationContext = {
+              sessionId: sessionId,
+              currentTopic: conversation?.currentTopic,
+              userRole: profile?.role || 'jogász',
+              messageCount: conversation?.messages.length || 0
+            };
+    
+            onSubmit(finalQuestion, bestAgent.agent.getConfig().id, conversationContext);
+        } else {
+            // Fallback if no agent is found
+            onSubmit(finalQuestion);
+        }
 
-        onSubmit(analysis.suggestedPrompt, analysis.agentType, conversationContext);
         setQuestion('');
         onQuestionChange('');
       } catch (error) {
@@ -83,7 +90,6 @@ export function QuestionInput({
     setQuestion(value);
     onQuestionChange(value);
     
-    // Reset agent analysis when question changes
     if (agentAnalysis) {
       setAgentAnalysis(null);
     }
@@ -97,9 +103,8 @@ export function QuestionInput({
         <form onSubmit={handleSubmit} className="space-y-4">
           {agentAnalysis && (
             <AgentIndicator 
-              agentType={agentAnalysis.agentType}
-              confidence={agentAnalysis.confidence}
-              reasoning={agentAnalysis.reasoning}
+              agent={agentAnalysis.agent}
+              confidence={agentAnalysis.score}
             />
           )}
           

@@ -33,7 +33,7 @@ export interface AgentConfig {
 }
 
 export interface AgentContext {
-  document: LegalDocument;
+  document?: LegalDocument;
   domain: string;
   metadata?: Record<string, any>;
   user?: {
@@ -102,14 +102,15 @@ export abstract class BaseAgent {
       throw new AgentSecurityError('Insufficient permissions for batch processing');
     }
 
+    const validDocuments = documents.filter(doc => doc); // Ensure no null/undefined docs
     const results: AgentResult[] = [];
     let successful = 0;
     let failed = 0;
 
     // Process documents in chunks to avoid memory issues
     const chunkSize = this.config.batchConfig?.maxBatchSize ?? 10;
-    for (let i = 0; i < documents.length; i += chunkSize) {
-      const chunk = documents.slice(i, i + chunkSize);
+    for (let i = 0; i < validDocuments.length; i += chunkSize) {
+      const chunk = validDocuments.slice(i, i + chunkSize);
       const chunkResults = await Promise.all(
         chunk.map(doc => this.process({ document: doc, domain: this.config.domainCode, user }))
       );
@@ -122,7 +123,7 @@ export abstract class BaseAgent {
     }
 
     return {
-      total: documents.length,
+      total: validDocuments.length,
       successful,
       failed,
       results,
@@ -394,7 +395,7 @@ export abstract class BaseAgent {
   public handleError(error: Error, context: AgentContext): AgentResult {
     return {
       success: false,
-      message: `Error processing document ${context.document.id}: ${error.message}`,
+      message: `Error processing document ${context.document?.id}: ${error.message}`,
       error,
     };
   }

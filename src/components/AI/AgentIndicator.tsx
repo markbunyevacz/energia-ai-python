@@ -1,43 +1,42 @@
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Brain, FileText, Search, Shield } from 'lucide-react';
-import { AgentType } from '@/core-legal-platform/routing/AIAgentRouter';
+import { BaseAgent } from '@/core-legal-platform/agents/base-agents/BaseAgent';
 
 interface AgentIndicatorProps {
-  agentType: AgentType;
+  agent: BaseAgent;
   confidence: number;
-  reasoning: string;
 }
 
-export function AgentIndicator({ agentType, confidence, reasoning }: AgentIndicatorProps) {
-  const getAgentConfig = (type: AgentType) => {
-    const configs = {
-      contract: {
+export function AgentIndicator({ agent, confidence }: AgentIndicatorProps) {
+  const getAgentConfig = (agentId: string) => {
+    const configs: { [key: string]: { icon: React.ElementType, label: string, color: string } } = {
+      'contract-analysis': {
         icon: FileText,
         label: 'Szerződés Ágens',
         color: 'bg-blue-100 text-blue-800'
       },
-      legal_research: {
+      'legal-research': {
         icon: Search,
         label: 'Jogi Kutatás Ágens',
         color: 'bg-green-100 text-green-800'
       },
-      compliance: {
+      'compliance': {
         icon: Shield,
         label: 'Megfelelőségi Ágens',
         color: 'bg-orange-100 text-orange-800'
       },
-      general: {
+      'general-purpose': {
         icon: Brain,
         label: 'Általános Ágens',
         color: 'bg-gray-100 text-gray-800'
       }
     };
 
-    return configs[type];
+    return configs[agentId] || configs['general-purpose'];
   };
 
-  const config = getAgentConfig(agentType);
+  const config = getAgentConfig(agent.getConfig().id);
   const Icon = config.icon;
 
   return (
@@ -52,7 +51,7 @@ export function AgentIndicator({ agentType, confidence, reasoning }: AgentIndica
             {Math.round(confidence * 100)}% megbízhatóság
           </Badge>
         </div>
-        <p className="text-sm text-gray-600 mt-1">{reasoning}</p>
+        <p className="text-sm text-gray-600 mt-1">{agent.getConfig().description}</p>
       </div>
     </div>
   );

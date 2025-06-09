@@ -11,8 +11,7 @@ import { Session } from '@supabase/supabase-js';
 import NotFoundPage from './pages/NotFound';
 import './App.css';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { DomainRegistry } from './core-legal-platform/legal-domains/registry/DomainRegistry';
-import { energyDomain } from './core-legal-platform/domains/energy/energy.domain';
+import { MoEProvider } from './contexts/MoEProvider';
 
 /**
  * Main App Component
@@ -60,14 +59,6 @@ export function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    // Register the core domains when the application starts.
-    // In a real application, this might be a more sophisticated process,
-    // but for now, we register the energy domain directly.
-    const domainRegistry = DomainRegistry.getInstance();
-    domainRegistry.registerDomain(energyDomain);
-  }, []);
-
   // Show loading spinner while checking authentication status
   if (loading) {
     return (
@@ -78,67 +69,69 @@ export function App() {
   }
 
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          {/* Public Authentication Routes */}
-          {/* These routes are accessible without authentication */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/reset-password-request" element={<ResetPasswordRequest />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          
-          {/* Protected Role-Based Routes */}
-          {/* Each route requires specific user roles for access */}
-          
-          {/* Admin Dashboard - Full system access and management */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <div>Admin Dashboard</div>
-              </ProtectedRoute>
-            }
-          />
-          
-          {/* Legal Manager Interface - Legal document management and analysis */}
-          <Route
-            path="/legal"
-            element={
-              <ProtectedRoute requiredRole="legal_manager">
-                <LovableFrontend />
-              </ProtectedRoute>
-            }
-          />
-          
-          {/* Analyst Dashboard - Data analysis and reporting tools */}
-          <Route
-            path="/analyst"
-            element={
-              <ProtectedRoute requiredRole="analyst">
-                <div>Analyst Dashboard</div>
-              </ProtectedRoute>
-            }
-          />
-          
-          {/* Viewer Dashboard - Read-only access to documents and reports */}
-          <Route
-            path="/viewer"
-            element={
-              <ProtectedRoute requiredRole="viewer">
-                <div>Viewer Dashboard</div>
-              </ProtectedRoute>
-            }
-          />
-          
-          {/* Default Redirects */}
-          {/* Redirect root path to login page */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          
-          {/* Catch-all route - redirect unknown paths to login */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AuthProvider>
-    </Router>
+    <MoEProvider>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            {/* Public Authentication Routes */}
+            {/* These routes are accessible without authentication */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/reset-password-request" element={<ResetPasswordRequest />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            
+            {/* Protected Role-Based Routes */}
+            {/* Each route requires specific user roles for access */}
+            
+            {/* Admin Dashboard - Full system access and management */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <div>Admin Dashboard</div>
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Legal Manager Interface - Legal document management and analysis */}
+            <Route
+              path="/legal"
+              element={
+                <ProtectedRoute requiredRole="legal_manager">
+                  <LovableFrontend />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Analyst Dashboard - Data analysis and reporting tools */}
+            <Route
+              path="/analyst"
+              element={
+                <ProtectedRoute requiredRole="analyst">
+                  <div>Analyst Dashboard</div>
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Viewer Dashboard - Read-only access to documents and reports */}
+            <Route
+              path="/viewer"
+              element={
+                <ProtectedRoute requiredRole="viewer">
+                  <div>Viewer Dashboard</div>
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Default Redirects */}
+            {/* Redirect root path to login page */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            
+            {/* Catch-all route - redirect unknown paths to login */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </MoEProvider>
   );
 }
 

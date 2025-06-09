@@ -84,4 +84,6 @@ export class EmbeddingService {
       throw error;
     }
   }
-} 
+}
+
+export default new EmbeddingService(); 

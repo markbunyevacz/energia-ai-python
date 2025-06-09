@@ -1,3 +1,5 @@
+\i create_vector_store.sql
+
 -- Create enum types if they don't exist
 DO $$ BEGIN
     CREATE TYPE legal_document_type AS ENUM (
@@ -71,6 +73,7 @@ CREATE TABLE legal_documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
     content TEXT NOT NULL,
+    summary JSONB,
     document_type legal_document_type NOT NULL,
     source_url TEXT,
     publication_date TIMESTAMP WITH TIME ZONE,

@@ -2,6 +2,8 @@ import { BaseAgent, AgentContext } from '../agents/base-agents/BaseAgent';
 import { DomainRegistry } from '../legal-domains/registry/DomainRegistry';
 import { LegalDomain } from '../legal-domains/types';
 import { conversationContextManager, ConversationContext } from '../common/conversationContext';
+import { vectorStoreService } from '../vector-store/VectorStoreService';
+import embeddingService from '../embedding/EmbeddingService';
 
 export interface AgentScore {
   agent: BaseAgent;
@@ -16,14 +18,19 @@ export interface MoEContext extends AgentContext {
 export class MixtureOfExpertsRouter {
   private agentPool: BaseAgent[];
   private domainRegistry: DomainRegistry;
+  private confidenceThreshold: number;
 
   constructor(agentPool: BaseAgent[], domainRegistry: DomainRegistry) {
     this.agentPool = agentPool;
     this.domainRegistry = domainRegistry;
+    this.confidenceThreshold = 0.7; // Default threshold
   }
 
   public async routeQuery(question: string, context: MoEContext): Promise<AgentScore[]> {
     const scores: AgentScore[] = [];
+
+    const queryEmbedding = await embeddingService.getEmbedding(question);
+    const { data: similarDocuments } = await vectorStoreService.similaritySearch(queryEmbedding, 0.7, 5);
 
     for (const agent of this.agentPool) {
       if (!agent.isEnabled()) {
@@ -38,11 +45,12 @@ export class MixtureOfExpertsRouter {
       const keywordScore = this.calculateKeywordScore(question, agentDomain);
       const contextScore = this.calculateContextScore(context, agentDomain);
       const historyScore = this.calculateHistoryScore(context, agent.getConfig().id);
+      const vectorScore = this.calculateVectorScore(similarDocuments, agentDomain);
 
       // Weighted average of scores
-      const finalScore = (keywordScore * 0.5) + (contextScore * 0.3) + (historyScore * 0.2);
+      const finalScore = (keywordScore * 0.4) + (contextScore * 0.2) + (historyScore * 0.2) + (vectorScore * 0.2);
 
-      if (finalScore > 0) { // Only consider agents with some relevance
+      if (finalScore > this.confidenceThreshold) {
         scores.push({ agent, score: finalScore });
       }
     }
@@ -52,6 +60,10 @@ export class MixtureOfExpertsRouter {
 
     // Return top 1-3 agents
     return scores.slice(0, 3);
+  }
+
+  public setConfidenceThreshold(threshold: number) {
+    this.confidenceThreshold = threshold;
   }
 
   private calculateKeywordScore(question: string, domain: LegalDomain): number {
@@ -112,5 +124,14 @@ export class MixtureOfExpertsRouter {
     // Give a score boost if the agent was used in the last 5 messages.
     // The more it was used, the higher the score.
     return (agentMentions / recentMessages.length) * 0.5; // Max score of 0.5 for this factor
+  }
+
+  private calculateVectorScore(similarDocuments: any[] | null, domain: LegalDomain): number {
+    if (!similarDocuments) {
+      return 0;
+    }
+
+    const domainMentions = similarDocuments.filter(doc => doc.domain_id === domain.code).length;
+    return domainMentions / similarDocuments.length;
   }
 } 

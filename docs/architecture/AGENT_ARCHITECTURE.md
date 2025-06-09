@@ -41,3 +41,25 @@ The scores are normalized and combined to produce a final confidence score betwe
 
 -   **Response**: The `routeQuery` method will return an array of the top 1-3 agents that exceed a minimum confidence threshold. Each entry will include the agent and its score.
 -   **Fallback Strategy**: If no agent meets the minimum confidence threshold, the router will return the `GeneralPurposeAgent` as a fallback. This ensures that the user always receives a response, even for queries that do not fit neatly into a specialized domain. 
+
+export interface UserFeedback {
+  id: string;
+  sessionId: string;
+  messageId: string;
+  agentId: string;
+  userId?: string;
+  feedbackType: 'rating' | 'correction' | 'suggestion' | 'complaint';
+  rating?: number; // 1-5 scale
+  comment?: string;
+  suggestedCorrection?: string;
+  timestamp: Date;
+  resolved: boolean;
+}
+
+export interface FeedbackAnalysis {
+  agentId: string;
+  averageRating: number;
+  commonIssues: string[];
+  improvementSuggestions: string[];
+  trendsOverTime: { date: Date; rating: number }[];
+} 
