@@ -1,13 +1,3 @@
--- Create a table for legal documents
-CREATE TABLE legal_documents (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title TEXT NOT NULL,
-    content TEXT,
-    publication_date DATE,
-    document_type TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 -- Create a table for citation edges to build the graph
 CREATE TABLE citation_edges (
     source_document_id UUID REFERENCES legal_documents(id),

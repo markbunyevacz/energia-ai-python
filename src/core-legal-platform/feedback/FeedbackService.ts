@@ -6,6 +6,7 @@ import {
   ImprovementAction,
   ImprovementPlan,
   UserFeedback,
+  InteractionMetrics,
 } from './types';
 
 /**
@@ -27,21 +28,36 @@ export class FeedbackService {
    * Stores a piece of user feedback in the database.
    * @param feedback - The user feedback to collect.
    */
-  async collectFeedback(feedback: UserFeedback): Promise<void> {
-    const { error } = await this.supabase.from('user_feedback').insert({
-      interaction_id: feedback.interactionId,
-      agent_id: feedback.agentId,
-      user_id: feedback.userId,
-      rating: feedback.rating,
-      category: feedback.category,
-      comments: feedback.comments,
-      suggested_correction: feedback.suggestedCorrection,
-    });
+  async collectFeedback(feedback: Omit<UserFeedback, 'id' | 'created_at'>): Promise<UserFeedback> {
+    const { data, error } = await this.supabase
+      .from('user_feedback')
+      .insert(feedback)
+      .select()
+      .single();
 
     if (error) {
       console.error('Error collecting feedback:', error);
       throw new Error('Failed to collect feedback.');
     }
+    return data;
+  }
+
+  /**
+   * Submits interaction metrics to the database.
+   * @param metrics - The interaction metrics to submit.
+   */
+  async submitInteractionMetrics(metrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at'>): Promise<InteractionMetrics> {
+    const { data, error } = await this.supabase
+      .from('interaction_metrics')
+      .insert(metrics)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to submit interaction metrics: ${error.message}`);
+    }
+
+    return data;
   }
 
   /**

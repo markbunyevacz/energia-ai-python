@@ -1,8 +1,10 @@
+import { createHash } from 'crypto';
 import { supabase } from '../../integrations/supabase/client.js';
 import { CrawlerManager } from '../crawler/crawler-manager.js';
 import { MagyarKozlonyCrawler } from '../crawler/magyar-kozlony-crawler.js';
 import { HungarianGazetteCrawler } from '../crawler/hungarian-gazette-crawler.js';
 import { JogtarCrawler } from '../crawler/jogtar-crawler.js';
+import { ChangeAnalyzer } from '@/core-legal-platform/proactive/ChangeAnalyzer.js';
 import type { LegalSource, CrawlerResult, CrawlerConfig } from '../crawler/types.js';
 import type { Database } from '../../integrations/supabase/types.js';
 
@@ -25,12 +27,14 @@ const DEFAULT_CRAWLER_CONFIG: CrawlerConfig = {
 
 export class DataCollectionAgent {
   private crawlerManager: CrawlerManager;
+  private changeAnalyzer: ChangeAnalyzer;
   private isRunning: boolean = false;
   private lastRunTime: Date | null = null;
   private readonly MIN_RUN_INTERVAL = 1000 * 60 * 60; // 1 hour
 
   constructor() {
     this.crawlerManager = CrawlerManager.getInstance();
+    this.changeAnalyzer = new ChangeAnalyzer();
   }
 
   /**
@@ -164,16 +168,31 @@ export class DataCollectionAgent {
       try {
         // Map document type to Hungarian document type
         const documentType: DocumentType = this.determineDocumentType(doc.content);
+        const contentHash = createHash('sha256').update(doc.content).digest('hex');
 
         // Check if document already exists
         const { data: existingDoc } = await supabase
           .from('documents')
-          .select('id')
+          .select('id, content, content_hash')
           .eq('metadata->original_url', doc.metadata.original_url)
           .single();
 
         if (existingDoc) {
-          // Update existing document
+          // If content has changed, log it and update
+          if (existingDoc.content_hash !== contentHash) {
+            console.log(`Change detected for document: ${doc.metadata.original_url}`);
+            
+            // 1. Analyze the change to get a summary
+            const summary = await this.changeAnalyzer.analyzeChanges(existingDoc.content ?? '', doc.content);
+
+            // 2. Log the change event
+            await supabase.from('legal_change_events').insert({
+              source_url: doc.metadata.original_url,
+              change_type: 'amendment',
+              summary: summary
+            });
+
+            // 3. Update existing document with new content and hash
           await supabase
             .from('documents')
             .update({
@@ -181,16 +200,19 @@ export class DataCollectionAgent {
               content: doc.content,
               type: documentType,
               metadata: doc.metadata,
+                content_hash: contentHash,
               updated_at: new Date().toISOString()
             })
             .eq('id', existingDoc.id);
+          }
         } else {
-          // Insert new document
+          // Insert new document with hash
           await supabase.from('documents').insert({
             title: doc.title,
             content: doc.content,
             type: documentType,
             metadata: doc.metadata,
+            content_hash: contentHash,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });

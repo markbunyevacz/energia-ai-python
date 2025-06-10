@@ -37,25 +37,26 @@ export type FeedbackCategory =
  * This is the core model for data collected from the UI.
  */
 export interface UserFeedback {
-  interactionId: InteractionId;
-  agentId: AgentId;
-  userId?: string;
-  timestamp: Date;
-  rating?: FeedbackRating; // From simple thumbs up/down
-  category?: FeedbackCategory; // From detailed feedback form
-  comments?: string; // From detailed feedback form
-  suggestedCorrection?: string; // From detailed feedback form
+  id: string;
+  interaction_id: InteractionId;
+  agent_id: AgentId;
+  user_id?: string;
+  created_at: string;
+  rating?: FeedbackRating;
+  category?: FeedbackCategory;
+  comments?: string;
+  suggested_correction?: string;
 }
 
 /**
  * Metrics logged automatically for each agent interaction.
  */
 export interface InteractionMetrics {
-  interactionId: InteractionId;
-  agentId: AgentId;
-  timestamp: Date;
-  responseTimeMs: number;
-  confidenceScore?: number; // Optional, if the agent provides it
+  interaction_id: InteractionId;
+  agent_id: AgentId;
+  created_at: string;
+  response_time_ms: number;
+  confidence_score?: number;
 }
 
 /**

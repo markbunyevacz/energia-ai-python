@@ -25,12 +25,6 @@ export interface LegalDocument {
   content: string;
   documentType: DocumentType;
   domainId: string;
-  hierarchyLevel?: LegalHierarchyLevel;
-  crossReferences?: {
-    documentId: string;
-    relationshipType: string;
-    metadata?: Record<string, any>;
-  }[];
   metadata: {
     created_at: string;
     updated_at: string;

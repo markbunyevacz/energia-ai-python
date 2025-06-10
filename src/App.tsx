@@ -8,6 +8,7 @@ import { ResetPassword } from './pages/ResetPassword';
 import { supabase } from '@/lib/supabase';
 import { LovableFrontend } from './components/LovableFrontend';
 import { Session } from '@supabase/supabase-js';
+import Dashboard from './pages/Dashboard';
 import NotFoundPage from './pages/NotFound';
 import './App.css';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -107,7 +108,16 @@ export function App() {
               path="/analyst"
               element={
                 <ProtectedRoute requiredRole="analyst">
-                  <div>Analyst Dashboard</div>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute requiredRole="viewer">
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />
@@ -123,8 +133,8 @@ export function App() {
             />
             
             {/* Default Redirects */}
-            {/* Redirect root path to login page */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            {/* Redirect root path to dashboard page */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             
             {/* Catch-all route - redirect unknown paths to login */}
             <Route path="*" element={<Navigate to="/login" replace />} />

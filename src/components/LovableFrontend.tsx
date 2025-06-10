@@ -13,7 +13,7 @@ import { supabase } from '@/lib/supabase';
 import { useMoE } from '@/contexts/MoEProvider';
 import { ThumbsUp, ThumbsDown, MessageSquarePlus } from 'lucide-react';
 import { FeedbackService } from '@/core-legal-platform/feedback/FeedbackService';
-import { UserFeedback, FeedbackCategory } from '@/core-legal-platform/feedback/types';
+import { UserFeedback, FeedbackCategory, FeedbackRating } from '@/core-legal-platform/feedback/types';
 import { v4 as uuidv4 } from 'uuid';
 import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
 import { energyDomain } from '@/core-legal-platform/domains/energy/energy.domain';
@@ -174,7 +174,6 @@ export function LovableFrontend() {
   const [selectedAgent, setSelectedAgent] = useState<BaseAgent | null>(null);
   const [confidenceThreshold, setConfidenceThreshold] = useState(0.7);
   const [currentInteractionId, setCurrentInteractionId] = useState<string | null>(null);
-  const [feedbackService] = useState(() => new FeedbackService(supabase));
   
   /** 
    * Error state for user feedback and debugging
@@ -186,6 +185,8 @@ export function LovableFrontend() {
   const [feedbackCategory, setFeedbackCategory] = useState<FeedbackCategory | ''>('');
   const [feedbackComment, setFeedbackComment] = useState('');
   const [feedbackSuggestion, setFeedbackSuggestion] = useState('');
+
+  const feedbackService = new FeedbackService(supabase);
 
   // ============================================================================
   // INITIALIZATION
@@ -432,50 +433,44 @@ export function LovableFrontend() {
     }
   };
 
-  const handleFeedback = async (rating: 'up' | 'down') => {
+  const handleFeedback = async (rating: FeedbackRating) => {
     if (!currentInteractionId || !selectedAgent) return;
-
     setFeedbackGiven(rating);
-
-    const feedback: UserFeedback = {
-      interactionId: currentInteractionId,
-      agentId: selectedAgent.getConfig().id,
-      userId: user?.id,
-      timestamp: new Date(),
+    const feedback: Omit<UserFeedback, 'id' | 'created_at'> = {
+      interaction_id: currentInteractionId,
+      agent_id: selectedAgent.agentId,
+      user_id: user?.id,
       rating: rating,
     };
     try {
       await feedbackService.collectFeedback(feedback);
     } catch (err) {
-      // Log the error, but don't bother the user as the primary action (rating) is visually complete.
-      console.error("Failed to submit simple feedback:", err);
+      console.error('Hiba a visszajelzés küldésekor:', err);
     }
   };
 
   const handleDetailedFeedbackSubmit = async () => {
-    if (!currentInteractionId || !selectedAgent || !feedbackCategory) return;
+    if (!currentInteractionId || !selectedAgent) return;
 
-    const feedback: UserFeedback = {
-        interactionId: currentInteractionId,
-        agentId: selectedAgent.getConfig().id,
-        timestamp: new Date(),
-        rating: feedbackGiven ?? undefined,
-        category: feedbackCategory,
-        comments: feedbackComment,
-        suggestedCorrection: feedbackSuggestion,
+    const feedback: Omit<UserFeedback, 'id' | 'created_at'> = {
+      interaction_id: currentInteractionId,
+      agent_id: selectedAgent.agentId,
+      user_id: user?.id,
+      rating: feedbackGiven ?? undefined,
+      category: feedbackCategory || undefined,
+      comments: feedbackComment || undefined,
+      suggested_correction: feedbackSuggestion || undefined,
     };
-
     try {
-        await feedbackService.collectFeedback(feedback);
-        console.log('Detailed feedback collected successfully');
-        // Reset and close the modal
-        setDetailedFeedbackOpen(false);
-        setFeedbackCategory('');
-        setFeedbackComment('');
-        setFeedbackSuggestion('');
+      await feedbackService.collectFeedback(feedback);
+      setDetailedFeedbackOpen(false);
+      // Reset feedback form
+      setFeedbackCategory('');
+      setFeedbackComment('');
+      setFeedbackSuggestion('');
     } catch (err) {
-        console.error("Error submitting detailed feedback:", err);
-        // Optionally show an error message within the modal
+      console.error('Hiba a részletes visszajelzés küldésekor:', err);
+      // Optionally show an error to the user
     }
   };
 

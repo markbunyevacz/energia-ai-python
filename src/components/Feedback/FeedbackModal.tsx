@@ -51,14 +51,13 @@ export function FeedbackModal({
     setError(null);
     setIsSubmitting(true);
 
-    const feedback: UserFeedback = {
-      interactionId,
-      agentId,
-      userId,
-      timestamp: new Date(),
+    const feedback: Omit<UserFeedback, 'id' | 'created_at'> = {
+      interaction_id: interactionId,
+      agent_id: agentId,
+      user_id: userId,
       category,
       comments,
-      suggestedCorrection: suggestedCorrection || undefined,
+      suggested_correction: suggestedCorrection || undefined,
     };
 
     try {

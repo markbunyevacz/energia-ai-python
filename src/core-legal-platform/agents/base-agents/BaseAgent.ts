@@ -1,12 +1,15 @@
 import { LegalDocument, DocumentType } from '@/core-legal-platform/legal-domains/types';
 import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
 import { LegalDocumentService } from '@/core-legal-platform/legal/legalDocumentService';
-import type { Database } from '@/integrations/supabase/types';
+import type { Database, Json } from '@/integrations/supabase/types';
 import NodeCache from 'node-cache';
-import { supabase } from '@/integrations/supabase/client';
-import { AgentSecurityError } from '@/core-legal-platform/agents/example/ExampleAgent';
-import { ConversationMessage } from '../../common/conversationContext';
 import { v4 as uuidv4 } from 'uuid';
+import { FeedbackService } from '@/core-legal-platform/feedback/FeedbackService';
+import { InteractionMetrics } from '@/core-legal-platform/feedback/types';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
+import { AgentResponse, AgentTask, AgentContext, AgentResult } from '@/core-legal-platform/agents/types';
+import { BaseLLM } from '@/llm/base-llm';
 
 type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
 type DbLegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
@@ -33,44 +36,41 @@ export interface AgentConfig {
   };
 }
 
-export interface AgentContext {
-  document?: LegalDocument;
-  domain: string;
-  metadata?: Record<string, any>;
-  user?: {
-    id: string;
-    role: string;
-    permissions: string[];
-  };
-  conversationHistory?: ConversationMessage[];
-}
+export { AgentContext, AgentResult };
 
-export interface AgentResult {
-  success: boolean;
-  message: string;
-  data?: any;
-  error?: Error;
-}
-
-export interface BatchProcessingResult {
-  total: number;
-  successful: number;
-  failed: number;
-  results: AgentResult[];
-}
-
-export abstract class BaseAgent {
+export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends AgentResponse = AgentResponse> {
   protected config: AgentConfig;
   protected domainRegistry: DomainRegistry;
   protected documentService: LegalDocumentService;
   protected documentCache: NodeCache;
   protected batchQueue: LegalDocument[] = [];
   protected batchTimeout: NodeJS.Timeout | null = null;
+  protected feedbackService: FeedbackService;
+  protected llm: BaseLLM;
+  protected systemPrompt: string;
+  protected name: string;
+  protected description: string;
+  public agentId: string;
+  protected supabase: SupabaseClient;
 
-  constructor(config: AgentConfig, domainRegistry?: DomainRegistry) {
+  constructor(
+    config: AgentConfig,
+    domainRegistry?: DomainRegistry,
+    llm: BaseLLM,
+    systemPrompt: string,
+    name: string,
+    description: string,
+  ) {
     this.config = config;
     this.domainRegistry = domainRegistry || DomainRegistry.getInstance();
     this.documentService = new LegalDocumentService();
+    this.supabase = supabaseClient;
+    this.feedbackService = new FeedbackService(this.supabase);
+    this.llm = llm;
+    this.systemPrompt = systemPrompt;
+    this.name = name;
+    this.description = description;
+    this.agentId = uuidv4();
     
     // Initialize cache with config
     this.documentCache = new NodeCache({
@@ -94,41 +94,47 @@ export abstract class BaseAgent {
     const interactionId = context.document?.id || uuidv4();
     
     try {
-      const result = await this.process(context);
+      const result = await this.process(context as T);
       const responseTimeMs = Date.now() - startTime;
 
       await this.logInteractionMetrics({
-        interaction_id: interactionId,
         agent_id: this.config.id,
+        session_id: context.sessionId,
         user_id: context.user?.id,
         response_time_ms: responseTimeMs,
         confidence_score: result.data?.confidence ?? null,
-      });
+      }, interactionId);
       
       return { ...result, interactionId };
 
     } catch (error) {
       const responseTimeMs = Date.now() - startTime;
       await this.logInteractionMetrics({
-        interaction_id: interactionId,
         agent_id: this.config.id,
+        session_id: context.sessionId,
         user_id: context.user?.id,
         response_time_ms: responseTimeMs,
         confidence_score: 0,
-      });
-      const agentResult = this.handleError(error as Error, context);
+      }, interactionId);
+      const agentResult = this.handleError(error as Error, context as AgentContext);
       return { ...agentResult, interactionId };
     }
   }
 
   /**
-   * Logs interaction metrics to the database.
+   * Logs interaction metrics to the feedback service.
    */
-  private async logInteractionMetrics(metrics: Database['public']['Tables']['interaction_metrics']['Insert']) {
-    const { error } = await supabase.from('interaction_metrics').insert(metrics);
-    if (error) {
-      // We log the error but don't throw, as metrics logging should not fail the main process.
-      console.error(`[Metrics] Failed to log interaction metrics for agent ${this.config.id}:`, error);
+  protected async logInteractionMetrics(metrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at'>, interactionId: string) {
+    try {
+      const interactionMetrics: InteractionMetrics = {
+        ...metrics,
+        interaction_id: interactionId,
+        created_at: new Date().toISOString(),
+      };
+      await this.feedbackService.submitInteractionMetrics(interactionMetrics);
+    } catch (error) {
+      // Log silently to avoid disrupting agent processing
+      console.error('Error logging interaction metrics:', (error as Error).message);
     }
   }
 
@@ -136,7 +142,34 @@ export abstract class BaseAgent {
    * Process a document using the agent's specific logic.
    * This method should be implemented by subclasses.
    */
-  public abstract process(context: AgentContext): Promise<AgentResult>;
+  public async process(task: T): Promise<U> {
+    const interactionId = uuidv4();
+    const startTime = Date.now();
+
+    // The agent's core logic for processing the task goes here.
+    // This is an abstract method, so the concrete implementation will be in the subclasses.
+    const result = await this.performTask(task, interactionId);
+
+    const endTime = Date.now();
+    const responseTimeMs = endTime - startTime;
+
+    const interactionMetrics = {
+      interaction_id: interactionId,
+      agent_id: this.config.agentId,
+      response_time_ms: responseTimeMs,
+      // confidence_score: result.confidenceScore, // This needs to be part of the result object
+    };
+
+    try {
+      await this.feedbackService.submitInteractionMetrics(interactionMetrics);
+    } catch (error) {
+      console.error(`[${this.config.name}] Failed to submit interaction metrics:`, error);
+    }
+
+    return result;
+  }
+
+  protected abstract performTask(task: T, interactionId: string): Promise<U>;
 
   /**
    * Process a batch of documents
@@ -310,7 +343,7 @@ export abstract class BaseAgent {
     }
 
     try {
-      const { data: { user }, error } = await supabase.auth.getUser(userId);
+      const { data: { user }, error } = await supabaseClient.auth.getUser(userId);
       return !error && !!user;
     } catch (error) {
       return false;
@@ -325,10 +358,8 @@ export abstract class BaseAgent {
       id: dbDoc.id,
       title: dbDoc.title,
       content: dbDoc.content ?? '',
-      documentType: dbDoc.document_type as DocumentType,
+      documentType: dbDoc.document_type as any, // Cast to any to avoid enum issues
       domainId: dbDoc.domain_id ?? '',
-      hierarchyLevel: dbDoc.hierarchy_level ?? undefined,
-      crossReferences: (dbDoc.cross_references as any) ?? [],
       metadata: (dbDoc.metadata as any) ?? {},
     };
   }
@@ -336,16 +367,11 @@ export abstract class BaseAgent {
   /**
    * Convert LegalDocument to database insert type
    */
-  private convertLegalToDbDocument(doc: Omit<LegalDocument, 'id' | 'metadata'>): DbLegalDocumentInsert {
+  private convertLegalToDbDocument(doc: Omit<LegalDocument, 'id' | 'metadata'>): Omit<DbLegalDocument, 'id' | 'created_at' | 'updated_at' | 'domain_id' | 'document_type'> & { metadata: Json | null } {
     return {
       title: doc.title,
       content: doc.content,
-      document_type: doc.documentType as 'law' | 'regulation' | 'policy' | 'decision' | 'other',
-      source_url: null,
-      publication_date: new Date().toISOString(),
-      domain_id: doc.domainId,
-      hierarchy_level: doc.hierarchyLevel,
-      cross_references: doc.crossReferences,
+      metadata: null
     };
   }
 
@@ -432,7 +458,11 @@ export abstract class BaseAgent {
     }
 
     const dbDoc = this.convertLegalToDbDocument(document);
-    const created = await this.documentService.createLegalDocument(dbDoc);
+    const created = await this.documentService.createLegalDocument({
+      ...dbDoc,
+      domain_id: document.domainId,
+      document_type: document.documentType
+    });
     const newDocument = this.convertDbToLegalDocument(created);
     this.documentCache.set(created.id, newDocument);
     return newDocument;
@@ -442,10 +472,45 @@ export abstract class BaseAgent {
    * Handle errors during agent operations
    */
   public handleError(error: Error, context: AgentContext): AgentResult {
+    console.error(`[${this.config.name}] Error processing task:`, error, 'Context:', context);
+    // Basic error handling, can be customized in subclasses
     return {
       success: false,
       message: `Error processing document ${context.document?.id}: ${error.message}`,
       error,
     };
+  }
+
+  public async execute(task: T): Promise<U & { interactionId: string }> {
+    const interactionId = uuidv4();
+    const startTime = Date.now();
+
+    try {
+      const result = await this.process(task);
+      const responseTimeMs = Date.now() - startTime;
+
+      await this.logInteractionMetrics({
+        agent_id: this.config.id,
+        session_id: task.sessionId,
+        user_id: task.user?.id,
+        response_time_ms: responseTimeMs,
+        confidence_score: result.data?.confidence ?? null,
+      }, interactionId);
+
+      return { ...result, interactionId };
+
+    } catch (error) {
+      const responseTimeMs = Date.now() - startTime;
+      await this.logInteractionMetrics({
+        agent_id: this.config.id,
+        session_id: task.sessionId,
+        user_id: task.user?.id,
+        response_time_ms: responseTimeMs,
+        confidence_score: 0,
+      }, interactionId);
+      
+      const agentResult = this.handleError(error as Error, task.context);
+      return { ...agentResult, interactionId } as U & { interactionId: string };
+    }
   }
 } 
