@@ -1,6 +1,6 @@
 # Implementation Backlog
 
-This document tracks the progress of the project implementation, divided into phases. Each phase will be marked with its status: 🕒 Not Started, ⏳ In Progress, ✅ Completed, ⏸️ Paused.
+This document tracks the progress of the project implementation, divided into phases. Each phase will be marked with its status: 🕒 Not Started, ⏳ In Progress, ✅ Completed, ⏸️ Paused, ⚠️ Verified with Issues.
 
 ---
 
@@ -30,7 +30,7 @@ This document tracks the progress of the project implementation, divided into ph
 ---
 
 ## Phase 1: Domain Abstraction
-**Status:** ✅ Completed
+**Status:** ⚠️ Verified with Issues
 *   [x] **Task 1.1: Design Domain-Agnostic Agent Structure**
     *   [x] Implement `BaseAgent` abstract class (`src/core-legal-platform/agents/base-agents/BaseAgent.ts`) to provide a common interface for all agents.
     *   [x] Define `AgentConfig` and `AgentContext` interfaces to standardize agent interaction and configuration.
@@ -38,7 +38,8 @@ This document tracks the progress of the project implementation, divided into ph
     *   [x] Create `DomainRegistry` (`src/core-legal-platform/legal-domains/registry/DomainRegistry.ts`) for dynamic management of legal domains.
     *   [x] Define the `LegalDomain` interface to structure domain-specific information and agent configurations.
 *   [x] **Task 1.3: Refactor Existing Agents**
-    *   [x] Update `ContractAnalysisAgent` and `GeneralPurposeAgent` to inherit from `BaseAgent`, aligning them with the new architecture.
+    *   [x] Update `ContractAnalysisAgent` and `GeneralPurposeAgent` to inherit from `BaseAgent`.
+    *   **NOTE:** Both agents use mock/dummy data and do not contain real processing logic.
 
 ---
 
@@ -50,26 +51,27 @@ This document tracks the progress of the project implementation, divided into ph
 *   [x] **Task 2.2: Implement Working Memory (Conversation Context)**
     *   [x] Develop `ConversationContextManager` (`src/core-legal-platform/common/conversationContext.ts`) to manage short-term memory.
     *   [x] Integrate conversation history into the `AgentContext` to provide statefulness to interactions.
-*   [ ] **Task 2.3: Implement Long-Term Memory**
-    *   [ ] **Sub-task 2.3.1:** Design and implement a vector store for persisting and retrieving agent knowledge and historical interactions over the long term.
-    *   [ ] **Sub-task 2.3.2:** Develop retrieval mechanisms (e.g., semantic search) for accessing relevant long-term memories.
-    *   [ ] **Sub-task 2.3.3:** Integrate the long-term memory retrieval mechanism into the `BaseAgent`'s context.
+    *   **NOTE:** The `getSummary` method in the manager is a mock.
+*   [x] **Task 2.3: Implement Long-Term Memory**
+    *   [x] **Sub-task 2.3.1:** Design and implement a vector store for persisting and retrieving agent knowledge and historical interactions over the long term. **(Partially Implemented: Retrieval is done via Supabase RPC, but embedding persistence logic is not explicitly verified).**
+    *   [x] **Sub-task 2.3.2:** Develop retrieval mechanisms (e.g., semantic search) for accessing relevant long-term memories. **(Implemented via `VectorStoreService` and `EmbeddingService`).**
+    *   [ ] **Sub-task 2.3.3:** Integrate the long-term memory retrieval mechanism into the `BaseAgent`'s context. **(NOTE: Integrated into MoE Router, not `BaseAgent` directly).**
 
 ---
 
 ## Phase 3: Human Feedback & Reasoning
-**Status:** ✅ Completed
+**Status:** ⚠️ Partially Completed
 *   [x] **Task 3.1: Implement Feedback Loop**
     *   [x] Create `interaction_metrics` and `user_feedback` tables in Supabase to store performance and user-provided data.
-    *   [x] Implement `FeedbackService` (`src/services/feedbackService.ts`) to handle the submission and retrieval of feedback.
+    *   [x] Implement `FeedbackService` (`src/core-legal-platform/feedback/FeedbackService.ts`) to handle the submission and retrieval of feedback.
     *   [x] Integrate automated metrics collection into the `BaseAgent`'s `processWithTelemetry` method.
-*   [x] **Task 3.2: Implement Chain-of-Thought (CoT) Reasoning**
-    *   [x] Add a `reasoning_log` column to the `interaction_metrics` table to store agent reasoning steps.
-    *   [x] Implement a `reason()` method in `BaseAgent` to structure and generate the reasoning log.
-    *   [x] Update `processWithTelemetry` to capture and persist the CoT log for each interaction.
-*   [x] **Task 3.3: Implement Proactive Agent Suggestions Framework**
-    *   [x] Add a `suggestions` property to the `AgentResult` interface.
-    *   [x] Implement a `generateSuggestions()` method in `BaseAgent` as a framework for subclasses to provide proactive insights.
+*   [ ] **Task 3.2: Implement Chain-of-Thought (CoT) Reasoning**
+    *   [ ] Add a `reasoning_log` column to the `interaction_metrics` table to store agent reasoning steps.
+    *   [ ] Implement a `reason()` method in `BaseAgent` to structure and generate the reasoning log.
+    *   [ ] Update `processWithTelemetry` to capture and persist the CoT log for each interaction.
+*   [ ] **Task 3.3: Implement Proactive Agent Suggestions Framework**
+    *   [ ] Add a `suggestions` property to the `AgentResult` interface.
+    *   [ ] Implement a `generateSuggestions()` method in `BaseAgent` as a framework for subclasses to provide proactive insights.
 
 ---
 
@@ -112,19 +114,19 @@ This document tracks the progress of the project implementation, divided into ph
 ---
 
 ## Phase 5: Advanced Agent Ecosystem
-**Status:** 🕒 Not Started
-*   [ ] **Prompt 5.1: Implement Legal Research Agent**
-    *   [ ] **Sub-task 5.1.1: Agent & Database Scaffolding**
-        *   [ ] Create `src/core-legal-platform/agents/legal-research/LegalResearchAgent.ts`.
-        *   [ ] Design and create `court_decisions` and `legal_precedents` tables.
-    *   [ ] **Sub-task 5.1.2: Data Ingestion Pipeline**
-        *   [ ] Build crawlers for Hungarian (Bírósági Határozatok Tára) and EU (CURIA) court decision portals.
-    *   [ ] **Sub-task 5.1.3: Implement Legal Research Logic**
-        *   [ ] Implement `process` method in `LegalResearchAgent` to handle natural language queries.
-        *   [ ] Integrate with vector store to find relevant case law and precedents.
-    *   [ ] **Sub-task 5.1.4: Build Citation Engine**
-        *   [ ] Create `src/core-legal-platform/citation/CitationEngine.ts`.
-        *   [ ] Implement automatic generation and validation of legal citations.
+**Status:** ⏳ In Progress
+*   [x] **Prompt 5.1: Implement Legal Research Agent**
+    *   [x] **Sub-task 5.1.1: Agent & Database Scaffolding**
+        *   [x] Create `src/core-legal-platform/agents/legal-research/LegalResearchAgent.ts`.
+        *   [x] Design and create `court_decisions` and `legal_precedents` tables.
+    *   [x] **Sub-task 5.1.2: Data Ingestion Pipeline**
+        *   [x] Build crawlers for Hungarian (Bírósági Határozatok Tára) and EU (CURIA) court decision portals.
+    *   [x] **Sub-task 5.1.3: Implement Legal Research Logic**
+        *   [x] Implement `process` method in `LegalResearchAgent` to handle natural language queries.
+        *   [x] Integrate with vector store to find relevant case law and precedents.
+    *   [x] **Sub-task 5.1.4: Build Citation Engine**
+        *   [x] Create `src/core-legal-platform/citation/CitationEngine.ts`.
+        *   [x] Implement automatic generation and validation of legal citations.
 *   [ ] **Prompt 5.2: Implement Compliance Monitoring Agent**
     *   [ ] **Sub-task 5.2.1: Agent & Framework Scaffolding**
         *   [ ] Create `src/core-legal-platform/agents/compliance/ComplianceAgent.ts`.
