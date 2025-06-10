@@ -12,9 +12,6 @@ import { BaseLLM } from '@/llm/base-llm';
 import { vectorStoreService, VectorStoreService } from '@/core-legal-platform/vector-store/VectorStoreService';
 import { EmbeddingService } from '@/core-legal-platform/embedding/EmbeddingService';
 
-type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
-type DbLegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
-
 export class AgentSecurityError extends Error {
   constructor(message: string) {
     super(message);
@@ -37,6 +34,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   protected embeddingService: EmbeddingService;
   protected batchQueue: LegalDocument[] = [];
   protected batchTimeout: NodeJS.Timeout | null = null;
+  protected reasoning_log: { step: string; timestamp: string; }[] = [];
   protected feedbackService: FeedbackService;
   protected llm: BaseLLM;
   protected systemPrompt: string;
@@ -79,6 +77,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   public async processWithTelemetry(context: AgentContext): Promise<AgentResult & { interactionId: string }> {
     const startTime = Date.now();
     const interactionId = context.document?.id || uuidv4();
+    this.reasoning_log = []; // Reset log for new telemetry call
 
     const task = {
       query: context.query,
@@ -94,9 +93,9 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       await this.logInteractionMetrics({
         agent_id: this.config.id,
         session_id: context.sessionId,
-        user_id: context.user?.id,
         response_time_ms: responseTimeMs,
-        confidence_score: (result as unknown as AgentResult).confidence ?? null,
+        confidence_score: (result as unknown as AgentResult).confidence ?? 0,
+        reasoning_log: this.reasoning_log,
       }, interactionId);
 
       return { ...(result as unknown as AgentResult), interactionId };
@@ -105,9 +104,9 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       await this.logInteractionMetrics({
         agent_id: this.config.id,
         session_id: context.sessionId,
-        user_id: context.user?.id,
         response_time_ms: responseTimeMs,
         confidence_score: 0,
+        reasoning_log: this.reasoning_log,
       }, interactionId);
       const agentResult = this.handleError(error as Error, context);
       return { ...agentResult, interactionId };
@@ -139,22 +138,19 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
    * This method should be implemented by subclasses.
    */
   public async process(task: T): Promise<U> {
+    this.reasoning_log = []; // Reset log for new processing task
     const interactionId = uuidv4();
     const startTime = Date.now();
-
-    // The agent's core logic for processing the task goes here.
-    // This is an abstract method, so the concrete implementation will be in the subclasses.
     const result = await this.performTask(task, interactionId);
-
     const endTime = Date.now();
     const responseTimeMs = endTime - startTime;
 
-    const interactionMetrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at'> = {
+    const interactionMetrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at' | 'user_id'> = {
       agent_id: this.config.id,
       session_id: task.sessionId,
-      user_id: task.user?.id,
       response_time_ms: responseTimeMs,
-      confidence_score: (result as unknown as AgentResult).confidence ?? null,
+      confidence_score: (result as unknown as AgentResult).confidence ?? 0,
+      reasoning_log: this.reasoning_log,
     };
 
     try {
@@ -167,6 +163,17 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   }
 
   protected abstract performTask(task: T, interactionId: string): Promise<U>;
+
+  /**
+   * Adds a step to the agent's reasoning log.
+   * @param step A description of the reasoning step.
+   */
+  protected reason(step: string): void {
+    this.reasoning_log.push({
+      step,
+      timestamp: new Date().toISOString(),
+    });
+  }
 
   /**
    * Process a batch of documents
@@ -350,109 +357,6 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   }
 
   /**
-   * Convert database document to LegalDocument
-   */
-  private convertDbToLegalDocument(dbDoc: DbLegalDocument): LegalDocument {
-    return {
-      id: dbDoc.id,
-      title: dbDoc.title,
-      content: dbDoc.content ?? '',
-      documentType: dbDoc.document_type as DocumentType,
-      domainId: 'unknown', // Synthesized field
-      metadata: {
-        publication_date: dbDoc.publication_date,
-        source_url: dbDoc.source_url,
-        created_at: dbDoc.created_at,
-        updated_at: dbDoc.updated_at,
-      },
-    };
-  }
-
-  /**
-   * Convert LegalDocument to database insert type
-   */
-  private convertLegalToDbDocument(doc: Partial<LegalDocument>): DbLegalDocumentInsert {
-    return {
-      id: doc.id,
-      title: doc.title ?? '',
-      content: doc.content ?? '',
-      document_type: doc.documentType as Database["public"]["Enums"]["legal_document_type"],
-      publication_date: doc.metadata?.publication_date,
-      source_url: doc.metadata?.source_url,
-    };
-  }
-
-  /**
-   * Get a document by ID with caching
-   */
-  protected async getDocument(documentId: string, user?: AgentContext['user']): Promise<LegalDocument | null> {
-    // Check authentication if required
-    if (this.config.securityConfig?.requireAuth && user) {
-      const isAuthenticated = await this.verifyAuthentication(user.id);
-      if (!isAuthenticated) {
-        throw new AgentSecurityError('Authentication failed');
-      }
-    }
-
-    // Check permissions
-    if (user && !this.hasRequiredPermissions(user)) {
-      throw new AgentSecurityError('Insufficient permissions to access document');
-    }
-
-    try {
-      const dbDoc = await this.documentService.getLegalDocument(documentId);
-      if (!dbDoc) return null;
-      return this.convertDbToLegalDocument(dbDoc);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  /**
-   * Update a document
-   */
-  protected async updateDocument(documentId: string, updates: Partial<LegalDocument>, user?: AgentContext['user']): Promise<LegalDocument> {
-    // Check authentication if required
-    if (this.config.securityConfig?.requireAuth && user) {
-      const isAuthenticated = await this.verifyAuthentication(user.id);
-      if (!isAuthenticated) {
-        throw new AgentSecurityError('Authentication failed');
-      }
-    }
-
-    // Check permissions
-    if (user && !this.hasRequiredPermissions(user)) {
-      throw new AgentSecurityError('Insufficient permissions to update document');
-    }
-
-    const updatedDbDoc = await this.documentService.updateLegalDocument(documentId, updates);
-    return this.convertDbToLegalDocument(updatedDbDoc);
-  }
-
-  /**
-   * Create a new document
-   */
-  protected async createDocument(document: Partial<LegalDocument>, user?: AgentContext['user']): Promise<LegalDocument> {
-    // Check authentication if required
-    if (this.config.securityConfig?.requireAuth && user) {
-      const isAuthenticated = await this.verifyAuthentication(user.id);
-      if (!isAuthenticated) {
-        throw new AgentSecurityError('Authentication failed');
-      }
-    }
-
-    // Check permissions
-    if (user && !this.hasRequiredPermissions(user)) {
-      throw new AgentSecurityError('Insufficient permissions to create document');
-    }
-
-    const dbDoc = this.convertLegalToDbDocument(document);
-    // The service expects the full insert type, let's just cast it for now
-    const created = await this.documentService.createLegalDocument(dbDoc as DbLegalDocumentInsert);
-    return this.convertDbToLegalDocument(created);
-  }
-
-  /**
    * Handle errors during agent operations
    */
   public handleError(error: Error, context: AgentContext): AgentResult {
@@ -476,9 +380,9 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       await this.logInteractionMetrics({
         agent_id: this.config.id,
         session_id: task.sessionId,
-        user_id: task.user?.id,
         response_time_ms: responseTimeMs,
-        confidence_score: (result as unknown as AgentResult).confidence ?? null,
+        confidence_score: (result as unknown as AgentResult).confidence ?? 0,
+        reasoning_log: this.reasoning_log,
       }, interactionId);
 
       return { ...result, interactionId };
@@ -487,13 +391,13 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       await this.logInteractionMetrics({
         agent_id: this.config.id,
         session_id: task.sessionId,
-        user_id: task.user?.id,
         response_time_ms: responseTimeMs,
         confidence_score: 0,
+        reasoning_log: this.reasoning_log,
       }, interactionId);
-
+      
       const agentResult = this.handleError(error as Error, task.context as AgentContext);
-      return { ...agentResult, interactionId } as U & { interactionId: string };
+      return { ...agentResult, interactionId } as unknown as U & { interactionId: string };
     }
   }
 
@@ -510,7 +414,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     matchCount: number = 5
   ): Promise<Array<{ id: string; content: string; similarity: number }>> {
     try {
-      const queryEmbedding = await this.embeddingService.createEmbedding(query);
+      const queryEmbedding = await this.embeddingService.getEmbedding(query);
       const searchResults = await this.vectorStoreService.similaritySearch(
         queryEmbedding,
         matchThreshold,

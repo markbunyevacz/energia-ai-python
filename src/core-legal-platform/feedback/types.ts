@@ -55,9 +55,11 @@ export interface InteractionMetrics {
   interaction_id: InteractionId;
   agent_id: AgentId;
   session_id: string;
+  user_id?: string;
   created_at: string;
   response_time_ms: number;
   confidence_score?: number;
+  reasoning_log?: { step: string; timestamp: string; }[];
 }
 
 /**
