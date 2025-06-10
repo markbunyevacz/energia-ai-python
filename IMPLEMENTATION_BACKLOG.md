@@ -26,6 +26,23 @@ This document tracks the progress of the project implementation, divided into ph
 
 ---
 
+## Cross-Cutting Concerns & Quality Assurance (Verified against dp.md)
+**Status:** 🕒 Not Started
+*   [ ] **Task QA.1: Establish Comprehensive Test Strategy**
+    *   **Context:** The `dp.md` success criteria mandates at least 80% test coverage for new components. The existing test environment is noted as unstable, and end-to-end tests have been deferred (see TD.3.4).
+    *   **Action:** Stabilize the test environment. Define and implement a comprehensive testing strategy that includes unit, integration, and end-to-end tests. Integrate test execution and coverage reporting into the CI/CD pipeline.
+*   [ ] **Task QA.2: Implement Robust Error Handling & Fault Tolerance**
+    *   **Context:** `dp.md` requires comprehensive error handling to ensure agents can operate independently and the system degrades gracefully.
+    *   **Action:** Design and implement a standardized error handling and logging framework across the application. Ensure that failures in one agent or domain do not cascade and cause system-wide outages.
+*   [ ] **Task QA.3: Define and Implement Performance Benchmarking**
+    *   **Context:** A key success metric in `dp.md` is that document processing maintains or improves on current performance levels.
+    *   **Action:** Create a suite of performance benchmarks to measure key operations (e.g., document ingestion, agent query response time, semantic search retrieval). Run these benchmarks as part of the CI/CD process to detect performance regressions.
+*   [ ] **Task QA.4: Enforce Code-Level Documentation Standards**
+    *   **Context:** `dp.md` emphasizes comprehensive documentation as part of overall code quality. While living documentation exists, code-level documentation needs to be standardized.
+    *   **Action:** Define a standard for code comments and API documentation (e.g., using JSDoc/TSDoc). Enforce this standard through linting rules and code reviews.
+
+---
+
 ## Bug Fixes & System Repairs
 **Status:** ✅ Completed
 *   [x] **Task BF.1: Repaired Critical User Creation Bug**
@@ -93,10 +110,10 @@ This document tracks the progress of the project implementation, divided into ph
     *   [x] Create `interaction_metrics` and `user_feedback` tables in Supabase to store performance and user-provided data.
     *   [x] Implement `FeedbackService` (`src/core-legal-platform/feedback/FeedbackService.ts`) to handle the submission and retrieval of feedback.
     *   [x] Integrate automated metrics collection into the `BaseAgent`'s `processWithTelemetry` method.
-*   [ ] **Task 3.2: Implement Chain-of-Thought (CoT) Reasoning**
-    *   [ ] Add a `reasoning_log` column to the `interaction_metrics` table to store agent reasoning steps.
-    *   [ ] Implement a `reason()` method in `BaseAgent` to structure and generate the reasoning log.
-    *   [ ] Update `processWithTelemetry` to capture and persist the CoT log for each interaction.
+*   [x] **Task 3.2: Implement Chain-of-Thought (CoT) Reasoning**
+    *   [x] Add a `reasoning_log` column to the `interaction_metrics` table to store agent reasoning steps.
+    *   [x] Implement a `reason()` method in `BaseAgent` to structure and generate the reasoning log.
+    *   [x] Update `processWithTelemetry` to capture and persist the CoT log for each interaction.
 *   [ ] **Task 3.3: Implement Proactive Agent Suggestions Framework**
     *   [ ] Add a `suggestions` property to the `AgentResult` interface.
     *   [ ] Implement a `generateSuggestions()` method in `BaseAgent` as a framework for subclasses to provide proactive insights.

@@ -1,15 +1,14 @@
-export interface LLMResponse {
-  content: string;
+export interface LLMConfig {
+  apiKey: string;
+  model: string;
 }
 
-export abstract class BaseLLM {
-  protected apiKey: string;
-  protected model: string;
+export interface LLMResult {
+  content: string;
+  metadata?: Record<string, any>;
+}
 
-  constructor(apiKey: string, model: string) {
-    this.apiKey = apiKey;
-    this.model = model;
-  }
-
-  abstract chat(prompt: string): Promise<LLMResponse>;
+export interface BaseLLM {
+  config: LLMConfig;
+  generate(prompt: string, options?: any): Promise<LLMResult>;
 } 
