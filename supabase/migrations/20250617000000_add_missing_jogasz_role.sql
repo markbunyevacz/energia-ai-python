@@ -1,0 +1,14 @@
+-- Add the missing 'jogász' enum value back to the user_role type.
+--
+-- REASON FOR THIS FIX:
+-- After fixing the missing 'role' column in the 'profiles' table, a new
+-- error emerged: "invalid input value for enum public.user_role: 'jogász'".
+--
+-- This was caused by a schema conflict where an early migration had defined
+-- the 'jogász' role, but a later, non-migration script had re-created the
+-- enum without this value. This left the database in a state where other
+-- parts of the system still expected the 'jogász' role to exist.
+--
+-- This migration adds the missing value back to the live enum, resolving
+-- the conflict and allowing user creation to succeed.
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'jogász'; 

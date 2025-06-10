@@ -18,6 +18,26 @@ This document tracks the progress of the project implementation, divided into ph
 
 ---
 
+## Bug Fixes & System Repairs
+**Status:** ✅ Completed
+*   [x] **Task BF.1: Repaired Critical User Creation Bug**
+    *   **Context:** New user creation and login were completely blocked, failing with a `500 Internal Server Error`. This was a critical production issue.
+    *   **Action:** A deep-dive analysis revealed a series of cascading failures originating from a corrupted database schema and out-of-sync migrations. The following repairs were implemented:
+        *   [x] **Schema Repair:** Added a missing `role` column back to the `profiles` table.
+        *   [x] **Enum Repair:** Added a missing `'jogász'` value back to the `user_role` enum type.
+        *   [x] **RLS Policy Repair:** Fixed a circular dependency in the Row Level Security policies for the `user_roles` table by implementing a `SECURITY DEFINER` function (`get_my_role`) to safely check the current user's role.
+*   [x] **Task BF.2: Implemented Hierarchical Role-Based Authorization**
+    *   **Context:** The authorization logic was too restrictive, checking for exact role matches (e.g., an `admin` could not access a `viewer` page).
+    *   **Action:** Refactored the `ProtectedRoute` component to support a role hierarchy (`admin` > `legal_manager` > `analyst` > `viewer`), allowing users with higher privileges to access all content available to lower-privilege roles.
+*   [x] **Task BF.3: Stabilized Supabase Migration History**
+    *   **Context:** The Supabase migration history had become corrupted and out-of-sync with the live database, preventing any new migrations from being applied.
+    *   **Action:** Manually repaired the migration history by running a series of `supabase migration repair` commands, bringing the local and remote schemas back into alignment.
+*   [x] **Task BF.4: Improved Login Page UI**
+    *   **Context:** The login page had a basic design.
+    *   **Action:** Updated the `Login.tsx` component with a cleaner, more modern design to improve the user experience.
+
+---
+
 ## Phase 0: Architecture Guardrails
 **Status:** ✅ Completed
 *   [x] **Task 0.1: Establish Living Documentation**

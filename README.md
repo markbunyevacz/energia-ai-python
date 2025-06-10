@@ -19,6 +19,11 @@ A modern web application for legal document analysis and contract management, bu
 - 🔐 Secure document handling
 - 📱 Responsive design
 
+### Key Systems
+
+-   **Authentication & Authorization**: A robust, role-based access control (RBAC) system built on Supabase. It includes a custom `profiles` table and a `user_roles` table, with a clear hierarchy (`admin` > `legal_manager` > `analyst` > `viewer`). Row Level Security (RLS) is enforced, and a secure `get_my_role()` function prevents common authorization pitfalls.
+-   **AI-Powered Analysis**: The core of the application, featuring an `AIAgentRouter` that intelligently routes user queries to the most appropriate AI agent based on context and keywords.
+
 ## Getting Started
 
 ### Prerequisites
@@ -39,13 +44,23 @@ A modern web application for legal document analysis and contract management, bu
    npm install
    ```
 
-3. Create a `.env` file in the root directory and add your environment variables:
+3. Create a `.env` file in the root directory and add your environment variables and Supabase environment variables:
    ```env
    VITE_API_URL=your_api_url
    VITE_API_KEY=your_api_key
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-4. Start the development server:
+4. Apply the database migrations:
+   This project uses Supabase for database management. To set up your local database schema, you will need to have the Supabase CLI installed and run the migrations located in the `supabase/migrations` directory.
+
+   ```bash
+   # (Assuming Supabase CLI is installed and you are logged in)
+   supabase db push
+   ```
+
+5. Start the development server:
    ```bash
    npm run dev
    ```

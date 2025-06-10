@@ -152,14 +152,26 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
   }
 
   /**
-   * Check role-based authorization if a specific role is required
-   * Ensures user has the exact role needed for the protected resource
-   * Provides specific error message indicating required role
-   * 
    * TODO: Consider implementing role hierarchy (e.g., admin can access all roles)
    * TODO: Add security logging for unauthorized access attempts
    */
-  if (requiredRole && user.role !== requiredRole) {
+
+  // Defines the hierarchical level of each user role. A higher number
+  // indicates a higher level of privilege. This is used to allow users with
+  // higher roles to access routes intended for lower-level roles
+  // (e.g., an 'admin' can access a 'viewer' page).
+  const roleHierarchy: Record<UserRole, number> = {
+    viewer: 1,
+    analyst: 2,
+    legal_manager: 3,
+    admin: 4,
+  };
+
+  // Checks if a role is required for the route and if the current user's
+  // role meets the minimum level required. If the user's role is not
+  // sufficient, they are shown an error message. This is the core of the
+  // hierarchical RBAC system.
+  if (requiredRole && (!user.role || roleHierarchy[user.role] < roleHierarchy[requiredRole])) {
     // TODO: Log unauthorized access attempt for security monitoring
     // securityLogger.logUnauthorizedAccess({
     //   userId: user.id,

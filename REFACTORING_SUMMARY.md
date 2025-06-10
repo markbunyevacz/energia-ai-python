@@ -126,6 +126,22 @@ This document summarizes the comprehensive refactoring and documentation improve
 - Accessible design with proper ARIA attributes
 - Consistent error state presentation
 
+### 8. Authentication and Authorization System Overhaul
+
+**Summary of Changes:**
+A comprehensive overhaul of the authentication and authorization systems was performed to fix a critical bug preventing new user creation and login. The process involved deep-diving into the database schema, frontend logic, and Supabase migration history to diagnose and resolve a series of cascading failures.
+
+**Key Issues Resolved:**
+- **Database Schema Corruption:** Fixed a critical schema mismatch where a `role` column was missing from the `profiles` table and a `user_role` enum value was missing, which caused all user creation attempts to fail with a `500 Internal Server Error`.
+- **Faulty RLS Policies:** Repaired circular Row Level Security (RLS) policies on the `user_roles` table that were preventing the application from fetching user roles after login. This was fixed by implementing a `SECURITY DEFINER` function (`get_my_role`) to safely check roles without causing an infinite loop.
+- **Supabase Migration History:** Repaired a corrupted and out-of-sync Supabase migration history that was preventing schema changes from being applied correctly.
+- **Restrictive Frontend Authorization:** The `ProtectedRoute` component was refactored to support a role hierarchy (e.g., `admin` > `legal_manager` > `viewer`), allowing users with higher privileges to access pages intended for lower-level roles.
+
+**New Implementations:**
+- **`get_my_role()` SQL Function:** A new security-definer function was added to the database to provide a secure and non-circular way of checking the current user's role.
+- **Role Hierarchy Logic:** The frontend `ProtectedRoute` now enforces a logical hierarchy of roles, making the authorization system more flexible and robust.
+- **Login Page UI Update:** The login page was updated with a cleaner, more modern design for an improved user experience.
+
 ## Documentation Standards Implemented
 
 ### 1. JSDoc Comments
