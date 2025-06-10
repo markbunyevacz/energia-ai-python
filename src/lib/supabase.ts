@@ -209,4 +209,4 @@ export const verifyEmail = async (token: string): Promise<void> => {
   if (error) {
     throw new Error(`Email verification failed: ${error.message}`);
   }
-}; 
+};

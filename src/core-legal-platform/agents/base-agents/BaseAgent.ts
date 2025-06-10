@@ -2,13 +2,13 @@ import { LegalDocument, DocumentType } from '@/core-legal-platform/legal-domains
 import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
 import { LegalDocumentService } from '@/core-legal-platform/legal/legalDocumentService';
 import type { Database, Json } from '@/integrations/supabase/types';
-import NodeCache from 'node-cache';
 import { v4 as uuidv4 } from 'uuid';
 import { FeedbackService } from '@/core-legal-platform/feedback/FeedbackService';
 import { InteractionMetrics } from '@/core-legal-platform/feedback/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { supabase as supabaseClient } from '@/integrations/supabase/client';
-import { AgentResponse, AgentTask, AgentContext, AgentResult } from '@/core-legal-platform/agents/types';
+import { AgentContext, AgentResult } from '@/core-legal-platform/agents/base-agents/BaseAgent';
+import { AgentResponse, AgentTask } from '@/core-legal-platform/agents/types';
 import { BaseLLM } from '@/llm/base-llm';
 
 type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
@@ -36,13 +36,24 @@ export interface AgentConfig {
   };
 }
 
-export { AgentContext, AgentResult };
+export interface AgentContext {
+  document?: LegalDocument;
+  sessionId: string;
+  user?: { id: string; role?: string };
+  domain: string;
+  query?: string;
+}
+
+export interface AgentResult<T = any> {
+  success: boolean;
+  data: T | null;
+  error?: string;
+}
 
 export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends AgentResponse = AgentResponse> {
   protected config: AgentConfig;
   protected domainRegistry: DomainRegistry;
   protected documentService: LegalDocumentService;
-  protected documentCache: NodeCache;
   protected batchQueue: LegalDocument[] = [];
   protected batchTimeout: NodeJS.Timeout | null = null;
   protected feedbackService: FeedbackService;
@@ -71,13 +82,6 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     this.name = name;
     this.description = description;
     this.agentId = uuidv4();
-    
-    // Initialize cache with config
-    this.documentCache = new NodeCache({
-      stdTTL: config.cacheConfig?.ttl ?? 300, // Default 5 minutes
-      maxKeys: config.cacheConfig?.maxSize ?? 1000, // Default 1000 items
-      checkperiod: 60, // Check for expired keys every minute
-    });
   }
 
   /**
@@ -262,7 +266,6 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       clearTimeout(this.batchTimeout);
     }
     await this.processBatchQueue();
-    this.documentCache.flushAll();
   }
 
   /**
@@ -392,19 +395,12 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       throw new AgentSecurityError('Insufficient permissions to access document');
     }
 
-    // Check cache first
-    const cached = this.documentCache.get<LegalDocument>(documentId);
-    if (cached) {
-      return cached;
-    }
-
     try {
       const dbDoc = await this.documentService.getLegalDocument(documentId);
       const document = this.convertDbToLegalDocument(dbDoc);
       if (dbDoc.content === null) {
         dbDoc.content = '';
       }
-      this.documentCache.set(documentId, document);
       return document;
     } catch (error) {
       return null;
@@ -436,7 +432,6 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       document_type: updates.documentType as 'law' | 'regulation' | 'policy' | 'decision' | 'other' ?? dbDoc.document_type,
     };
     const document = this.convertDbToLegalDocument(updatedDoc);
-    this.documentCache.set(documentId, document);
     return document;
   }
 
@@ -464,7 +459,6 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       document_type: document.documentType
     });
     const newDocument = this.convertDbToLegalDocument(created);
-    this.documentCache.set(created.id, newDocument);
     return newDocument;
   }
 
