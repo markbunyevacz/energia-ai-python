@@ -1,7 +1,9 @@
 import { supabase } from '../../integrations/supabase/client.js';
 import type { Database } from '../../integrations/supabase/types.js';
+import { LegalDocument, DocumentType } from '@/core-legal-platform/legal-domains/types';
+import { vectorStoreService } from '../vector-store/VectorStoreService.js';
 
-type LegalDocument = Database['public']['Tables']['legal_documents']['Row'];
+type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
 type LegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
 type LegalChange = Database['public']['Tables']['legal_changes']['Row'];
 type LegalChangeInsert = Database['public']['Tables']['legal_changes']['Insert'];
@@ -10,28 +12,77 @@ type ContractInsert = Database['public']['Tables']['contracts']['Insert'];
 type ContractImpact = Database['public']['Tables']['contract_impacts']['Row'];
 type ContractImpactInsert = Database['public']['Tables']['contract_impacts']['Insert'];
 
+// A mapping between the domain-level DocumentType and the database enum
+const toDbDocumentType = (type: DocumentType): LegalDocumentInsert['document_type'] => {
+  const mapping: Record<DocumentType, LegalDocumentInsert['document_type']> = {
+    'law': 'törvény',
+    'regulation': 'rendelet',
+    'policy': 'szabályzat',
+    'decision': 'határozat',
+    'other': 'egyéb',
+  };
+  return mapping[type];
+};
+
+const fromDbDocumentType = (type: DbLegalDocument['document_type']): DocumentType => {
+    const mapping: Record<DbLegalDocument['document_type'], DocumentType> = {
+        'törvény': 'law',
+        'rendelet': 'regulation',
+        'szabályzat': 'policy',
+        'határozat': 'decision',
+        'egyéb': 'other',
+        // This handles the other potential values from the DB enum
+        'szerződés': 'other', 
+    };
+    return mapping[type];
+}
+
+const toLegalDocument = (dbDoc: DbLegalDocument): LegalDocument => {
+    return {
+        ...dbDoc,
+        documentType: fromDbDocumentType(dbDoc.document_type),
+        metadata: typeof dbDoc.metadata === 'string' ? JSON.parse(dbDoc.metadata) : dbDoc.metadata ?? {},
+    };
+};
+
 export class LegalDocumentService {
   // Legal Documents
-  async createLegalDocument(document: LegalDocumentInsert): Promise<LegalDocument> {
+  async createLegalDocument(document: Omit<LegalDocument, 'id'>): Promise<LegalDocument> {
+    const docToInsert: LegalDocumentInsert = {
+      title: document.title,
+      content: document.content,
+      document_type: toDbDocumentType(document.documentType),
+      domain_id: document.domainId,
+      metadata: document.metadata ? JSON.stringify(document.metadata) : null,
+    };
+
     const { data, error } = await supabase
       .from('legal_documents')
-      .insert(document)
+      .insert(docToInsert)
       .select()
       .single();
     
     if (error) throw error;
-    return data;
+
+    const newDoc = toLegalDocument(data);
+
+    if (newDoc.content) {
+      vectorStoreService.addDocument({ id: newDoc.id, content: newDoc.content })
+        .catch(err => console.error(`Failed to add document ${newDoc.id} to vector store:`, err));
+    }
+    
+    return newDoc;
   }
 
-  async getLegalDocument(id: string): Promise<LegalDocument> {
+  async getLegalDocument(id: string): Promise<LegalDocument | null> {
     const { data, error } = await supabase
       .from('legal_documents')
       .select()
       .eq('id', id)
       .single();
     
-    if (error) throw error;
-    return data;
+    if (error) return null;
+    return toLegalDocument(data);
   }
 
   async listLegalDocuments(): Promise<LegalDocument[]> {
@@ -41,7 +92,25 @@ export class LegalDocumentService {
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data;
+    return data.map(toLegalDocument);
+  }
+
+  async updateLegalDocument(id: string, updates: Partial<Omit<LegalDocument, 'id'>>): Promise<LegalDocument> {
+    const updatesToInsert: Partial<LegalDocumentInsert> = {
+        ...updates,
+        document_type: updates.documentType ? toDbDocumentType(updates.documentType) : undefined,
+    };
+    delete (updatesToInsert as any).documentType; // remove the domain-level type
+
+    const { data, error } = await supabase
+      .from('legal_documents')
+      .update(updatesToInsert)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return toLegalDocument(data);
   }
 
   // Legal Changes

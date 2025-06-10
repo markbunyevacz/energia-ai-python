@@ -15,8 +15,7 @@ export interface LegalDomain {
   active: boolean;
 }
 
-// Extend existing DocumentType enum
-export type DocumentType = Database['public']['Enums']['document_type'];
+export type DocumentType = 'law' | 'regulation' | 'policy' | 'decision' | 'other';
 export type LegalHierarchyLevel = Database['public']['Enums']['legal_hierarchy_level'];
 
 export interface LegalDocument {
@@ -26,8 +25,6 @@ export interface LegalDocument {
   documentType: DocumentType;
   domainId: string;
   metadata: {
-    created_at: string;
-    updated_at: string;
     [key: string]: any;
   };
 }

@@ -5,16 +5,24 @@ This document tracks the progress of the project implementation, divided into ph
 ---
 
 ## Technical Debt & Refinements
-**Status:** 🕒 Not Started
-*   [ ] **Task TD.1: Automate Supabase Type Generation**
+**Status:** ⏳ In Progress
+*   [x] **Task TD.1: Automate Supabase Type Generation**
     *   **Context:** The `Database` type definitions in `src/integrations/supabase/types.ts` are currently maintained manually. This is error-prone and leads to type mismatches when the database schema changes.
     *   **Action:** Implement a script (e.g., using `supabase gen types typescript`) that automatically generates TypeScript definitions from the live database schema and integrate it into the development workflow.
-*   [ ] **Task TD.2: Refactor `BaseAgent` Type Conversions**
+*   [x] **Task TD.2: Refactor `BaseAgent` Type Conversions**
     *   **Context:** The `convertDbToLegalDocument` and `convertLegalToDbDocument` methods in `BaseAgent.ts` use `any` casts and workarounds (e.g., `metadata: null`) to bypass strict type-checking. This was a temporary fix to resolve linter errors.
     *   **Action:** Refactor these methods to be fully type-safe, removing all `any` casts and ensuring data integrity between the application and database layers. This is dependent on **TD.1**.
 *   [ ] **Task TD.3: Refine Long-Term Memory (Vector Store) Integration**
-    *   **Context:** Phase 2.3 for Long-Term memory is unimplemented. The current system relies only on working memory.
-    *   **Action:** Fully implement the vector store for long-term memory, including embedding generation, storage, and retrieval logic, and integrate it into `BaseAgent`.
+    *   **Context:** Phase 2.3 for Long-Term memory is unimplemented. The current system relies only on working memory. A robust long-term memory is foundational for advanced agent capabilities in Phase 5.
+    *   **Action:** Fully implement and integrate the vector store for long-term memory into the `BaseAgent`.
+    *   **Sub-tasks:**
+        *   [x] **TD.3.1: Analyze Existing Memory Components:** Review `VectorStoreService` and `EmbeddingService` to map out the current, partially implemented state.
+        *   [x] **TD.3.2: Implement Embedding Persistence:** Add logic to generate and save vector embeddings for document chunks whenever a document is created or updated.
+        *   [⚠️] **TD.3.3: Integrate Memory Retrieval into `BaseAgent`:** Create a `searchLongTermMemory` method in `BaseAgent` to provide a common, reusable interface for semantic search. **(Blocked)**
+        *   [ ] **TD.3.4: Create End-to-End Validation Test:** Implement a test to verify the entire workflow, from document creation to retrieval via semantic search.
+*   [ ] **Task TD.4: Resolve Domain vs. Database Type Mismatch (NEW)**
+    *   **Context:** There is a critical divergence between the application's `LegalDocument` type (which includes `domainId` and `metadata`) and the `legal_documents` database table schema (which lacks these fields). This prevents type-safe integration between the service layer and the agent layer.
+    *   **Action:** Reconcile the domain and database types. This may involve migrating the database schema to include the missing fields, refactoring the `LegalDocumentService` to perform the necessary joins and data synthesis, or a combination of both. This task blocks TD.3.3.
 
 ---
 
@@ -241,4 +249,4 @@ This document tracks the progress of the project implementation, divided into ph
     *   [ ] **Sub-task 10.3.2:** Document the process for restoring the system from a backup in case of failure.
 *   [ ] **Task 10.4: Add Comprehensive Logging and Alerting**
     *   [ ] **Sub-task 10.4.1:** Set up a centralized logging system (e.g., ELK Stack, Loki, or a cloud provider's service).
-    *   [ ] **Sub-task 10.4.2:** Configure alerts in Prometheus/Alertmanager or the logging system to notify the team of critical errors or performance degradation. 
+    *   [_] **Sub-task 10.4.2:** Configure alerts in Prometheus/Alertmanager or the logging system to notify the team of critical errors or performance degradation.

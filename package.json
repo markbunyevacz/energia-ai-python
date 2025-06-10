@@ -19,7 +19,8 @@
     "test:ui": "vitest --ui",
     "test:integration": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' vitest run",
     "process:documents": "NODE_OPTIONS='--loader ts-node/esm' ts-node scripts/processLegalDocuments.ts",
-    "check:arch": "depcruise --config .dependency-cruiser.cjs src"
+    "check:arch": "depcruise --config .dependency-cruiser.cjs src",
+    "supabase:types": "supabase gen types typescript --project-id abjuvmwpjapknuxqrefg > src/integrations/supabase/types.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.18.0",
@@ -70,7 +71,6 @@
     "cmdk": "^1.1.1",
     "cypress": "^14.4.0",
     "diff": "^8.0.2",
-    "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.6.0",
     "express": "^4.21.2",
     "input-otp": "^1.4.2",

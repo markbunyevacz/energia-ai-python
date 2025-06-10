@@ -7,53 +7,34 @@ import { FeedbackService } from '@/core-legal-platform/feedback/FeedbackService'
 import { InteractionMetrics } from '@/core-legal-platform/feedback/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { supabase as supabaseClient } from '@/integrations/supabase/client';
-import { AgentContext, AgentResult } from '@/core-legal-platform/agents/base-agents/BaseAgent';
-import { AgentResponse, AgentTask } from '@/core-legal-platform/agents/types';
+import { AgentConfig, AgentContext, AgentResult, AgentResponse, AgentTask } from '@/core-legal-platform/agents/types';
 import { BaseLLM } from '@/llm/base-llm';
+import { vectorStoreService, VectorStoreService } from '@/core-legal-platform/vector-store/VectorStoreService';
+import { EmbeddingService } from '@/core-legal-platform/embedding/EmbeddingService';
 
 type DbLegalDocument = Database['public']['Tables']['legal_documents']['Row'];
 type DbLegalDocumentInsert = Database['public']['Tables']['legal_documents']['Insert'];
 
-export interface AgentConfig {
-  id: string;
-  name: string;
-  description: string;
-  domainCode: string;
-  enabled: boolean;
-  metadata?: Record<string, any>;
-  cacheConfig?: {
-    ttl: number; // Time to live in seconds
-    maxSize: number; // Maximum number of items in cache
-  };
-  batchConfig?: {
-    maxBatchSize: number; // Maximum number of documents to process in a batch
-    batchTimeout: number; // Maximum time to wait for batch completion in milliseconds
-  };
-  securityConfig?: {
-    requireAuth: boolean; // Whether authentication is required
-    allowedRoles: string[]; // Roles that can access this agent
-    allowedDomains: string[]; // Domains this agent can access
-  };
+export class AgentSecurityError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AgentSecurityError';
+  }
 }
 
-export interface AgentContext {
-  document?: LegalDocument;
-  sessionId: string;
-  user?: { id: string; role?: string };
-  domain: string;
-  query?: string;
-}
-
-export interface AgentResult<T = any> {
-  success: boolean;
-  data: T | null;
-  error?: string;
+export interface BatchProcessingResult {
+  total: number;
+  successful: number;
+  failed: number;
+  results: AgentResult[];
 }
 
 export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends AgentResponse = AgentResponse> {
   protected config: AgentConfig;
   protected domainRegistry: DomainRegistry;
   protected documentService: LegalDocumentService;
+  protected vectorStoreService: VectorStoreService;
+  protected embeddingService: EmbeddingService;
   protected batchQueue: LegalDocument[] = [];
   protected batchTimeout: NodeJS.Timeout | null = null;
   protected feedbackService: FeedbackService;
@@ -66,16 +47,18 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
 
   constructor(
     config: AgentConfig,
-    domainRegistry?: DomainRegistry,
     llm: BaseLLM,
     systemPrompt: string,
     name: string,
     description: string,
+    domainRegistry?: DomainRegistry,
   ) {
     this.config = config;
     this.domainRegistry = domainRegistry || DomainRegistry.getInstance();
     this.documentService = new LegalDocumentService();
     this.supabase = supabaseClient;
+    this.vectorStoreService = vectorStoreService;
+    this.embeddingService = new EmbeddingService();
     this.feedbackService = new FeedbackService(this.supabase);
     this.llm = llm;
     this.systemPrompt = systemPrompt;
@@ -96,9 +79,16 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   public async processWithTelemetry(context: AgentContext): Promise<AgentResult & { interactionId: string }> {
     const startTime = Date.now();
     const interactionId = context.document?.id || uuidv4();
-    
+
+    const task = {
+      query: context.query,
+      context: context,
+      sessionId: context.sessionId,
+      user: context.user,
+    } as T;
+
     try {
-      const result = await this.process(context as T);
+      const result = await this.process(task);
       const responseTimeMs = Date.now() - startTime;
 
       await this.logInteractionMetrics({
@@ -106,11 +96,10 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
         session_id: context.sessionId,
         user_id: context.user?.id,
         response_time_ms: responseTimeMs,
-        confidence_score: result.data?.confidence ?? null,
+        confidence_score: (result as unknown as AgentResult).confidence ?? null,
       }, interactionId);
-      
-      return { ...result, interactionId };
 
+      return { ...(result as unknown as AgentResult), interactionId };
     } catch (error) {
       const responseTimeMs = Date.now() - startTime;
       await this.logInteractionMetrics({
@@ -120,7 +109,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
         response_time_ms: responseTimeMs,
         confidence_score: 0,
       }, interactionId);
-      const agentResult = this.handleError(error as Error, context as AgentContext);
+      const agentResult = this.handleError(error as Error, context);
       return { ...agentResult, interactionId };
     }
   }
@@ -128,7 +117,10 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   /**
    * Logs interaction metrics to the feedback service.
    */
-  protected async logInteractionMetrics(metrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at'>, interactionId: string) {
+  protected async logInteractionMetrics(
+    metrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at'>,
+    interactionId: string
+  ) {
     try {
       const interactionMetrics: InteractionMetrics = {
         ...metrics,
@@ -157,15 +149,16 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     const endTime = Date.now();
     const responseTimeMs = endTime - startTime;
 
-    const interactionMetrics = {
-      interaction_id: interactionId,
-      agent_id: this.config.agentId,
+    const interactionMetrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at'> = {
+      agent_id: this.config.id,
+      session_id: task.sessionId,
+      user_id: task.user?.id,
       response_time_ms: responseTimeMs,
-      // confidence_score: result.confidenceScore, // This needs to be part of the result object
+      confidence_score: (result as unknown as AgentResult).confidence ?? null,
     };
 
     try {
-      await this.feedbackService.submitInteractionMetrics(interactionMetrics);
+      await this.logInteractionMetrics(interactionMetrics, interactionId);
     } catch (error) {
       console.error(`[${this.config.name}] Failed to submit interaction metrics:`, error);
     }
@@ -198,9 +191,14 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     for (let i = 0; i < validDocuments.length; i += chunkSize) {
       const chunk = validDocuments.slice(i, i + chunkSize);
       const chunkResults = await Promise.all(
-        chunk.map(doc => this.processWithTelemetry({ document: doc, domain: this.config.domainCode, user }))
+        chunk.map(doc => this.processWithTelemetry({
+          document: doc,
+          domain: this.config.domainCode,
+          user,
+          sessionId: uuidv4(),
+        }))
       );
-      
+
       chunkResults.forEach(result => {
         results.push(result);
         if (result.success) successful++;
@@ -319,13 +317,11 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   /**
    * Check if user has required permissions
    */
-  protected hasRequiredPermissions(user: AgentContext['user']): boolean {
-    if (!user) return false;
-
+  protected hasRequiredPermissions(user: NonNullable<AgentContext['user']>): boolean {
     const { allowedRoles, allowedDomains } = this.config.securityConfig ?? {};
-    
+
     // Check role permissions
-    if (allowedRoles && !allowedRoles.includes(user.role)) {
+    if (allowedRoles && user.role && !allowedRoles.includes(user.role)) {
       return false;
     }
 
@@ -346,8 +342,8 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     }
 
     try {
-      const { data: { user }, error } = await supabaseClient.auth.getUser(userId);
-      return !error && !!user;
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      return !!user && user.id === userId;
     } catch (error) {
       return false;
     }
@@ -361,20 +357,28 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       id: dbDoc.id,
       title: dbDoc.title,
       content: dbDoc.content ?? '',
-      documentType: dbDoc.document_type as any, // Cast to any to avoid enum issues
-      domainId: dbDoc.domain_id ?? '',
-      metadata: (dbDoc.metadata as any) ?? {},
+      documentType: dbDoc.document_type as DocumentType,
+      domainId: 'unknown', // Synthesized field
+      metadata: {
+        publication_date: dbDoc.publication_date,
+        source_url: dbDoc.source_url,
+        created_at: dbDoc.created_at,
+        updated_at: dbDoc.updated_at,
+      },
     };
   }
 
   /**
    * Convert LegalDocument to database insert type
    */
-  private convertLegalToDbDocument(doc: Omit<LegalDocument, 'id' | 'metadata'>): Omit<DbLegalDocument, 'id' | 'created_at' | 'updated_at' | 'domain_id' | 'document_type'> & { metadata: Json | null } {
+  private convertLegalToDbDocument(doc: Partial<LegalDocument>): DbLegalDocumentInsert {
     return {
-      title: doc.title,
-      content: doc.content,
-      metadata: null
+      id: doc.id,
+      title: doc.title ?? '',
+      content: doc.content ?? '',
+      document_type: doc.documentType as Database["public"]["Enums"]["legal_document_type"],
+      publication_date: doc.metadata?.publication_date,
+      source_url: doc.metadata?.source_url,
     };
   }
 
@@ -397,11 +401,8 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
 
     try {
       const dbDoc = await this.documentService.getLegalDocument(documentId);
-      const document = this.convertDbToLegalDocument(dbDoc);
-      if (dbDoc.content === null) {
-        dbDoc.content = '';
-      }
-      return document;
+      if (!dbDoc) return null;
+      return this.convertDbToLegalDocument(dbDoc);
     } catch (error) {
       return null;
     }
@@ -424,21 +425,14 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       throw new AgentSecurityError('Insufficient permissions to update document');
     }
 
-    const dbDoc = await this.documentService.getLegalDocument(documentId);
-    const updatedDoc = {
-      ...dbDoc,
-      title: updates.title ?? dbDoc.title,
-      content: updates.content ?? dbDoc.content,
-      document_type: updates.documentType as 'law' | 'regulation' | 'policy' | 'decision' | 'other' ?? dbDoc.document_type,
-    };
-    const document = this.convertDbToLegalDocument(updatedDoc);
-    return document;
+    const updatedDbDoc = await this.documentService.updateLegalDocument(documentId, updates);
+    return this.convertDbToLegalDocument(updatedDbDoc);
   }
 
   /**
    * Create a new document
    */
-  protected async createDocument(document: Omit<LegalDocument, 'id' | 'metadata'>, user?: AgentContext['user']): Promise<LegalDocument> {
+  protected async createDocument(document: Partial<LegalDocument>, user?: AgentContext['user']): Promise<LegalDocument> {
     // Check authentication if required
     if (this.config.securityConfig?.requireAuth && user) {
       const isAuthenticated = await this.verifyAuthentication(user.id);
@@ -453,13 +447,9 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     }
 
     const dbDoc = this.convertLegalToDbDocument(document);
-    const created = await this.documentService.createLegalDocument({
-      ...dbDoc,
-      domain_id: document.domainId,
-      document_type: document.documentType
-    });
-    const newDocument = this.convertDbToLegalDocument(created);
-    return newDocument;
+    // The service expects the full insert type, let's just cast it for now
+    const created = await this.documentService.createLegalDocument(dbDoc as DbLegalDocumentInsert);
+    return this.convertDbToLegalDocument(created);
   }
 
   /**
@@ -470,8 +460,8 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     // Basic error handling, can be customized in subclasses
     return {
       success: false,
-      message: `Error processing document ${context.document?.id}: ${error.message}`,
-      error,
+      data: null,
+      error: `Error processing document ${context.document?.id}: ${error.message}`,
     };
   }
 
@@ -488,11 +478,10 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
         session_id: task.sessionId,
         user_id: task.user?.id,
         response_time_ms: responseTimeMs,
-        confidence_score: result.data?.confidence ?? null,
+        confidence_score: (result as unknown as AgentResult).confidence ?? null,
       }, interactionId);
 
       return { ...result, interactionId };
-
     } catch (error) {
       const responseTimeMs = Date.now() - startTime;
       await this.logInteractionMetrics({
@@ -502,9 +491,44 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
         response_time_ms: responseTimeMs,
         confidence_score: 0,
       }, interactionId);
-      
-      const agentResult = this.handleError(error as Error, task.context);
+
+      const agentResult = this.handleError(error as Error, task.context as AgentContext);
       return { ...agentResult, interactionId } as U & { interactionId: string };
+    }
+  }
+
+  /**
+   * Searches the long-term memory for content related to the query.
+   * @param query The search query.
+   * @param matchThreshold The minimum similarity score to consider a match.
+   * @param matchCount The maximum number of matches to return.
+   * @returns A list of relevant document chunks.
+   */
+  protected async searchLongTermMemory(
+    query: string,
+    matchThreshold: number = 0.75,
+    matchCount: number = 5
+  ): Promise<Array<{ id: string; content: string; similarity: number }>> {
+    try {
+      const queryEmbedding = await this.embeddingService.createEmbedding(query);
+      const searchResults = await this.vectorStoreService.similaritySearch(
+        queryEmbedding,
+        matchThreshold,
+        matchCount
+      );
+
+      if (searchResults.error) {
+        throw searchResults.error;
+      }
+
+      return (searchResults.data ?? []).map((result: any) => ({
+        id: result.id,
+        content: result.content,
+        similarity: result.similarity,
+      }));
+    } catch (error) {
+      console.error('Error searching long-term memory:', error);
+      return [];
     }
   }
 } 

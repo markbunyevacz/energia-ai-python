@@ -2,11 +2,13 @@ import { ExampleAgent } from '../ExampleAgent';
 import { AgentConfig, AgentContext } from '../../base-agents/BaseAgent';
 import { LegalDocument } from '../../../legal-domains/types';
 import { DomainRegistry } from '../../../legal-domains/registry/DomainRegistry';
+import { vi } from 'vitest';
 
-jest.mock('../../../legal-domains/registry/DomainRegistry');
+vi.mock('../../../legal-domains/registry/DomainRegistry');
 
 describe('ExampleAgent', () => {
   let agent: ExampleAgent;
+  let domainRegistry: DomainRegistry;
   const mockConfig: AgentConfig = {
     id: 'example-agent',
     name: 'Example Agent',
