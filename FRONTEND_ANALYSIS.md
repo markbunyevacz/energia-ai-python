@@ -330,6 +330,62 @@ useEffect(() => {
 - Input validation and sanitization
 - Secure file upload handling
 
+## Strategic Direction for Access Control and User Roles
+
+Based on a detailed strategic review, the following blueprint has been developed to evolve the application's current Role-Based Access Control (RBAC) system into a more granular, scalable, and user-centric model. This plan directly addresses the long-term requirements for multi-domain support, enterprise-grade security, and compliance outlined in the project's development principles (dp.md).
+
+### 1. Core Role Hierarchy and Responsibilities
+
+The foundation is a clear role hierarchy where higher roles inherit the permissions of lower ones.
+
+-   **System Administrator:** A technical role focused on system health, user management (inviting, assigning roles), and global configuration.
+-   **Legal Manager (Partner/Team Lead):** Manages teams and workstreams. Can create cases, assign documents, review/approve analyses, and manage team access to legal domains.
+-   **Analyst (Lawyer/Associate):** The primary user performing core analysis work using the full suite of tools like `LovableFrontend`.
+-   **Viewer (Client/Stakeholder):** A read-only role with access restricted to explicitly shared documents or analyses.
+
+### 2. Granular, Permission-Based Architecture
+
+To move beyond the limitations of a role-only system and support multi-domain complexity, the architecture will shift to a granular, permission-based model layered on top of the core roles.
+
+-   **Fine-Grained Permissions:** The system will be governed by explicit permission strings (e.g., `document:upload`, `domain:view:energy_law`, `user:invite`). Roles will become default bundles of these permissions.
+-   **Permission Templates with Inheritance:** To streamline administration, `Legal Managers` and `Admins` can create templates (e.g., "Junior Energy Analyst"). These templates will support inheritance (e.g., "Senior Analyst" inherits from "Junior Analyst" and adds more permissions), making the system highly maintainable.
+
+### 3. UI/UX Implications and Best Practices
+
+The permission system must be intuitive and enhance the user experience.
+
+-   **Progressive Disclosure:** The UI will dynamically adapt. A `Legal Manager` will see additional UI elements like "Approve" buttons or "Team Dashboard" tabs that are invisible to an `Analyst`.
+-   **Clear Visual Hierarchy:** Subtle cues like **Role Badges** ("Jane Doe - *Legal Manager*") and contextual page titles will reinforce the user's current capabilities.
+-   **Permission Explanations:** To build trust, disabled elements will have tooltips explaining *why* access is restricted. Contextual help links ("Why do I need 'Corporate Law' access for this?") will provide further clarity.
+-   **Audit Trail as a UX Feature:** The compliance audit log will be transformed into a user-facing "Case Timeline" or "History" feature, showing who has done what in a human-readable format, turning a compliance burden into a collaboration tool.
+
+### 4. Advanced Access Control Patterns
+
+The model is designed to handle complex, real-world legal scenarios gracefully.
+
+-   **Flexible Client Access (Viewers):** Instead of creating multiple viewer roles, the system will feature a **granular sharing dialog**. An `Analyst` or `Manager` sharing a document can use checkboxes to control exactly what the `Viewer` can see (e.g., summary only, full text, comments) and set access expiration dates.
+-   **Cross-Domain Collaboration:** Cases can be tagged with multiple legal domains. To access them, a user must have permissions for **all** associated domains (an "intersection model"). A "Lead Reviewer" can be assigned to a case to manage approvals while specialists collaborate within their permitted scope.
+-   **External API Integration:** Third-party systems will be managed via **Service Accounts**. These are non-human users with their own API keys and granular permissions, ensuring all actions are securely managed and tracked in the audit trail.
+
+### 5. Governance and Maintenance
+
+The long-term integrity of the system will be ensured through clear rules and dedicated tooling.
+
+-   **Permission Conflict Resolution:** The system will enforce a **Deny by Default / Most Restrictive Wins** policy. If a user has conflicting permissions from different assignments, the most restrictive rule will apply, ensuring the highest level of security.
+-   **Domain Lifecycle Management:** A "Domain Management Console" will be created for `Admins` to manage the evolution of legal practice areas. This will allow them to create, archive, and, most importantly, manage the migration of documents and permissions when a domain splits or changes (e.g., "Energy Law" evolving into "Renewable Energy" and "Oil & Gas").
+
+### 6. Advanced Governance and Real-World Scenarios
+
+To ensure the model is robust enough for the complexities of legal practice, it incorporates solutions for exceptional circumstances, external communications, and regulatory demands.
+
+-   **Emergency Access ("Break-Glass" Procedure):** For genuine emergencies (e.g., a critical court deadline), the system will feature a formal, audited **Elevated Access Request** workflow. A user can request temporary, time-bound access to a restricted resource, which must be approved by a designated authority (e.g., System Admin, Head of Compliance). The entire process—request, justification, approval, and all actions taken—is logged with high priority in the audit trail, providing a fully transparent and accountable exception mechanism.
+
+-   **Secure Client Communication Integration:** The platform's permission model extends to external communications. Instead of insecure email attachments, documents are shared via a **secure client portal** (using the `Viewer` role) where granular access controls are enforced. Any documents exported from the system are "redaction-aware," meaning they will only contain the information the recipient is authorized to see.
+
+-   **Domain-Specific Compliance Reporting:** To address varying regulatory requirements, the permission model supports domain-specific reporting without administrative overhead. Legal domains can be tagged with metadata (e.g., `MEKH_REPORTING_REQUIRED`). The audit trail can then be filtered by these tags, allowing a `Compliance Officer` to easily generate domain-specific reports (e.g., "Show all access events for MEKH-related documents this quarter").
+
+This strategic access control model, complete with its advanced governance patterns, provides the security, usability, and scalability required for the platform's ambitious goal of serving all areas of Hungarian law.
+
 ## Recommendations for Enhancement
 
 ### 1. Immediate Improvements
@@ -359,6 +415,10 @@ useEffect(() => {
 - Export capabilities (PDF, Word, etc.)
 
 ### 3. Long-term Strategic Improvements
+
+**Advanced Access Control and Enterprise Features:**
+- **Implement the Strategic Access Control Model:** Roll out the comprehensive role, permission, and template-based architecture outlined in the preceding section. This is foundational for all future enterprise and multi-domain features.
+- **Build the Audit Trail UX:** Transform the backend audit log into the user-facing "Case Timeline" feature.
 
 **AI Integration:**
 - Custom AI model training
