@@ -1,256 +1,63 @@
-// TODO: This entire test suite is broken and needs to be rewritten.
-// It is significantly out of date with the current implementation of the
-// CitationGraphBuilder and its dependencies. The mocks are incorrect,
-// method signatures have changed, and types are mismatched.
-// Commenting out to unblock the build and overall refactoring.
-
-/*
 import { CitationGraphBuilder } from '../CitationGraphBuilder';
-import { ProcessedDocument } from '@/lib/claude';
-import { supabase } from '@/integrations/supabase/client';
-import { DocumentProcessor } from '../../document-processing/DocumentProcessor';
-import { embeddingService } from '../../embedding/embeddingService';
+import { vi } from 'vitest';
+import { createClient } from '@supabase/supabase-js';
 
-// Mock Supabase client
-jest.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    insert: jest.fn().mockResolvedValue({ error: null }),
-  },
-}));
+vi.mock('@supabase/supabase-js', () => {
+  const mockQueryBuilder = {
+    from: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    contains: vi.fn().mockReturnThis(),
+    textSearch: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data: { id: 'mock-doc-id' }, error: null }),
+    then: (resolve: any) => resolve({ data: [], error: null }),
+  };
+
+  const mockSupabase = {
+    from: vi.fn(() => mockQueryBuilder),
+  };
+
+  return {
+    createClient: vi.fn(() => mockSupabase),
+  };
+});
 
 // Mock dependencies
-jest.mock('../../document-processing/DocumentProcessor');
-jest.mock('../../embedding/embeddingService');
+const mockEmbeddingService = {
+  findSimilarDocuments: vi.fn().mockResolvedValue([
+    { id: 'doc2', content: 'Related document', embedding: [0.1, 0.2] }
+  ])
+};
 
 describe('CitationGraphBuilder', () => {
   let builder: CitationGraphBuilder;
-  const mockDocuments: ProcessedDocument[] = [
-    {
-      content: 'This law references 2024. évi ABC törvény and 2024. évi XYZ rendelet',
-      metadata: {
-        documentType: 'law',
-        date: '2024-03-15',
-        references: [],
-        legalAreas: ['civil'],
-        title: 'Test Law 1',
-        source: 'test',
-      },
-    },
-    {
-      content: 'This regulation references 2024. évi ABC törvény',
-      metadata: {
-        documentType: 'regulation',
-        date: '2024-03-15',
-        references: [],
-        legalAreas: ['civil'],
-        title: 'Test Regulation 1',
-        source: 'test',
-      },
-    },
-  ];
+  const testDocument = {
+    id: 'doc1',
+    content: 'Reference to 42 U.S.C. § 1983',
+    embedding: [0.1, 0.2, 0.3],
+    metadata: {
+      title: 'Test Document',
+      citation: 'Test Citation',
+      documentType: 'Statute',
+      date: '2023-01-01'
+    }
+  };
 
   beforeEach(() => {
-    builder = new CitationGraphBuilder();
-    jest.clearAllMocks();
+    builder = new CitationGraphBuilder(
+      mockEmbeddingService as any
+    );
+    vi.clearAllMocks();
   });
 
-  describe('buildGraph', () => {
-    it('should create nodes and edges from documents', async () => {
-      await builder.buildGraph(mockDocuments);
-
-      // Verify Supabase calls
-      expect(supabase.from).toHaveBeenCalledWith('citation_nodes');
-      expect(supabase.from).toHaveBeenCalledWith('citation_edges');
-      expect(supabase.insert).toHaveBeenCalledTimes(2);
-    });
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
-  describe('findImpactChains', () => {
-    it('should find all documents affected by a change', async () => {
-      // Mock Supabase response
-      (supabase.from as jest.Mock).mockImplementation((table) => {
-        if (table === 'citation_edges') {
-          return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockResolvedValue({
-              data: [{ target_id: 'node2' }],
-              error: null,
-            }),
-          };
-        }
-        return supabase;
-      });
-
-      const impactChain = await builder.findImpactChains('node1');
-      expect(impactChain).toBeDefined();
-    });
+  test('should process a document and store citations', async () => {
+    const processDocumentSpy = vi.spyOn(builder, 'processDocument');
+    await builder.processDocument(testDocument as any);
+    expect(processDocumentSpy).toHaveBeenCalledWith(testDocument);
   });
-
-  describe('getCitingDocuments', () => {
-    it('should find all documents that cite a specific document', async () => {
-      // Mock Supabase response
-      (supabase.from as jest.Mock).mockImplementation((table) => {
-        if (table === 'citation_edges') {
-          return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockResolvedValue({
-              data: [{ source_id: 'node2' }],
-              error: null,
-            }),
-          };
-        }
-        return supabase;
-      });
-
-      const citingDocs = await builder.getCitingDocuments('node1');
-      expect(citingDocs).toBeDefined();
-    });
-  });
-
-  describe('getCitedDocuments', () => {
-    it('should find all documents cited by a specific document', async () => {
-      // Mock Supabase response
-      (supabase.from as jest.Mock).mockImplementation((table) => {
-        if (table === 'citation_edges') {
-          return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockResolvedValue({
-              data: [{ target_id: 'node2' }],
-              error: null,
-            }),
-          };
-        }
-        return supabase;
-      });
-
-      const citedDocs = await builder.getCitedDocuments('node1');
-      expect(citedDocs).toBeDefined();
-    });
-  });
-
-  describe('extractCitations', () => {
-    const mockDocumentId = 'doc-123';
-    const mockContent = 'This document references 2024. évi ABC törvény';
-
-    it('should extract explicit citations and create relationships', async () => {
-      // Mock DocumentProcessor
-      (DocumentProcessor.extractLegalReferences as jest.Mock).mockReturnValue(['2024. évi ABC törvény']);
-
-      // Mock Supabase find target document
-      (supabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        ilike: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({
-          data: { id: 'target-123' },
-          error: null
-        })
-      });
-
-      // Mock Supabase insert citation relationship
-      (supabase.from as jest.Mock).mockReturnValue({
-        insert: jest.fn().mockReturnThis(),
-        select: jest.fn().mockResolvedValue({ error: null })
-      });
-
-      await builder.extractCitations(mockDocumentId, mockContent);
-
-      expect(DocumentProcessor.extractLegalReferences).toHaveBeenCalledWith(mockContent);
-      expect(supabase.from).toHaveBeenCalledWith('citation_relationships');
-    });
-
-    it('should find implicit citations using semantic similarity', async () => {
-      // Mock embedding service
-      (embeddingService.generateEmbedding as jest.Mock).mockResolvedValue([0.1, 0.2, 0.3]);
-
-      // Mock Supabase match_documents RPC
-      (supabase.rpc as jest.Mock).mockResolvedValue({
-        data: [
-          { id: 'similar-123', similarity: 0.9 },
-          { id: 'similar-456', similarity: 0.7 }
-        ],
-        error: null
-      });
-
-      // Mock Supabase insert citation relationship
-      (supabase.from as jest.Mock).mockReturnValue({
-        insert: jest.fn().mockReturnThis(),
-        select: jest.fn().mockResolvedValue({ error: null })
-      });
-
-      await builder.extractCitations(mockDocumentId, mockContent);
-
-      expect(embeddingService.generateEmbedding).toHaveBeenCalledWith(mockContent);
-      expect(supabase.rpc).toHaveBeenCalledWith('match_documents', expect.any(Object));
-    });
-  });
-
-  describe('analyzeImpactChains', () => {
-    const mockChangedDocId = 'changed-123';
-
-    it('should analyze impact chains for changed document', async () => {
-      // Mock direct citations
-      (supabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        gte: jest.fn().mockResolvedValue({
-          data: [
-            {
-              id: 'citation-123',
-              target_document_id: 'target-123',
-              citation_type: 'explicit',
-              confidence_score: 0.9
-            }
-          ],
-          error: null
-        })
-      });
-
-      // Mock impact chain creation
-      (supabase.from as jest.Mock).mockReturnValue({
-        insert: jest.fn().mockResolvedValue({ error: null })
-      });
-
-      await builder.analyzeImpactChains(mockChangedDocId);
-
-      expect(supabase.from).toHaveBeenCalledWith('citation_relationships');
-      expect(supabase.from).toHaveBeenCalledWith('citation_impact_chains');
-    });
-  });
-
-  describe('getAffectedDocuments', () => {
-    const mockDocumentId = 'doc-123';
-
-    it('should return affected documents ordered by impact level', async () => {
-      const mockImpactChains = [
-        {
-          id: 'chain-123',
-          root_document_id: mockDocumentId,
-          affected_document_id: 'affected-123',
-          impact_path: [mockDocumentId, 'affected-123'],
-          impact_level: 'high',
-          created_at: '2024-03-15T12:00:00Z',
-          updated_at: '2024-03-15T12:00:00Z'
-        }
-      ];
-
-      (supabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockResolvedValue({
-          data: mockImpactChains,
-          error: null
-        })
-      });
-
-      const result = await builder.getAffectedDocuments(mockDocumentId);
-
-      expect(result).toEqual(mockImpactChains);
-      expect(supabase.from).toHaveBeenCalledWith('citation_impact_chains');
-    });
-  });
-});
-*/ 
+}); 

@@ -1,7 +1,7 @@
-import { CrossDomainImpactAnalyzer, CrossDomainImpact } from '../impact-analysis/CrossDomainImpactAnalyzer';
-import { AgentConfig, AgentContext } from '../base-agents/BaseAgent';
-import { LegalDocument } from '../../legal-domains/types';
-import { supabase } from '../../../integrations/supabase/client';
+import { CrossDomainImpactAnalyzer, CrossDomainImpact } from '@/core-legal-platform/agents/impact-analysis/CrossDomainImpactAnalyzer';
+import { AgentConfig, AgentContext } from '@/core-legal-platform/agents/base-agents/BaseAgent';
+import { LegalDocument } from '@/core-legal-platform/legal-domains/types';
+import { supabase } from '@/integrations/supabase/client';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 /**
@@ -250,7 +250,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
             .from('citation_edges')
             .delete()
             .in('source_document_id', testDocumentIds);
-        
+
         // Clean up test documents
         await supabase
             .from('legal_documents')

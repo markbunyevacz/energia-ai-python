@@ -1,12 +1,13 @@
-import { BaseAgent, AgentConfig, AgentContext, AgentResult } from '../base-agents/BaseAgent';
+import { BaseAgent, AgentConfig, AgentContext, AgentResult, AgentTask, AgentResponse } from '../base-agents/BaseAgent';
 import { LegalDomain } from '../../legal-domains/types';
 import type { Database } from '../../../integrations/supabase/types';
+import { BaseLLM } from '@/llm/base-llm';
 
 export class ExampleAgent extends BaseAgent {
   private processingCount: number = 0;
 
-  constructor(config: AgentConfig) {
-    super(config);
+  constructor(config: AgentConfig, llm: BaseLLM) {
+    super(config, llm, "You are a helpful assistant.", "Example Agent", "An example agent.");
   }
 
   public async initialize(): Promise<void> {
@@ -15,8 +16,7 @@ export class ExampleAgent extends BaseAgent {
     console.log(`Initialized ${this.config.name} agent`);
   }
 
-  public async process(context: AgentContext): Promise<AgentResult> {
-    try {
+  protected async performTask(task: AgentTask): Promise<AgentResponse> {
       if (!this.isEnabled()) {
         throw new Error('Agent is disabled');
       }
@@ -34,17 +34,14 @@ export class ExampleAgent extends BaseAgent {
         processed: true,
         count: this.processingCount,
         domain: domain.code,
-        documentId: context.document.id,
+      documentId: task.context?.document?.id,
       };
 
       return {
         success: true,
-        message: `Successfully processed document ${context.document.id}`,
+      message: `Successfully processed document ${task.context?.document?.id}`,
         data: result,
       };
-    } catch (error) {
-      return this.handleError(error as Error, context);
-    }
   }
 
   public async cleanup(): Promise<void> {
@@ -61,8 +58,8 @@ export class ExampleAgent extends BaseAgent {
     // Implement error handling logic
     return {
       success: false,
-      message: `Error processing document ${context.document.id}: ${error.message}`,
-      error: error,
+      data: null,
+      error: `Error processing document ${context.document?.id}: ${error.message}`,
     };
   }
 }

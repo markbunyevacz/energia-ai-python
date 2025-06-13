@@ -29,17 +29,16 @@ export class GeneralPurposeAgent extends BaseAgent {
   protected async performTask(task: AgentTask, interactionId: string): Promise<AgentResponse> {
     this.reason(`Starting task ${interactionId} for user query: "${task.query}"`);
     
-    // For now, it returns a simple message.
-    // In the future, this could call a general-purpose LLM.
-    this.reason('This is a mock agent. No real LLM call will be made.');
+    // Call the LLM to get a response.
+    const llmResponse = await this.llm.generate(task.query);
     
     const responseData = {
-        summary: `A "${task.context?.document?.title}" című dokumentummal kapcsolatos általános kérdésre válaszolva...`,
+        summary: llmResponse,
         recommendations: ['Konzultáljon szakértővel a specifikus részletekért.'],
         risks: [],
     };
     
-    this.reason(`Generated summary and recommendations for document ID: ${task.context?.document?.id}`);
+    this.reason(`Generated LLM response for query: "${task.query}"`);
 
     return {
       success: true,

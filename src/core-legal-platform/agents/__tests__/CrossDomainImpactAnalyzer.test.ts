@@ -81,7 +81,7 @@ describe('CrossDomainImpactAnalyzer', () => {
             const result = await analyzer.process(context);
 
             expect(result.success).toBe(false);
-            expect(result.message).toContain('Document content is empty');
+            expect(result.error).toContain('Document content is empty');
         });
 
         it('should handle embedding service failures gracefully', async () => {

@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { beforeAll, afterAll } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
 

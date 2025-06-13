@@ -140,7 +140,7 @@ export class CitationGraphBuilder {
   /**
    * Real edge persistence - batch processing for performance
    */
-  private async persistAllEdges(): Promise<void> {
+  public async persistAllEdges(): Promise<void> {
     const edges: any[] = [];
     
     for (const [sourceId, targetSet] of this.graph.entries()) {
@@ -371,5 +371,13 @@ export class CitationGraphBuilder {
     
     this.impactChainCache.set(cacheKey, impactChain);
     return impactChain;
+  }
+
+  public async processDocument(document: Document): Promise<void> {
+    this.documents.set(document.id, document);
+    this.graph.addNode(document.id, document);
+
+    await this.processExplicitCitations([document]);
+    await this.processImplicitCitations([document]);
   }
 } 

@@ -45,32 +45,15 @@ export class ContractAnalysisAgent extends BaseAgent {
     }
 
     try {
-        // For the demo, we return a mock analysis.
-        // The logic for calling an LLM is commented out but can be enabled with an API key.
-        const analysisResult = {
-            risk_level: 'medium',
-            summary: `A(z) "${document.title}" szerződés elemzése befejeződött. Közepes kockázati szintet azonosítottunk.`,
-            recommendations: [
-                "Javasoljuk a fizetési feltételek pontosítását.",
-                "A felelősségkorlátozási klauzula felülvizsgálata javasolt."
-            ],
-            risks: [
-                {
-                    type: "Pénzügyi kockázat",
-                    severity: "high",
-                    description: "A késedelmi kamat mértéke nincs egyértelműen meghatározva, ami vitákhoz vezethet.",
-                    recommendation: "Rögzítsenek egyértelmű, számszerűsített késedelmi kamatlábat.",
-                    section: "Fizetési feltételek"
-                },
-                {
-                    type: "Megfelelőségi kockázat",
-                    severity: "medium",
-                    description: "A szerződés nem hivatkozik a legújabb energiaügyi szabályozásra.",
-                    recommendation: "Egészítsék ki a szerződést a vonatkozó jogszabályi hivatkozásokkal.",
-                    section: "Általános rendelkezések"
-                }
-            ]
-        };
+        // The logic for calling an LLM is now enabled.
+        const prompt = `Analyze the following legal document and provide a risk analysis. Document Title: "${document.title}". Content: """${document.content}""". Please provide:
+        1. A brief summary of the document.
+        2. A list of potential risks, their severity (high, medium, low), a description, and a recommendation for each.
+        3. A list of general recommendations for improvement.
+        
+        Please format the output as a JSON object with keys: "summary", "risks" (an array of objects with keys "type", "severity", "description", "recommendation", "section"), and "recommendations" (an array of strings).`;
+
+        const analysisResult = await this.queryLanguageModel(prompt);
 
         return {
             success: true,
@@ -82,7 +65,6 @@ export class ContractAnalysisAgent extends BaseAgent {
     }
   }
 
-  /*
   private async queryLanguageModel(prompt: string): Promise<any> {
     try {
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
@@ -91,11 +73,12 @@ export class ContractAnalysisAgent extends BaseAgent {
         }, {
             headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` }
         });
-        return response.data.choices[0].message.content;
+        const content = response.data.choices[0].message.content;
+        // The LLM returns a stringified JSON, so we need to parse it.
+        return JSON.parse(content);
     } catch (error) {
         console.error('Error querying language model:', error);
         throw new ContractAnalysisError('Failed to get analysis from language model.', ErrorCodes.API_ERROR);
     }
   }
-  */
 } 

@@ -1,79 +1,90 @@
 import { DomainRegistry } from '../registry/DomainRegistry';
-import { DomainService } from '../registry/DomainService';
 import { LegalDomain } from '../types';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { supabase } from '@/integrations/supabase/client';
 
-vi.mock('../registry/DomainService');
+vi.mock('@/integrations/supabase/client', () => {
+  const eq = vi.fn().mockResolvedValue({ data: [], error: null });
+  const select = vi.fn(() => ({ eq }));
+  return {
+    supabase: {
+      from: vi.fn(() => ({ select })),
+    }
+  }
+});
 
 const mockDomain: LegalDomain = {
-  id: '1',
   code: 'energy',
   name: 'Energy Law',
   description: 'Energy law domain',
   active: true,
   documentTypes: ['law', 'regulation'],
-  processingRules: [],
-  complianceRequirements: [],
-  metadata: {
-    created_at: '2024-03-23T00:00:00Z',
-    updated_at: '2024-03-23T00:00:00Z',
-  },
+  agentConfig: {},
 };
 
 describe('DomainRegistry', () => {
   let registry: DomainRegistry;
-  let mockDomainService: {
-    registerDomain: ReturnType<typeof vi.fn>;
-    getDomain: ReturnType<typeof vi.fn>;
-    listDomains: ReturnType<typeof vi.fn>;
-    updateDomain: ReturnType<typeof vi.fn>;
-  };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset the singleton instance for DomainRegistry
     (DomainRegistry as any).instance = undefined;
-    mockDomainService = {
-      registerDomain: vi.fn().mockResolvedValue(mockDomain),
-      getDomain: vi.fn().mockResolvedValue(mockDomain),
-      listDomains: vi.fn().mockResolvedValue([mockDomain]),
-      updateDomain: vi.fn().mockResolvedValue(mockDomain),
-    };
-    (DomainService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue(mockDomainService);
     registry = DomainRegistry.getInstance();
+    (supabase.from('legal_domains').select('*').eq as vi.Mock).mockResolvedValue({
+        data: [
+            {
+                code: 'energy',
+                name: 'Energy Law',
+                description: 'Energy law domain',
+                document_types: ['law', 'regulation'],
+                metadata: { agent_config: {} },
+                active: true,
+            }
+        ],
+        error: null,
+    });
   });
 
-  it('should register a new domain', async () => {
-    const domain: Omit<LegalDomain, 'id' | 'metadata'> = {
-      code: 'energy',
-      name: 'Energy Law',
-      description: 'Energy law domain',
-      active: true,
-      documentTypes: ['law', 'regulation'],
-      processingRules: [],
-      complianceRequirements: [],
-    };
-    const registered = await registry.registerDomain(domain);
-    expect(registered).toEqual(mockDomain);
-    expect(mockDomainService.registerDomain).toHaveBeenCalledWith(domain);
+  it('should be a singleton', () => {
+    const instance1 = DomainRegistry.getInstance();
+    const instance2 = DomainRegistry.getInstance();
+    expect(instance1).toBe(instance2);
   });
 
-  it('should retrieve a registered domain', async () => {
-    await registry.getDomain('energy');
-    expect(mockDomainService.getDomain).toHaveBeenCalledWith('energy');
+  it('should load domains from the database', async () => {
+    await registry.loadDomainsFromDb();
+    const domain = registry.getDomain('energy');
+    expect(domain).toBeDefined();
+    expect(domain?.name).toBe('Energy Law');
+    expect(supabase.from).toHaveBeenCalledWith('legal_domains');
   });
 
-  it('should list all domains', async () => {
-    await registry.listDomains();
-    expect(mockDomainService.listDomains).toHaveBeenCalled();
+  it('should retrieve a registered domain', () => {
+    registry.registerDomain(mockDomain);
+    const domain = registry.getDomain('energy');
+    expect(domain).toEqual(mockDomain);
   });
 
-  it('should update a domain', async () => {
-    const updates = {
-      name: 'Updated Energy Law',
-      description: 'Updated description',
-    };
-    await registry.updateDomain('energy', updates);
-    expect(mockDomainService.updateDomain).toHaveBeenCalledWith('energy', updates);
+  it('should return null for a non-existent domain', () => {
+    const domain = registry.getDomain('non-existent');
+    expect(domain).toBeNull();
+  });
+
+  it('should list all active domains', () => {
+    registry.registerDomain(mockDomain);
+    const domains = registry.getActiveDomains();
+    expect(domains).toHaveLength(1);
+    expect(domains[0]).toEqual(mockDomain);
+  });
+
+  it('should handle errors when loading from DB', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    (supabase.from('legal_domains').select('*').eq as vi.Mock).mockResolvedValue({
+        data: null,
+        error: new Error('DB Error'),
+    });
+
+    await expect(registry.loadDomainsFromDb()).rejects.toThrow('Could not load legal domains from the database.');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error loading domains:', expect.any(Error));
+    consoleErrorSpy.mockRestore();
   });
 }); 

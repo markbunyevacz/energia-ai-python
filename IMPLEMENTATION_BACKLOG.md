@@ -75,7 +75,7 @@ This document tracks the progress of the project implementation, divided into ph
 ---
 
 ## Phase 1: Domain Abstraction
-**Status:** ⚠️ Verified with Issues
+**Status:** ✅ Completed
 *   [x] **Task 1.1: Design Domain-Agnostic Agent Structure**
     *   [x] Implement `BaseAgent` abstract class (`src/core-legal-platform/agents/base-agents/BaseAgent.ts`) to provide a common interface for all agents.
     *   [x] Define `AgentConfig` and `AgentContext` interfaces to standardize agent interaction and configuration.
@@ -84,7 +84,7 @@ This document tracks the progress of the project implementation, divided into ph
     *   [x] Define the `LegalDomain` interface to structure domain-specific information and agent configurations.
 *   [x] **Task 1.3: Refactor Existing Agents**
     *   [x] Update `ContractAnalysisAgent` and `GeneralPurposeAgent` to inherit from `BaseAgent`.
-    *   **NOTE:** Both agents use mock/dummy data and do not contain real processing logic.
+    *   [x] **NOTE:** Both agents now use live LLM calls instead of mock data.
 
 ---
 

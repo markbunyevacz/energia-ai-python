@@ -52,4 +52,11 @@ out
 .tmp
 
 # Supabase config
-supabase/functions/**/config.toml 
+supabase/functions/**/config.toml
+
+# Supabase - Replace with your project's credentials
+VITE_SUPABASE_URL=https://abjuvmwpjapknuxqrefg.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFianV2bXdwamFwa251eHFyZWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDU2MTAsImV4cCI6MjA2NDQ4MTYxMH0.AP72jjnx6xbHBCfAi7iDDrquZC2TuyGPgNnsdLeFt0Q
+
+# OpenAI - Replace with your API key
+OPENAI_API_KEY=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

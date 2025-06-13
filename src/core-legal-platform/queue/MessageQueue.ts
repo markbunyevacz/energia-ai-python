@@ -148,27 +148,13 @@ export class MessageQueue extends EventEmitter {
   }
 }
 
-async function mergeQueues() {
-  const [hierarchyResults, queueResults] = await Promise.allSettled([
-    import('./hierarchy/HierarchyManager'),
-    import('./queue/MessageQueue')
-  ]);
-  
-  return {
-    hierarchy: hierarchyResults.status === 'fulfilled' 
-      ? hierarchyResults.value 
-      : null,
-    queue: queueResults.value
-  };
-}
-
 // Local priority queue changes
 const PRIORITY_LEVELS = ['HIGH', 'MEDIUM', 'LOW'] as const;
 
 // Feature branch additions
-const LEGAL_PRIORITIES = [HierarchyLevel.Constitution];
+const LEGAL_PRIORITIES = ['CONSTITUTION'];
 
 // Merged solution
 const PRIORITY_MAP = new Map([
-  [HierarchyLevel.Constitution, 'CRITICAL']
+  ['CONSTITUTION', 'CRITICAL']
 ]);

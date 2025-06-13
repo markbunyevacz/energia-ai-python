@@ -4,6 +4,9 @@ import { ProcessedDocument, Domain } from '../types';
 import { CitationError } from '../errors';
 import { DocumentMetadata } from '@/lib/claude';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { DomainPatternManager } from '../DomainPatternManager';
+
+vi.mock('../DomainPatternManager');
 
 // Mock Supabase client
 const mockSupabase = {
@@ -33,6 +36,10 @@ vi.mock('@langchain/community/vectorstores/supabase', () => ({
   }))
 }));
 
+vi.mocked(DomainPatternManager).mockImplementation(() => ({
+    getPatternsForDomain: vi.fn().mockResolvedValue([]),
+}) as any);
+
 describe('CitationExtractor', () => {
   let extractor: CitationExtractor;
   const mockOpenAiKey = 'test-key';
@@ -47,8 +54,9 @@ describe('CitationExtractor', () => {
   };
 
   beforeEach(() => {
-    extractor = new CitationExtractor(mockSupabase, mockOpenAiKey);
     vi.clearAllMocks();
+    extractor = new CitationExtractor(mockSupabase, mockOpenAiKey);
+    vi.spyOn((extractor as any).rateLimiter, 'waitForToken').mockResolvedValue(undefined);
   });
 
   describe('extractCitations', () => {

@@ -12,6 +12,8 @@ import { BaseLLM } from '@/llm/base-llm';
 import { vectorStoreService, VectorStoreService } from '@/core-legal-platform/vector-store/VectorStoreService';
 import { EmbeddingService } from '@/core-legal-platform/embedding/EmbeddingService';
 
+export { AgentConfig, AgentContext, AgentResult, AgentResponse, AgentTask };
+
 export class AgentSecurityError extends Error {
   constructor(message: string) {
     super(message);
@@ -141,25 +143,29 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
     this.reasoning_log = []; // Reset log for new processing task
     const interactionId = uuidv4();
     const startTime = Date.now();
-    const result = await this.performTask(task, interactionId);
-    const endTime = Date.now();
-    const responseTimeMs = endTime - startTime;
-
-    const interactionMetrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at' | 'user_id'> = {
-      agent_id: this.config.id,
-      session_id: task.sessionId,
-      response_time_ms: responseTimeMs,
-      confidence_score: (result as unknown as AgentResult).confidence ?? 0,
-      reasoning_log: this.reasoning_log,
-    };
-
     try {
-      await this.logInteractionMetrics(interactionMetrics, interactionId);
-    } catch (error) {
-      console.error(`[${this.config.name}] Failed to submit interaction metrics:`, error);
-    }
+      const result = await this.performTask(task, interactionId);
+      const endTime = Date.now();
+      const responseTimeMs = endTime - startTime;
 
-    return result;
+      const interactionMetrics: Omit<InteractionMetrics, 'interaction_id' | 'created_at' | 'user_id'> = {
+        agent_id: this.config.id,
+        session_id: task.sessionId,
+        response_time_ms: responseTimeMs,
+        confidence_score: (result as unknown as AgentResult).confidence ?? 0,
+        reasoning_log: this.reasoning_log,
+      };
+
+      try {
+        await this.logInteractionMetrics(interactionMetrics, interactionId);
+      } catch (error) {
+        console.error(`[${this.config.name}] Failed to submit interaction metrics:`, error);
+      }
+
+      return result;
+    } catch (error) {
+        return this.handleError(error as Error, task.context) as U;
+    }
   }
 
   protected abstract performTask(task: T, interactionId: string): Promise<U>;
