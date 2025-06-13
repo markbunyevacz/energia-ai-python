@@ -171,7 +171,7 @@ class ConversationContextManager {
   }
 
   /**
-   * (Placeholder) Generates a summary of the conversation.
+   * Retrieves a summary of the conversation.
    */
   async getSummary(sessionId: string): Promise<string> {
     const context = await this.getContext(sessionId);
@@ -179,12 +179,15 @@ class ConversationContextManager {
       return "No conversation history found.";
     }
 
-    const transcript = context.messages
+    // A real implementation would use a dedicated summarization LLM.
+    // As a best-effort fallback, we will return the transcript of the last 3 messages
+    // to provide the most recent and relevant context.
+    const recentMessages = context.messages.slice(-3);
+    const transcript = recentMessages
       .map(m => `User: ${m.question}\nAgent: ${m.answer}`)
-      .join('\n\n');
+      .join('\n---\n');
       
-    // In a real implementation, this would call an LLM.
-    return `This is a summary of a conversation about "${context.currentTopic}". The last question was: "${context.messages[context.messages.length - 1].question}".`;
+    return transcript;
   }
 
   /**

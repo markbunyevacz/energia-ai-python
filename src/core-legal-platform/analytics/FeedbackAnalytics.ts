@@ -93,22 +93,41 @@ export class FeedbackAnalytics {
   }
 
   /**
-   * Placeholder for anomaly detection logic.
+   * Detects anomalies in agent performance based on a set of predefined rules.
+   * A more advanced implementation could use statistical methods (e.g., standard deviation)
+   * to identify outliers, but this rule-based approach is effective for clear-cut issues.
    */
   private detectAnomalies(analyses: FeedbackAnalysis[]): string[] {
     const anomalies: string[] = [];
+
+    // Calculate overall average response time to use as a benchmark
+    const allResponseTimes = analyses.map(a => a.performanceMetrics.averageResponseTimeMs).filter(t => t > 0);
+    const overallAverageTime = allResponseTimes.length > 0
+      ? allResponseTimes.reduce((sum, time) => sum + time, 0) / allResponseTimes.length
+      : 0;
+
     for (const analysis of analyses) {
-      // Example rule: flag agent if satisfaction drops below 50% with significant feedback
+      // Rule 1: Flag agent if satisfaction drops below 50% with significant feedback
       if (analysis.satisfactionScore < 0.5 && analysis.feedbackCount > 10) {
         anomalies.push(
-          `Figyelem: A(z) "${analysis.agentId}" ügynök elégedettségi mutatója (${(analysis.satisfactionScore * 100).toFixed(1)}%) alacsony.`
+          `Alacsony elégedettség: A(z) "${analysis.agentId}" ügynök elégedettségi mutatója (${(analysis.satisfactionScore * 100).toFixed(1)}%) alacsony.`
         );
       }
-      // Example rule: flag agent for high volume of "Inaccurate" feedback
-      const inaccurateRatio = analysis.categoryBreakdown['Inaccurate Information'] / analysis.feedbackCount;
+      
+      // Rule 2: Flag agent for high volume of "Inaccurate" feedback
+      const inaccurateRatio = analysis.feedbackCount > 0
+        ? (analysis.categoryBreakdown['Inaccurate Information'] || 0) / analysis.feedbackCount
+        : 0;
       if (inaccurateRatio > 0.4 && analysis.feedbackCount > 5) {
         anomalies.push(
-          `Figyelem: A(z) "${analysis.agentId}" ügynök sok "Pontatlan" visszajelzést kap.`
+          `Sok pontatlan visszajelzés: A(z) "${analysis.agentId}" ügynök sok "Pontatlan" visszajelzést kap.`
+        );
+      }
+
+      // Rule 3: Flag agent for significantly higher response times than average
+      if (overallAverageTime > 0 && analysis.performanceMetrics.averageResponseTimeMs > overallAverageTime * 2 && analysis.performanceMetrics.averageResponseTimeMs > 2000) {
+        anomalies.push(
+          `Lassú válaszidő: A(z) "${analysis.agentId}" ügynök átlagos válaszideje (${analysis.performanceMetrics.averageResponseTimeMs.toFixed(0)}ms) jelentősen meghaladja az átlagot.`
         );
       }
     }

@@ -189,7 +189,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         expect(result.success).toBe(false);
         expect(result.error).toBeDefined();
-        expect(result.message).toContain('empty');
+        expect(result.error?.message).toContain('empty');
     });
 
     async function setupTestDocuments(): Promise<void> {

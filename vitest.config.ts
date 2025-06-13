@@ -1,16 +1,14 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import dotenv from 'dotenv';
-
-dotenv.config({ path: resolve(__dirname, '.env') });
 
 export default defineConfig({
   plugins: [react()],
   test: {
+    globalSetup: './src/test/globalSetup.ts',
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./src/test/setup.ts', './src/test/mocks/supabase.ts', './src/test/mocks/embedding.ts'],
+    setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'tests/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
       provider: 'v8',

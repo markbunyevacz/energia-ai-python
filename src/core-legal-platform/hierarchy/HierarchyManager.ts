@@ -95,9 +95,9 @@ export class LegalConflictAnalyzer {
     }
     
     // Placeholder for procedural conflict (not implemented)
-    // if (this.detectProceduralConflict(newContent, existingContent)) {
-    //   return { hasConflict: true, conflictType: 'procedural_conflict', confidence: 0.7, details: ["Procedural conflict detected."] };
-    // }
+    if (this.detectProceduralConflict(newContent, existingContent)) {
+      return { hasConflict: true, conflictType: 'procedural_conflict', confidence: 0.7, details: ["Procedural conflict detected."] };
+    }
     
     return {
       hasConflict: false,
@@ -159,42 +159,69 @@ export class LegalConflictAnalyzer {
     return overlaps;
   }
 
+  private detectProceduralConflict(content1: string, content2: string): boolean {
+    const proceduralKeywords = [
+      'hatályba lép', // comes into force
+      'módosítja', // amends
+      'hatályon kívül helyezi', // repeals
+      'megállapítja', // establishes
+    ];
+
+    const content1Lower = content1.toLowerCase();
+    const content2Lower = content2.toLowerCase();
+
+    // Check if one document explicitly references a procedure affecting the other.
+    // This is a simplified check. A real implementation would need to parse document IDs and titles.
+    for (const keyword of proceduralKeywords) {
+      if (content1Lower.includes(keyword) && content2Lower.includes(keyword)) {
+        return true; // Both documents mention the same procedure, potential conflict.
+      }
+    }
+
+    return false;
+  }
+
   private calculateConfidence(evidenceCount: number): number {
     return Math.min(0.95, 0.7 + (evidenceCount * 0.1)); // Capped at 0.95
   }
 }
 
+import { Logger } from '@/lib/logging/logger';
+
 // REAL IMPLEMENTATION: Notification service
 export class LegalNotificationService implements NotificationService {
+  private logger = new Logger('LegalNotificationService');
+
   async notifyConflict(document: LegalDocument, conflictingDocs: LegalDocument[]): Promise<void> {
-    // REAL IMPLEMENTATION: Integrate with actual notification system
-    // This is a placeholder. In a real system, this would:
-    // 1. Send email/notification to relevant stakeholders (e.g., document owners, legal reviewers).
-    // 2. Create a conflict resolution task in a workflow system or ticketing system.
-    // 3. Log the conflict details to an audit trail or monitoring system.
-    console.warn(`[LEGAL HIERARCHY CONFLICT]`);
-    console.warn(`Document ID: ${document.id} (Title: "${document.title}", Level: ${LegalHierarchyLevel[document.hierarchyLevel]})`);
-    console.warn(`Conflicts with the following document(s):`);
-    conflictingDocs.forEach(conflictingDoc => {
-      console.warn(`  - ID: ${conflictingDoc.id} (Title: "${conflictingDoc.title}", Level: ${LegalHierarchyLevel[conflictingDoc.hierarchyLevel]})`);
-    });
-    // Example: sendEmail('legal-team@example.com', 'Conflict Detected', `...details...`);
-    // Example: createJiraTicket('Conflict in document ' + document.id, '...');
+    const conflictDetails = {
+      primaryDocument: {
+        id: document.id,
+        title: document.title,
+        level: LegalHierarchyLevel[document.hierarchyLevel]
+      },
+      conflictingDocuments: conflictingDocs.map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        level: LegalHierarchyLevel[doc.hierarchyLevel]
+      }))
+    };
+    this.logger.warn('[LEGAL HIERARCHY CONFLICT]', conflictDetails);
   }
 
   async notifyInvalidation(invalidatedDoc: LegalDocument, causedBy: LegalDocument): Promise<void> {
-    // REAL IMPLEMENTATION: Integrate with actual notification system
-    // This is a placeholder. In a real system, this would:
-    // 1. Notify owners/stewards of the invalidated document.
-    // 2. Update the document's status to "Invalid" or "Requires Review" in the primary document management system/database.
-    // 3. Potentially trigger automated workflows for re-evaluation or archival of the invalidated document.
-    // 4. Log the invalidation event for auditing purposes.
-    console.warn(`[LEGAL DOCUMENT INVALIDATION]`);
-    console.warn(`Document ID: ${invalidatedDoc.id} (Title: "${invalidatedDoc.title}", Level: ${LegalHierarchyLevel[invalidatedDoc.hierarchyLevel]}) has been invalidated.`);
-    console.warn(`Reason: Changes in higher-level document ID: ${causedBy.id} (Title: "${causedBy.title}", Level: ${LegalHierarchyLevel[causedBy.hierarchyLevel]}).`);
-    console.warn(`The status of document ${invalidatedDoc.id} should be updated to reflect this invalidation.`);
-    // Example: updateDocumentStatusInDB(invalidatedDoc.id, 'INVALID');
-    // Example: sendEmail(invalidatedDoc.ownerEmail, 'Document Invalidated', '...');
+    const invalidationDetails = {
+      invalidatedDocument: {
+        id: invalidatedDoc.id,
+        title: invalidatedDoc.title,
+        level: LegalHierarchyLevel[invalidatedDoc.hierarchyLevel]
+      },
+      triggeringDocument: {
+        id: causedBy.id,
+        title: causedBy.title,
+        level: LegalHierarchyLevel[causedBy.hierarchyLevel]
+      }
+    };
+    this.logger.warn('[LEGAL DOCUMENT INVALIDATION]', invalidationDetails);
   }
 }
 
@@ -331,11 +358,21 @@ export class HierarchyManager {
    * @returns True if lowerDoc is considered dependent on higherDoc for invalidation purposes.
    */
   private dependsOn(higherDoc: LegalDocument, lowerDoc: LegalDocument): boolean {
-    if (!higherDoc || !lowerDoc) return false;
-    if (!higherDoc.isValid) return false; // Cannot depend on an invalid document for this purpose.
-    
-    // Basic hierarchical dependency: a lower-level law depends on a higher-level one.
-    // More advanced: check for thematic links, shared keywords, explicit citations (future enhancement).
+    if (!higherDoc || !lowerDoc || !higherDoc.isValid) {
+      return false;
+    }
+
+    // 1. Check for explicit citation (more reliable)
+    const lowerContent = lowerDoc.content.toLowerCase();
+    const higherTitle = higherDoc.title.toLowerCase();
+    // A real implementation might also check for official document numbers/IDs if available
+    if (lowerContent.includes(higherTitle)) {
+      return true;
+    }
+
+    // 2. Fallback to basic hierarchical dependency
+    // A lower-level law is generally dependent on any higher-level law in the same domain.
+    // This is a broad assumption and could be refined with domain-specific logic.
     return lowerDoc.hierarchyLevel > higherDoc.hierarchyLevel;
   }
 

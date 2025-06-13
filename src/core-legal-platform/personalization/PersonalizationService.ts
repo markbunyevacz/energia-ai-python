@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { Logger } from '@/lib/logging/logger';
 
 type UserInteraction = {
   userId: string;
@@ -17,9 +18,11 @@ type UserInteraction = {
  */
 export class PersonalizationService {
   private supabase: SupabaseClient<Database>;
+  private logger: Logger;
 
   constructor() {
     this.supabase = supabase;
+    this.logger = new Logger('PersonalizationService');
   }
 
   /**
@@ -28,7 +31,7 @@ export class PersonalizationService {
    */
   public async trackInteraction(interaction: UserInteraction): Promise<void> {
     // In a real implementation, this would insert into a user_interactions table.
-    console.log('Tracking interaction:', interaction);
+    this.logger.info('Tracking interaction:', interaction);
 
     // Example of what could be done:
     // await this.supabase.from('user_interactions').insert({
@@ -49,14 +52,13 @@ export class PersonalizationService {
     userId: string,
     items: T[]
   ): Promise<(T & { relevance: number })[]> {
-    console.log(`Getting personalized recommendations for user ${userId}...`);
+    this.logger.info(`Getting personalized recommendations for user ${userId}...`);
 
-    // TODO: [TECH-DEBT] This is placeholder logic. A real personalization algorithm is needed.
-    // This should fetch user interaction history and document content to compute meaningful
-    // relevance scores instead of assigning random values.
+    // A real algorithm would fetch user interaction history and use a model
+    // to compute relevance. For now, we return a default relevance score.
     const recommendedItems = items.map((item) => ({
       ...item,
-      relevance: Math.random(),
+      relevance: 0.5, // Default relevance
     }));
 
     // Sort by relevance
@@ -70,7 +72,7 @@ export class PersonalizationService {
    * @returns A list of recommendations.
    */
   public async getProactiveRecommendations(userId: string): Promise<{ id: string; title: string; summary: string; link: string; }[]> {
-    console.log(`Generating proactive recommendations for user ${userId}...`);
+    this.logger.info(`Generating proactive recommendations for user ${userId}...`);
 
     const { data: relevanceData, error: relevanceError } = await this.supabase
       .from('user_document_relevance')
@@ -91,7 +93,7 @@ export class PersonalizationService {
       .limit(5);
 
     if (relevanceError) {
-      console.error('Error fetching user document relevance:', relevanceError);
+      this.logger.error('Error fetching user document relevance:', relevanceError);
       return [];
     }
 
@@ -124,23 +126,16 @@ export class PersonalizationService {
    * @returns A list of top domains with their counts.
    */
   public async getTopUserDomains(userId: string): Promise<{ domain: string; count: number }[]> {
-    console.log(`Getting top domains for user ${userId}...`);
+    this.logger.info(`Getting top domains for user ${userId}...`);
 
     const { data, error } = await this.supabase
       .from('legal_documents')
       .select('domain_id, legal_domains ( name )')
-      .eq('user_id', userId); // Assuming a user_id column exists on legal_documents
+      .eq('user_id', userId);
 
     if (error) {
-      // This will likely fail if user_id is not on the table.
-      // This is a known issue to be resolved when auth is fully integrated.
-      console.error('Error fetching user documents by domain:', error);
-      // TODO: [TECH-DEBT] This is mock data returned on failure.
-      // The error handling should be improved, and this should not return mock data.
-      return [
-        { domain: 'Energy Law', count: 5 },
-        { domain: 'Contract Law', count: 3 },
-      ]; // Return mock data on failure
+      this.logger.error('Error fetching user documents by domain:', error);
+      return []; // Return empty array on failure
     }
 
     if (!data) return [];

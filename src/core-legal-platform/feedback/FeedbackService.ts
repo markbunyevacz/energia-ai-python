@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
 import {
   AgentId,
   DateRange,
@@ -139,13 +140,14 @@ export class FeedbackService {
     analysis: FeedbackAnalysis,
   ): Promise<ImprovementPlan> {
     const actions: ImprovementAction[] = [];
+    const analysisId = uuidv4(); // Generate a unique ID for this analysis
 
     // Rule 1: If satisfaction is low and "Inaccurate" is a high category, suggest fine-tuning.
     if (analysis.satisfactionScore < 0.6 && analysis.categoryBreakdown['Inaccurate Information'] > analysis.feedbackCount * 0.3) {
       actions.push({
         type: 'UPDATE_FINETUNING_DATA',
         description: `Agent has a satisfaction score of ${analysis.satisfactionScore.toFixed(2)} with many "Inaccurate Information" reports. Review and update its knowledge base or fine-tuning data.`,
-        payload: { analysisId: 'placeholder-analysis-id' },
+        payload: { analysisId },
       });
     }
 
@@ -162,7 +164,7 @@ export class FeedbackService {
     
     return {
       agentId: analysis.agentId,
-      analysisId: 'placeholder-analysis-id', // In a real system, this would be a real ID.
+      analysisId, // Use the generated ID
       generatedAt: new Date(),
       actions,
     };

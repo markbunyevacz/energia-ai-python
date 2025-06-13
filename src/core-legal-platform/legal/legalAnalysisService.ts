@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { Json } from '@/types/supabase';
 import LRU from 'lru-cache';
+import pdf from 'pdf-parse/lib/pdf-parse';
 import { BaseAgent, AgentContext } from '@/core-legal-platform/agents/base-agents/BaseAgent';
 import { LegalDocument } from '@/core-legal-platform/legal-domains/types';
 import { MixtureOfExpertsRouter, MoEContext } from '@/core-legal-platform/routing/MixtureOfExpertsRouter';
@@ -329,8 +330,15 @@ export class LegalAnalysisService {
 
       // 1. Extract text from the document
       const textExtractionStart = performance.now();
-      // This is a placeholder for text extraction. In a real scenario, you'd use a library.
-      const documentText = await file.text();
+      
+      let documentText: string;
+      if (file.type === 'application/pdf') {
+        const data = await pdf(await file.arrayBuffer());
+        documentText = data.text;
+      } else {
+        documentText = await file.text();
+      }
+
       metrics.textExtractionTime = performance.now() - textExtractionStart;
 
       // 2. Chunk the document

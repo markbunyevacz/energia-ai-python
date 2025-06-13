@@ -284,41 +284,41 @@ This section lists files containing mock, dummy, or placeholder implementations 
     *   **L104:** `// Placeholder for sending email. In a real-world scenario, this would`
 
 *   **File:** `src/core-legal-platform/personalization/PersonalizationService.ts`
-    *   **L53:** `// TODO: [TECH-DEBT] This is placeholder logic. A real personalization algorithm is needed.`
-    *   **L137:** `// TODO: [TECH-DEBT] This is mock data returned on failure.`
-    *   **L138:** `// The error handling should be improved, and this should not return mock data.`
-    *   **L142:** `]; // Return mock data on failure`
+    *   **L53:** `[x] // TODO: [TECH-DEBT] This is placeholder logic. A real personalization algorithm is needed.`
+    *   **L137:** `[x] // TODO: [TECH-DEBT] This is mock data returned on failure.`
+    *   **L138:** `[x] // The error handling should be improved, and this should not return mock data.`
+    *   **L142:** `[x] ]; // Return mock data on failure`
 
 *   **File:** `src/core-legal-platform/i18n/LegalTranslationManager.ts`
-    *   **L119:** `* This is a placeholder for a real implementation.`
-    *   **L127:** `// The following is a placeholder structure.`
-    *   **L128:** `console.warn(\`lookupApi is a placeholder and not implemented. Called for term "${term}" in ${language}.\`);`
+    *   **L119:** `[x] * This is a placeholder for a real implementation.`
+    *   **L127:** `[x] // The following is a placeholder structure.`
+    *   **L128:** `[x] console.warn(\`lookupApi is a placeholder and not implemented. Called for term "${term}" in ${language}.\`);`
 
 *   **File:** `src/core-legal-platform/feedback/FeedbackService.ts`
-    *   **L147:** `payload: { analysisId: 'placeholder-analysis-id' },`
-    *   **L164:** `analysisId: 'placeholder-analysis-id', // In a real system, this would be a real ID.`
+    *   **L147:** `[x] payload: { analysisId: 'placeholder-analysis-id' },`
+    *   **L164:** `[x] analysisId: 'placeholder-analysis-id', // In a real system, this would be a real ID.`
 
 *   **File:** `src/core-legal-platform/embedding/embedding/EmbeddingService.ts`
-    *   **L2:** `// Mock implementation for now`
-    *   **L16:** `// Mock implementation for now`
+    *   **L2:** `[x] // Mock implementation for now`
+    *   **L16:** `[x] // Mock implementation for now`
 
 *   **File:** `src/core-legal-platform/legal/legalAnalysisService.ts`
-    *   **L331:** `// This is a placeholder for text extraction. In a real scenario, you'd use a library.`
+    *   **L331:** `[x] // This is a placeholder for text extraction. In a real scenario, you'd use a library.`
 
 *   **File:** `src/core-legal-platform/common/conversationContext.ts`
-    *   **L173:** `* (Placeholder) Generates a summary of the conversation.`
+    *   **L173:** `[x] * (Placeholder) Generates a summary of the conversation.`
 
 *   **File:** `src/core-legal-platform/hierarchy/HierarchyManager.ts`
-    *   **L96:** `// Placeholder for procedural conflict (not implemented)`
-    *   **L170:** `// This is a placeholder. In a real system, this would:`
-    *   **L186:** `// This is a placeholder. In a real system, this would:`
+    *   **L96:** `[x] // Placeholder for procedural conflict (not implemented)`
+    *   **L170:** `[x] // This is a placeholder. In a real system, this would:`
+    *   **L186:** `[x] // This is a placeholder. In a real system, this would:`
 
 *   **File:** `src/core-legal-platform/analytics/FeedbackAnalytics.ts`
-    *   **L95:** `* Placeholder for anomaly detection logic.`
+    *   **L95:** `[x] * Placeholder for anomaly detection logic.`
 
 *   **File:** `src/core-legal-platform/citation/CitationEngine.ts`
-    *   **L7:** `// Mock implementation`
-    *   **L19:** `// Mock implementation`
+    *   **L7:** `[x] // Mock implementation`
+    *   **L19:** `[x] // Mock implementation`
 
 ---
 

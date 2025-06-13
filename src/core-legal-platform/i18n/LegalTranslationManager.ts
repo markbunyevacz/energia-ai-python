@@ -30,6 +30,8 @@ export type LegalDictionary = Record<LegalTerm, LegalTermEntry>;
 // Statically import the dictionary. This is efficient for Deno/edge environments.
 import dictionaryData from './legal-dictionary.json' assert { type: 'json' };
 
+import { Logger } from '@/lib/logging/logger';
+
 /**
  * Manages translation of legal terms using a dedicated dictionary.
  * Designed to be extensible for context-aware translation and integration
@@ -37,10 +39,12 @@ import dictionaryData from './legal-dictionary.json' assert { type: 'json' };
  */
 export class LegalTranslationManager {
   private dictionary: LegalDictionary;
+  private logger: Logger;
   // private openAIApi: OpenAIApi | null = null; // Commented out - OpenAI not available
 
   constructor(openaiConfig?: any) { // Changed from Configuration to any
     this.dictionary = this.loadDictionary();
+    this.logger = new Logger('LegalTranslationManager');
     // if (openaiConfig) {
     //     this.openAIApi = new OpenAIApi(openaiConfig);
     // }
@@ -124,33 +128,23 @@ export class LegalTranslationManager {
    * @returns A promise that resolves to a potential translation entry or null.
    */
   public async lookupApi(term: LegalTerm, language: LanguageCode): Promise<LegalTermEntry | null> {
-    // TODO: Implement a real integration with a legal terminology database like IATE.
-    // The following is a placeholder structure.
-    console.warn(`lookupApi is a placeholder and not implemented. Called for term "${term}" in ${language}.`);
-    
-    // Example of what a real implementation might return:
-    /*
-    const response = await fetch(`https://example-iate-api.eu/lookup?term=${term}&lang=${language}`);
-    if (!response.ok) {
-      return null;
-    }
-    const data = await response.json();
-    const entry: LegalTermEntry = {
-      canonicalName: data.canonicalName,
-      translations: {
-        en: data.translations.en,
-        hu: data.translations.hu,
-        de: data.translations.de,
-      },
-      metadata: {
-        source: 'IATE',
-        domain: data.domain,
+    this.logger.info(`Performing local dictionary lookup for term: "${term}"`);
+
+    // This is a fallback implementation. A production system should query a real
+    // external terminology database (e.g., IATE) here for more comprehensive results.
+    const lowerCaseTerm = term.toLowerCase();
+
+    for (const key in this.dictionary) {
+      const entry = this.dictionary[key];
+      const translations = Object.values(entry.translations).map(t => t.toLowerCase());
+      if (translations.includes(lowerCaseTerm)) {
+        this.logger.info(`Found match for "${term}" in local dictionary.`);
+        return entry;
       }
-    };
-    return entry;
-    */
-    
-    return Promise.resolve(null);
+    }
+
+    this.logger.warn(`No local dictionary match found for term: "${term}"`);
+    return null;
   }
 
   /**
