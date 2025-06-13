@@ -26,6 +26,9 @@ export class CURIACrawler extends BaseCrawler {
       await this.initialize();
       console.log(`[${this.config.name}] Starting crawl...`);
 
+      // TODO: [TECH-DEBT] This is mock data. A real crawler implementation is needed.
+      // The crawler should make HTTP requests to curia.europa.eu, parse the HTML,
+      // and extract the relevant document information.
       const mockData = [
         {
           case_number: 'C-123/23',

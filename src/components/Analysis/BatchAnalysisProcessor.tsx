@@ -182,6 +182,9 @@ export function BatchAnalysisProcessor() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         setProgress(((i + 1) / selectedFiles.length) * 100);
 
+        // TODO: [TECH-DEBT] This is a mock analysis result. A real implementation is needed.
+        // This should call the backend agent(s) for contract analysis (e.g., ContractAnalysisAgent)
+        // with the document content and receive a real analysis result.
         const newAnalysis: ContractAnalysis = {
           id: Math.random().toString(36).substr(2, 9),
           contractId: `DEMO-${Date.now()}-${i + 1}`,

@@ -51,7 +51,9 @@ export class PersonalizationService {
   ): Promise<(T & { relevance: number })[]> {
     console.log(`Getting personalized recommendations for user ${userId}...`);
 
-    // Placeholder logic: assign random relevance scores
+    // TODO: [TECH-DEBT] This is placeholder logic. A real personalization algorithm is needed.
+    // This should fetch user interaction history and document content to compute meaningful
+    // relevance scores instead of assigning random values.
     const recommendedItems = items.map((item) => ({
       ...item,
       relevance: Math.random(),
@@ -133,6 +135,8 @@ export class PersonalizationService {
       // This will likely fail if user_id is not on the table.
       // This is a known issue to be resolved when auth is fully integrated.
       console.error('Error fetching user documents by domain:', error);
+      // TODO: [TECH-DEBT] This is mock data returned on failure.
+      // The error handling should be improved, and this should not return mock data.
       return [
         { domain: 'Energy Law', count: 5 },
         { domain: 'Contract Law', count: 3 },

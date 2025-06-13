@@ -66,4 +66,15 @@ To maintain a clean and organized codebase, we will use the following structure:
 └── ...
 ```
 
+This combination of co-located unit tests and a top-level `tests` directory for integration and E2E tests provides a good balance of separation and discoverability.
+
+## 6. Mocking Strategy
+
+To ensure our unit tests are fast, deterministic, and isolated, we employ a comprehensive mocking strategy for external dependencies. The primary goal is to test our application's logic, not the functionality of third-party services.
+
+-   **Database (Supabase):** The Supabase client is mocked to simulate database interactions. This avoids the need for a live database during unit tests and allows us to control the exact data returned for different scenarios.
+-   **AI/LLM Services (LangChain, OpenAI):** All calls to external AI services are mocked. This is critical to prevent slow, expensive, and non-deterministic API calls during test runs. We provide predictable mock responses to test how our application handles them.
+-   **Internal Services & Managers:** Services that encapsulate external access (e.g., `DomainPatternManager`) are mocked at a high level. This simplifies tests by allowing us to directly control the data returned to the component under test, without needing to mock the underlying database calls.
+-   **Utilities (`RateLimiter`):** Time-based utilities are mocked to prevent tests from being slowed down by artificial delays like `setTimeout`. This allows tests to run immediately and efficiently.
+
 This combination of co-located unit tests and a top-level `tests` directory for integration and E2E tests provides a good balance of separation and discoverability. 

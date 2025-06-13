@@ -1,4 +1,3 @@
-
 interface WebSocketMessage {
   type: string;
   data: any;
@@ -16,7 +15,9 @@ class WebSocketService {
     if (this.ws?.readyState === WebSocket.OPEN) return;
 
     try {
-      // Using a mock WebSocket URL - in production this would be your Supabase edge function WebSocket
+      // TODO: [TECH-DEBT] This is a mock WebSocket URL.
+      // This should be replaced with the actual WebSocket endpoint for the application's backend,
+      // likely a Supabase Edge Function.
       this.ws = new WebSocket('wss://echo.websocket.org/');
       
       this.ws.onopen = () => {

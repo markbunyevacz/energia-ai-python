@@ -46,7 +46,9 @@ export function ABTestingFramework() {
   const { trackConversionEvent, trackFeatureUsage } = useUserBehaviorTracking();
   const { trackUserAction } = useAnalyticsTracking();
 
-  // Mock A/B tests data
+  // TODO: [TECH-DEBT] This is mock data. A real A/B testing implementation is needed.
+  // This should be integrated with a backend service or a database table
+  // to fetch, manage, and track real A/B tests and their results.
   useEffect(() => {
     const mockTests: ABTest[] = [
       {

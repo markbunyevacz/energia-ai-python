@@ -15,6 +15,9 @@ export function ContractAnalysis() {
     
     try {
       // Simulate AI analysis
+      // TODO: [TECH-DEBT] This is a mock analysis result. A real implementation is needed.
+      // This should call the backend agent for contract analysis (e.g., ContractAnalysisAgent)
+      // with the document content and receive a real analysis result.
       setTimeout(() => {
         const newAnalysis: ContractAnalysis = {
           id: Math.random().toString(36).substr(2, 9),

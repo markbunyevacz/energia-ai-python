@@ -26,7 +26,9 @@ export class BHTCrawler extends BaseCrawler {
       await this.initialize();
       console.log(`[${this.config.name}] Starting crawl...`);
 
-      // Mock implementation
+      // TODO: [TECH-DEBT] This is mock data. A real crawler implementation is needed.
+      // The crawler should use Playwright or a similar tool to navigate birosag.hu,
+      // perform searches, and parse the resulting documents.
       const mockData = [
         {
           case_number: 'BHT.2023.123',
