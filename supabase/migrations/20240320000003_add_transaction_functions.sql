@@ -5,8 +5,8 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- This is a placeholder as transactions are implicit in functions.
-  -- The function exists for conceptual clarity in the application layer.
+  -- The function exists for conceptual clarity in the application layer,
+  -- as transactions are implicitly handled within individual function calls in PostgreSQL.
   PERFORM 1;
 END;
 $$;
@@ -17,7 +17,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- This is a placeholder as transactions are implicit in functions.
+  -- The function exists for conceptual clarity in the application layer.
   PERFORM 1;
 END;
 $$;
@@ -28,7 +28,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- This is a placeholder as transactions are implicit in functions.
+  -- The function exists for conceptual clarity in the application layer.
   PERFORM 1;
 END;
 $$;

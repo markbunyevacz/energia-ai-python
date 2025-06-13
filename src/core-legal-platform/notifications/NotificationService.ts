@@ -1,8 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
-
-type UserPreferences = Database['public']['Tables']['user_preferences']['Row'];
+import { Logger } from '@/lib/logging/logger';
 
 /**
  * @file NotificationService.ts
@@ -27,9 +26,11 @@ type NotificationChannel = 'email' | 'in_app';
 
 export class NotificationService {
   private supabase: SupabaseClient<Database>;
+  private logger: Logger;
 
   constructor() {
     this.supabase = supabase;
+    this.logger = new Logger('NotificationService');
   }
 
   /**
@@ -37,7 +38,7 @@ export class NotificationService {
    * @param userId The ID of the user.
    * @returns The user's preferences, or null if not found.
    */
-  public async getUserPreferences(userId: string): Promise<UserPreferences | null> {
+  public async getUserPreferences(userId: string): Promise<any | null> {
     const { data, error } = await this.supabase
       .from('user_preferences')
       .select('*')
@@ -45,7 +46,7 @@ export class NotificationService {
       .single();
 
     if (error) {
-      console.error('Error fetching user preferences:', error);
+      this.logger.error('Error fetching user preferences:', error);
       return null;
     }
 
@@ -58,7 +59,7 @@ export class NotificationService {
    * @param preferences The partial preferences to update.
    * @returns The updated preferences, or null on error.
    */
-  public async updateUserPreferences(userId: string, preferences: Partial<Omit<UserPreferences, 'id' | 'user_id' | 'created_at' | 'updated_at'>>): Promise<UserPreferences | null> {
+  public async updateUserPreferences(userId: string, preferences: Partial<any>): Promise<any | null> {
     const { data, error } = await this.supabase
       .from('user_preferences')
       .update(preferences)
@@ -67,7 +68,7 @@ export class NotificationService {
       .single();
 
     if (error) {
-      console.error('Error updating user preferences:', error);
+      this.logger.error('Error updating user preferences:', error);
       return null;
     }
 
@@ -88,7 +89,7 @@ export class NotificationService {
 
     // Default to true if preferences are not set
     if (preferences === null || isEnabled) {
-        console.log(`Sending ${channel} notification to user ${user.id}: "${notification.title}"`);
+        this.logger.info(`Sending ${channel} notification to user ${user.id}: "${notification.title}"`);
         // In a real implementation, this would call an email service (e.g., SendGrid)
         // or write to a 'notifications' table for in-app display.
         if (channel === 'email') {
@@ -97,28 +98,43 @@ export class NotificationService {
             this.createInAppNotification(user, notification);
         }
     } else {
-        console.log(`Notification for user ${user.id} is disabled for ${channel} channel.`);
+        this.logger.info(`Notification for user ${user.id} is disabled for ${channel} channel.`);
     }
   }
 
   private async sendEmail(user: User, notification: Notification): Promise<void> {
-    // Placeholder for sending email. In a real-world scenario, this would
-    // integrate with a service like SendGrid, Postmark, or AWS SES.
-    console.log(`Pretending to send email to ${user.email} with title: ${notification.title}`);
+    try {
+      const { data, error } = await this.supabase.functions.invoke('send-email', {
+        body: { 
+          to: user.email, 
+          subject: notification.title,
+          html: `<p>${notification.message}</p>${notification.link ? `<p><a href="${notification.link}">View Details</a></p>` : ''}`
+        },
+      });
+
+      if (error) {
+        this.logger.error('Error sending email notification:', error);
+      } else {
+        this.logger.info('Email notification sent successfully:', data);
+      }
+    } catch (e) {
+      this.logger.error('An unexpected error occurred while sending email:', e);
+    }
   }
 
   private async createInAppNotification(user: User, notification: Notification): Promise<void> {
-    console.log(`Creating in-app notification for user ${user.id} with title: ${notification.title}`);
+    this.logger.info(`Creating in-app notification for user ${user.id} with title: ${notification.title}`);
     
     const { error } = await this.supabase.from('notifications').insert({
       user_id: user.id,
       title: notification.title,
       message: notification.message,
       link: notification.link,
+      type: 'egyéb' // Default type, valid according to schema
     });
 
     if (error) {
-      console.error('Error creating in-app notification:', error);
+      this.logger.error('Error creating in-app notification:', error);
     }
   }
 
@@ -127,11 +143,11 @@ export class NotificationService {
    * @param notifications A map of user IDs to their list of notifications.
    */
   public async sendBatchNotifications(notifications: Map<string, Notification[]>): Promise<void> {
-    console.log(`Sending batch notifications to ${notifications.size} users...`);
+    this.logger.info(`Sending batch notifications to ${notifications.size} users...`);
     for (const [userId, userNotifications] of notifications.entries()) {
       // In a real implementation, you would format this as a single digest email/notification.
       // And check preferences before sending.
-      console.log(`User ${userId} has ${userNotifications.length} updates.`);
+      this.logger.info(`User ${userId} has ${userNotifications.length} updates.`);
     }
   }
 } 

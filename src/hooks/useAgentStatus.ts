@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../integrations/supabase/client';
 
 interface AgentStatus {
   status: string;
@@ -12,20 +13,46 @@ export function useAgentStatus(agentId: string): AgentStatus {
   const [isOnline, setIsOnline] = useState<boolean>(false);
 
   useEffect(() => {
-    // TODO: Implement actual agent status monitoring
-    // This is a placeholder implementation
-    const checkStatus = () => {
-      // Simulate status check
-      const isAgentOnline = Math.random() > 0.5;
-      setIsOnline(isAgentOnline);
-      setStatus(isAgentOnline ? 'Online' : 'Offline');
-      if (isAgentOnline) {
-        setLastActive(new Date().toISOString());
+    const fetchAgentStatus = async () => {
+      if (!agentId) return;
+
+      const { data, error } = await supabase
+        .from('system_health')
+        .select('status, created_at')
+        .eq('service_name', agentId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.error('Error fetching agent status:', error);
+        setStatus('Error');
+        setIsOnline(false);
+        return;
+      }
+
+      if (data) {
+        const lastCheckTime = new Date(data.created_at).getTime();
+        const now = new Date().getTime();
+        const fiveMinutes = 5 * 60 * 1000;
+
+        if (now - lastCheckTime < fiveMinutes && data.status === 'success') {
+          setStatus('Online');
+          setIsOnline(true);
+          setLastActive(new Date(data.created_at).toISOString());
+        } else {
+          setStatus('Offline');
+          setIsOnline(false);
+          setLastActive(new Date(data.created_at).toISOString());
+        }
+      } else {
+        setStatus('Unknown');
+        setIsOnline(false);
       }
     };
 
-    checkStatus();
-    const interval = setInterval(checkStatus, 30000); // Check every 30 seconds
+    fetchAgentStatus();
+    const interval = setInterval(fetchAgentStatus, 30000); // Check every 30 seconds
 
     return () => clearInterval(interval);
   }, [agentId]);

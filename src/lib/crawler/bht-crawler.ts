@@ -1,5 +1,6 @@
 import { BaseCrawler } from './base-crawler';
 import type { CrawlerConfig, CrawlerResult } from './types';
+import { Page } from 'playwright';
 
 export const BHT_CRAWLER_CONFIG: CrawlerConfig = {
   name: 'BHTCrawler',
@@ -21,41 +22,83 @@ export class BHTCrawler extends BaseCrawler {
     super(BHT_CRAWLER_CONFIG);
   }
 
+  private async searchAndScrape(page: Page) {
+    const documents: any[] = [];
+    for (const term of this.searchTerms) {
+      this.logger.info(`Searching for term: "${term}"`);
+      await page.waitForSelector('#ujKeresesLink', { timeout: 60000 });
+      await page.click('#ujKeresesLink');
+      
+      await page.waitForSelector('#szavakszovegben', { timeout: 60000 });
+      await page.fill('#szavakszovegben', term);
+      await page.click('button[type="submit"]');
+
+      await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 60000 });
+
+      const results = await this.scrapeResults(page);
+      documents.push(...results);
+    }
+    return documents;
+  }
+
+  private async scrapeResults(page: Page) {
+    const scrapedDocuments: any[] = [];
+    const resultRows = await page.$$('table.table-striped tbody tr');
+
+    for (const row of resultRows) {
+        const caseNumber = await row.$eval('td:nth-child(2)', el => el.textContent?.trim());
+        const courtName = await row.$eval('td:nth-child(3)', el => el.textContent?.trim());
+        const decisionDate = await row.$eval('td:nth-child(4)', el => el.textContent?.trim());
+        const summary = await row.$eval('td:nth-child(5)', el => el.textContent?.trim());
+        const link = await row.$eval('td:nth-child(2) a', el => el.getAttribute('href'));
+
+        if (caseNumber && courtName && decisionDate && summary && link) {
+            scrapedDocuments.push({
+                case_number: caseNumber,
+                court_name: courtName,
+                decision_date: decisionDate,
+                summary: summary,
+                full_text: '', // Will be fetched on demand
+                jurisdiction: 'HU',
+                source_url: `${this.config.baseUrl}/${link}`
+            });
+        }
+    }
+    this.logger.info(`Scraped ${scrapedDocuments.length} documents.`);
+    return scrapedDocuments;
+  }
+
   public async crawl(): Promise<CrawlerResult> {
+    const startTime = new Date();
     try {
       await this.initialize();
-      console.log(`[${this.config.name}] Starting crawl...`);
+      if (!this.page) {
+        throw new Error("Page not initialized");
+      }
+      this.logger.info(`[${this.config.name}] Starting crawl...`);
 
-      // TODO: [TECH-DEBT] This is mock data. A real crawler implementation is needed.
-      // The crawler should use Playwright or a similar tool to navigate birosag.hu,
-      // perform searches, and parse the resulting documents.
-      const mockData = [
-        {
-          case_number: 'BHT.2023.123',
-          court_name: 'Fővárosi Törvényszék',
-          decision_date: '2023-10-26',
-          summary: 'A case regarding energy contract disputes.',
-          full_text: 'Full text of the decision...',
-          jurisdiction: 'HU',
-          source_url: `${this.config.baseUrl}/123`
-        }
-      ];
+      await this.page.goto(this.config.baseUrl, { waitUntil: 'networkidle' });
 
-      // In a real implementation, we would use Playwright to:
-      // 1. Navigate to the entry URL.
-      // 2. Perform searches using the search terms.
-      // 3. Scrape the search results to get links to individual decisions.
-      // 4. Visit each decision page and extract the relevant data.
-      // 5. Save the data to the `court_decisions` table.
+      const iframeElement = await this.page.waitForSelector('#bht-iframe');
+      if (!iframeElement) {
+        throw new Error('Could not find the BHT iframe.');
+      }
+
+      const frame = await iframeElement.contentFrame();
+      if (!frame) {
+        throw new Error('Could not get content frame of BHT iframe.');
+      }
       
-      console.log(`[${this.config.name}] Crawl finished successfully.`);
+      const documents = await this.searchAndScrape(frame);
+      
+      this.logger.info(`[${this.config.name}] Crawl finished successfully.`);
       await this.logCrawlResult(this.config.baseUrl, 'success');
 
       return {
         success: true,
-        documents: mockData,
+        documents: documents,
         errors: [],
-        startTime: new Date(),
+        startTime: startTime,
         endTime: new Date(),
         source: {
             id: 'bht',
@@ -68,13 +111,13 @@ export class BHTCrawler extends BaseCrawler {
 
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An unknown error occurred';
-      console.error(`[${this.config.name}] Crawl failed: ${message}`);
+      this.logger.error(`[${this.config.name}] Crawl failed: ${message}`);
       await this.logCrawlResult(this.config.baseUrl, 'error', message);
       return {
         success: false,
         documents: [],
         errors: [message],
-        startTime: new Date(),
+        startTime: startTime,
         endTime: new Date(),
         source: {
             id: 'bht',

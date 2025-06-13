@@ -6,6 +6,7 @@ import type { CrawlerConfig, CrawlerResult } from './types.js';
 // import type { CrawlerProxy } from './types.js'; // Unused import
 import { RateLimiter } from './rate-limiter.js';
 import { ProxyManager } from './proxy-manager.js';
+import { Logger } from '../logging/logger.js';
 
 chromium.use(stealth());
 
@@ -16,11 +17,13 @@ export abstract class BaseCrawler {
   protected readonly config: CrawlerConfig;
   protected readonly rateLimiter: RateLimiter;
   protected readonly proxyManager: ProxyManager;
+  protected readonly logger: Logger;
 
   constructor(config: CrawlerConfig) {
     this.config = config;
     this.rateLimiter = new RateLimiter(config.maxRequestsPerMinute);
     this.proxyManager = new ProxyManager();
+    this.logger = new Logger(this.config.name);
   }
 
   protected async initialize(): Promise<void> {
@@ -77,10 +80,10 @@ export abstract class BaseCrawler {
         });
 
       if (dbError) {
-        console.error('Failed to log crawl result:', dbError);
+        this.logger.error('Failed to log crawl result:', dbError);
       }
     } catch (error) {
-      console.error('Failed to log crawl result:', error);
+      this.logger.error('Failed to log crawl result:', error);
     }
   }
 

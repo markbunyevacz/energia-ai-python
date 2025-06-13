@@ -1,6 +1,5 @@
 import { readFileSync } from 'fs';
-// import { join } from 'path'; // Unused import
-// import { glob } from 'glob'; // Commented out due to API issues
+import { glob } from 'glob';
 
 export class ImplementationValidator {
   private static readonly MOCK_PATTERNS = [
@@ -27,8 +26,10 @@ export class ImplementationValidator {
     issues: string[];
   }> {
     const issues: string[] = [];
-    // Simplified implementation without glob
-    const files = ['src/main.tsx']; // Placeholder - would need proper file discovery
+    const files = glob.sync('src/**/*', {
+      ignore: this.EXCLUDED_DIRS.map(dir => `**/${dir}/**`),
+      nodir: true,
+    });
 
     for (const file of files) {
       const content = readFileSync(file, 'utf-8');
