@@ -23,6 +23,9 @@ This document tracks the progress of the project implementation, divided into ph
 *   [x] **Task TD.4: Resolve Domain vs. Database Type Mismatch**
     *   **Context:** There is a critical divergence between the application's `LegalDocument` type (which includes `domainId` and `metadata`) and the `legal_documents` database table schema (which lacks these fields). This prevents type-safe integration between the service layer and the agent layer.
     *   **Action:** Reconcile the domain and database types. This was resolved by refactoring `BaseAgent.ts` to correctly use the abstraction provided by `LegalDocumentService`, which already handles the type mismatch. No database migration was needed.
+*   [ ] **Task TD.5: Address Mock/Placeholder Implementations**
+    *   **Context:** A codebase scan identified numerous mock, dummy, and placeholder implementations across the application. These represent incomplete features or technical debt that must be resolved.
+    *   **Action:** Systematically replace all placeholder implementations with robust, production-ready code. Refer to the **[Mock/Dummy/Placeholder Implementations](#mockdummyplaceholder-implementations)** section for a detailed list of affected files.
 
 ---
 
@@ -96,7 +99,7 @@ This document tracks the progress of the project implementation, divided into ph
 *   [x] **Task 2.2: Implement Working Memory (Conversation Context)**
     *   [x] Develop `ConversationContextManager` (`src/core-legal-platform/common/conversationContext.ts`) to manage short-term memory.
     *   [x] Integrate conversation history into the `AgentContext` to provide statefulness to interactions.
-    *   **NOTE:** The `getSummary` method in the manager is a mock.
+    *   **NOTE:** The `getSummary` method in the manager is a mock. See **Task TD.5**.
 *   [x] **Task 2.3: Implement Long-Term Memory**
     *   [x] **Sub-task 2.3.1:** Design and implement a vector store for persisting and retrieving agent knowledge and historical interactions over the long term. **(Partially Implemented: Retrieval is done via Supabase RPC, but embedding persistence logic is not explicitly verified).**
     *   [x] **Sub-task 2.3.2:** Develop retrieval mechanisms (e.g., semantic search) for accessing relevant long-term memories. **(Implemented via `VectorStoreService` and `EmbeddingService`).**
@@ -249,6 +252,73 @@ This document tracks the progress of the project implementation, divided into ph
     *   [ ] **Sub-task 9.3.1:** Set up a load balancer (e.g., using a cloud provider's service) to distribute incoming API requests across multiple instances of the backend service.
 *   [ ] **Task 9.4: Implement Auto-scaling**
     *   [ ] **Sub-task 9.4.1:** Configure auto-scaling rules for the agent worker service based on metrics like message queue length or CPU utilization.
+
+---
+
+## Mock/Dummy/Placeholder Implementations
+
+This section lists files containing mock, dummy, or placeholder implementations that need to be replaced with real logic.
+
+*   **File:** `src/lib/crawler/bht-crawler.ts`
+    *   **L28:** `// TODO: [TECH-DEBT] This is mock data. A real crawler implementation is needed.`
+    *   **L31:** `const mockData = [`
+    *   **L55:** `documents: mockData,`
+
+*   **File:** `src/lib/crawler/curia-crawler.ts`
+    *   **L28:** `// TODO: [TECH-DEBT] This is mock data. A real crawler implementation is needed.`
+    *   **L31:** `const mockData = [`
+    *   **L48:** `documents: mockData,`
+
+*   **File:** `src/lib/validation.ts`
+    *   **L30:** `const files = ['src/main.tsx']; // Placeholder - would need proper file discovery`
+
+*   **File:** `supabase/migrations/20240320000003_add_transaction_functions.sql`
+    *   **L7:** `-- This is a placeholder as transactions are implicit in functions.`
+    *   **L19:** `-- This is a placeholder as transactions are implicit in functions.`
+    *   **L30:** `-- This is a placeholder as transactions are implicit in functions.`
+
+*   **File:** `src/hooks/useAgentStatus.ts`
+    *   **L15:** `// This is a placeholder implementation`
+
+*   **File:** `src/core-legal-platform/notifications/NotificationService.ts`
+    *   **L104:** `// Placeholder for sending email. In a real-world scenario, this would`
+
+*   **File:** `src/core-legal-platform/personalization/PersonalizationService.ts`
+    *   **L53:** `// TODO: [TECH-DEBT] This is placeholder logic. A real personalization algorithm is needed.`
+    *   **L137:** `// TODO: [TECH-DEBT] This is mock data returned on failure.`
+    *   **L138:** `// The error handling should be improved, and this should not return mock data.`
+    *   **L142:** `]; // Return mock data on failure`
+
+*   **File:** `src/core-legal-platform/i18n/LegalTranslationManager.ts`
+    *   **L119:** `* This is a placeholder for a real implementation.`
+    *   **L127:** `// The following is a placeholder structure.`
+    *   **L128:** `console.warn(\`lookupApi is a placeholder and not implemented. Called for term "${term}" in ${language}.\`);`
+
+*   **File:** `src/core-legal-platform/feedback/FeedbackService.ts`
+    *   **L147:** `payload: { analysisId: 'placeholder-analysis-id' },`
+    *   **L164:** `analysisId: 'placeholder-analysis-id', // In a real system, this would be a real ID.`
+
+*   **File:** `src/core-legal-platform/embedding/embedding/EmbeddingService.ts`
+    *   **L2:** `// Mock implementation for now`
+    *   **L16:** `// Mock implementation for now`
+
+*   **File:** `src/core-legal-platform/legal/legalAnalysisService.ts`
+    *   **L331:** `// This is a placeholder for text extraction. In a real scenario, you'd use a library.`
+
+*   **File:** `src/core-legal-platform/common/conversationContext.ts`
+    *   **L173:** `* (Placeholder) Generates a summary of the conversation.`
+
+*   **File:** `src/core-legal-platform/hierarchy/HierarchyManager.ts`
+    *   **L96:** `// Placeholder for procedural conflict (not implemented)`
+    *   **L170:** `// This is a placeholder. In a real system, this would:`
+    *   **L186:** `// This is a placeholder. In a real system, this would:`
+
+*   **File:** `src/core-legal-platform/analytics/FeedbackAnalytics.ts`
+    *   **L95:** `* Placeholder for anomaly detection logic.`
+
+*   **File:** `src/core-legal-platform/citation/CitationEngine.ts`
+    *   **L7:** `// Mock implementation`
+    *   **L19:** `// Mock implementation`
 
 ---
 
