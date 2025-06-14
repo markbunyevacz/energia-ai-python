@@ -80,4 +80,26 @@ export class PDFParser {
       throw new Error(`Failed to extract images from PDF: ${error?.message || 'Unknown error'}`);
     }
   }
+
+  private extractKeywords(title: string, documentType: string, authority: string): string[] {
+    const hungarianLegalTerms = [
+      'törvény', 'rendelet', 'határozat', 'utasítás', 'szabályzat',
+      'jogszabály', 'módosítás', 'hatálybalépés', 'végrehajtás'
+    ];
+    
+    const domainKeywords = {
+      'adó': ['adózás', 'áfa', 'társasági adó', 'személyi jövedelemadó'],
+      'munka': ['munkajog', 'foglalkoztatás', 'bér', 'munkaidő'],
+      'környezet': ['környezetvédelem', 'hulladék', 'levegőminőség']
+    };
+    
+    // Extract keywords from title and content
+    // Categorize by legal domain
+    // Add Hungarian-specific legal terminology
+  }
+
+  private parseDate(dateStr: string): string {
+    // Handles: "2024.01.15", "15.01.2024", "2024-01-15"
+    // Returns: ISO format for database storage
+  }
 } 

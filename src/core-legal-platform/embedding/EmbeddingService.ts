@@ -16,32 +16,12 @@ export interface Document {
 export class EmbeddingService {
   // REAL embedding service using Supabase Edge Function instead of direct Hugging Face call
   async getEmbedding(content: string): Promise<number[]> {
-    try {
-      const { data, error } = await supabase.functions.invoke('create-embedding', {
-        body: { text: content },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (!data || !Array.isArray(data.embedding)) {
-        throw new Error('malformed response');
-      }
-
-      return data.embedding as number[];
-    } catch (err) {
-      // Graceful fallback: generate a deterministic pseudo-embedding locally so downstream logic still works
-      const vectorSize = 384;
-      const embedding = new Array<number>(vectorSize).fill(0);
-      for (let i = 0; i < content.length; i++) {
-        const idx = i % vectorSize;
-        embedding[idx] = (embedding[idx] + content.charCodeAt(i)) % 1000; // keep numbers small
-      }
-      // Normalize
-      const norm = Math.sqrt(embedding.reduce((sum, v) => sum + v * v, 0));
-      return embedding.map((v) => v / (norm || 1));
-    }
+    // Call Supabase Edge Function for embedding generation
+    const { data } = await supabase.functions.invoke('create-embedding', {
+      body: { text: content }
+    });
+    
+    return data.embedding; // 1536-dimensional vector
   }
 
   // Efficient similarity search

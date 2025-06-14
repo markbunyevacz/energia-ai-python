@@ -27,35 +27,6 @@
  * - More robust selectors based on actual site structure
  */
 
-/**
- * Magyar Közlöny Crawler - Frontend Integration Version
- * 
- * PURPOSE: User-Initiated & Frontend Integration
- * This crawler is designed for on-demand crawling triggered by users or frontend components.
- * It provides immediate results for interactive use cases.
- * 
- * ARCHITECTURE: Extends BaseCrawler
- * - Optimized for frontend integration
- * - Simple, immediate document extraction
- * - Returns CrawlerResult for immediate frontend display
- * - Integrated with the main application's Supabase client
- * 
- * USE CASES:
- * - Manual crawling triggered by users
- * - Real-time document discovery
- * - Interactive legal research sessions
- * - Quick document verification
- * 
- * PERFORMANCE: Optimized for speed and immediate feedback
- * SCOPE: Focused, targeted crawling based on user queries
- * 
- * UPDATED: Enhanced based on analysis of magyarkozlony.hu/segitseg
- * - Improved search strategies matching human usage patterns
- * - Better document type recognition
- * - Enhanced metadata extraction
- * - More robust selectors based on actual site structure
- */
-
 import { BaseCrawler } from './base-crawler';
 import type { CrawlerResult, DocumentMetadata, CrawlerConfig } from './types';
 import { supabase } from '@/integrations/supabase/client';
