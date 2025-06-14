@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { resolve } from 'path';
+import path from 'path';
 
 /**
  * Vitest Global Setup
@@ -14,9 +14,9 @@ import { resolve } from 'path';
  *
  * It is configured in `vitest.config.ts` via the `globalSetup` option.
  */
-export default () => {
+export default async () => {
   console.log('--- Loading environment variables for tests from .env file ---');
-  const envPath = resolve(process.cwd(), '.env');
+  const envPath = path.resolve(__dirname, '../../.env');
   const result = config({ path: envPath });
 
   if (result.error) {

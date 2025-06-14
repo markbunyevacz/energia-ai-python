@@ -74,7 +74,7 @@ export class CrossDomainImpactAnalyzer extends BaseAgent {
             return {
                 success: false,
                 message: `Processing failed: ${error.message}`,
-                error: error,
+                error: error.message,
                 data: null,
             };
         }

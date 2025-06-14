@@ -13,6 +13,7 @@ export default {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+  globalSetup: '<rootDir>/src/test/globalSetup.ts',
   globals: {
     'ts-jest': {
       tsconfig: 'tsconfig.test.json'

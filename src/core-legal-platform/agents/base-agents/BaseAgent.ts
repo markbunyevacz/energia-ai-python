@@ -136,8 +136,58 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   }
 
   /**
-   * Process a document using the agent's specific logic.
-   * This method should be implemented by subclasses.
+   * Main processing method that all agents must implement.
+   * 
+   * This is the core method where agent-specific logic is implemented. It follows
+   * a standardized pattern for processing legal documents and queries while allowing
+   * each agent to specialize in their domain expertise.
+   * 
+   * IMPLEMENTATION REQUIREMENTS:
+   * - Must validate input context and document content
+   * - Should implement domain-specific processing logic
+   * - Must return structured AgentResult with success/error states
+   * - Should include reasoning logs for transparency
+   * - Must handle errors gracefully without throwing exceptions
+   * 
+   * CONTEXT STRUCTURE:
+   * - document: The legal document to process
+   * - query: User's natural language query
+   * - user: User information for personalization
+   * - conversationHistory: Previous interactions for context
+   * 
+   * RESULT STRUCTURE:
+   * - success: Boolean indicating processing success
+   * - message: Human-readable result summary
+   * - data: Structured response data (agent-specific)
+   * - error: Error message if processing failed
+   * - reasoning: Chain-of-thought explanation
+   * 
+   * @param context - Complete processing context with document, query, and user info
+   * @returns Promise<AgentResult> - Standardized result structure
+   * @abstract - Must be implemented by all concrete agent classes
+   * 
+   * @example
+   * ```typescript
+   * class ContractAgent extends BaseAgent {
+   *   async process(context: AgentContext): Promise<AgentResult> {
+   *     // Validate inputs
+   *     if (!context.document?.content) {
+   *       return this.handleError(new Error("No document content"), context);
+   *     }
+   *     
+   *     // Process document
+   *     const analysis = await this.analyzeContract(context.document);
+   *     
+   *     // Return structured result
+   *     return {
+   *       success: true,
+   *       message: "Contract analysis completed",
+   *       data: analysis,
+   *       reasoning: this.getReasoningLog()
+   *     };
+   *   }
+   * }
+   * ```
    */
   public async process(task: T): Promise<U> {
     this.reasoning_log = []; // Reset log for new processing task

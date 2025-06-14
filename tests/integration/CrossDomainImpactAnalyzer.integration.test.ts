@@ -190,7 +190,7 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
         expect(result.success).toBe(false);
         expect(result.error).toBeDefined();
         if (result.error) {
-            expect(result.error.message).toContain('empty');
+            expect(result.error).toContain('empty');
         }
     }, 45000);
 
