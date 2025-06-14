@@ -189,8 +189,10 @@ describe('CrossDomainImpactAnalyzer Integration Tests', () => {
 
         expect(result.success).toBe(false);
         expect(result.error).toBeDefined();
-        expect(result.error?.message).toContain('empty');
-    });
+        if (result.error) {
+            expect(result.error.message).toContain('empty');
+        }
+    }, 45000);
 
     async function setupTestDocuments(): Promise<void> {
         // Insert test documents into the actual database

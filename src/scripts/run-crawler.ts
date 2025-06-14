@@ -1,6 +1,6 @@
 import { BHTCrawler } from '../lib/crawler/bht-crawler';
 import { CURIACrawler } from '../lib/crawler/curia-crawler';
-import { MagyarKozlonyCrawler } from '../lib/crawler/MagyarKozlonyCrawler';
+import { MagyarKozlonyCrawler } from '../lib/crawler/magyar-kozlony-crawler';
 import { BaseCrawler } from '../lib/crawler/base-crawler';
 import dotenv from 'dotenv';
 
@@ -25,15 +25,24 @@ async function main() {
     process.exit(1);
   }
 
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+  // Check for Supabase credentials (both VITE_ prefixed and non-prefixed)
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
     console.error('Missing Supabase credentials. Please check your .env file.');
+    console.error('Required: SUPABASE_URL/VITE_SUPABASE_URL and SUPABASE_KEY/VITE_SUPABASE_ANON_KEY');
     process.exit(1);
   }
+  
+  // Set the non-prefixed versions for the crawlers
+  process.env.SUPABASE_URL = supabaseUrl;
+  process.env.SUPABASE_KEY = supabaseKey;
 
   const crawler = new CrawlerClass();
   
   try {
-    console.log(`Starting ${crawler.config.name}...`);
+    console.log(`Starting crawler...`);
     const result = await crawler.crawl();
     
     if (result.success) {

@@ -1,3 +1,39 @@
+/**
+ * Magyar Közlöny Crawler - Background Processing Version
+ * 
+ * PURPOSE: Automated Background Processing & Data Pipeline
+ * This crawler is designed for scheduled, automated crawling operations that run
+ * independently in the background to maintain a comprehensive legal database.
+ * 
+ * ARCHITECTURE: Extends LegalCrawler
+ * - Sophisticated change detection using content hashing and similarity scoring
+ * - Version control system for tracking document evolution over time
+ * - Advanced PDF processing and content extraction capabilities
+ * - Comprehensive logging and monitoring for production environments
+ * 
+ * USE CASES:
+ * - Scheduled daily/weekly crawling operations
+ * - Comprehensive legal database maintenance
+ * - Change detection and notification systems
+ * - Historical document tracking and versioning
+ * - Large-scale data processing and analysis
+ * 
+ * PERFORMANCE: Optimized for throughput and data completeness
+ * SCOPE: Comprehensive crawling of entire legal document corpus
+ * 
+ * KEY DIFFERENCES FROM FRONTEND VERSION:
+ * - Runs independently without user interaction
+ * - Maintains persistent state and version history
+ * - Includes advanced change detection algorithms
+ * - Supports bulk processing and data transformation
+ * - Integrated with monitoring and alerting systems
+ * 
+ * UPDATED: Enhanced based on analysis of magyarkozlony.hu/segitseg
+ * - Improved understanding of document categorization
+ * - Better handling of Hungarian legal document types
+ * - Enhanced metadata extraction for legal research
+ */
+
 import { LegalCrawler } from './LegalCrawler.js';
 import { CrawlerConfig, DocumentMetadata, ChangeDetectionResult } from './types.js';
 import { createClient } from '@supabase/supabase-js';

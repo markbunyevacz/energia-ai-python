@@ -210,10 +210,14 @@ This document tracks the progress of the project implementation, divided into ph
 *   [ ] **Task 7.1: Implement Real-time Client Communication**
     *   [ ] **Sub-task 7.1.1:** Integrate Supabase Realtime into the frontend to listen for database changes.
     *   [ ] **Sub-task 7.1.2:** Implement a WebSocket service for more complex real-time interactions if Supabase Realtime is insufficient.
-*   [ ] **Task 7.2: Build High-Frequency Crawler System**
-    *   [ ] **Sub-task 7.2.1:** Develop a dedicated crawler for Magyar Közlöny (Hungarian Gazette).
-    *   [ ] **Sub-task 7.2.2:** Develop a dedicated crawler for the Jogtár service.
-    *   [ ] **Sub-task 7.2.3:** Schedule these crawlers to run at high frequency to detect changes quickly.
+*   [ ] **Task 7.2: Build Comprehensive Hungarian Legal Hierarchy Crawler System**
+    *   [x] **Sub-task 7.2.1:** Develop a dedicated crawler for Magyar Közlöny (Hungarian Gazette).
+    *   [ ] **Sub-task 7.2.2:** Develop a dedicated crawler for the National Legislation Database (njt.hu).
+    *   [ ] **Sub-task 7.2.3:** Develop a dedicated crawler for EUR-Lex (EU legal documents).
+    *   [ ] **Sub-task 7.2.4:** Implement Fundamental Law (Alaptörvény) ingestion and hierarchy mapping.
+    *   [ ] **Sub-task 7.2.5:** Create legal hierarchy relationship mapping between Acts, Decrees, and Court Decisions.
+    *   [ ] **Sub-task 7.2.6:** Schedule these crawlers to run at appropriate frequencies based on source update patterns.
+    *   [ ] **Sub-task 7.2.7:** Implement change detection and differential analysis for each source type.
 *   [ ] **Task 7.3: Implement Automated Change Summarization**
     *   [ ] **Sub-task 7.3.1:** Integrate a robust LLM (e.g., via API) into the change detection pipeline.
     *   [ ] **Sub-task 7.3.2:** Develop prompts to generate concise, human-readable summaries of detected legal changes.

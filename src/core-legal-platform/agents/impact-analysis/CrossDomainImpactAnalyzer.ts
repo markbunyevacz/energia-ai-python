@@ -65,11 +65,18 @@ export class CrossDomainImpactAnalyzer extends BaseAgent {
      * Integrates with contract analysis and provides comprehensive impact assessment
      */
     public async process(context: AgentContext): Promise<AgentResult> {
+        // This initial check is handled directly instead of using this.handleError
+        // to ensure a standard `Error` object is always returned. The base
+        // handleError method was found to create malformed errors that broke tests.
         if (!context.document.content) {
-            return this.handleError(
-                new Error("Document content is empty"), 
-                context
-            );
+            const error = new Error("Document content is empty");
+            console.error(`[${this.config.name}] Error processing task:`, error);
+            return {
+                success: false,
+                message: `Processing failed: ${error.message}`,
+                error: error,
+                data: null,
+            };
         }
 
         const startTime = Date.now();

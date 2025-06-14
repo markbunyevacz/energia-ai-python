@@ -1,3 +1,36 @@
+/**
+ * Magyar Közlöny Crawler - Frontend Integration Version
+ * 
+ * PURPOSE: User-Initiated & Frontend Integration
+ * This crawler is designed for on-demand crawling triggered by users or frontend components.
+ * It provides immediate results for interactive use cases.
+ * 
+ * ARCHITECTURE: Extends BaseCrawler
+ * - Optimized for frontend integration
+ * - Simple, immediate document extraction
+ * - Returns CrawlerResult for immediate frontend display
+ * - Integrated with main application's Supabase client
+ * 
+ * USE CASES:
+ * - Manual crawling triggered by users ("Check Magyar Közlöny now")
+ * - Frontend components needing fresh data immediately
+ * - Interactive legal research sessions
+ * - Real-time document retrieval for user queries
+ * 
+ * FEATURES:
+ * - Fast, lightweight operation
+ * - PDF download and storage in Supabase Storage
+ * - Basic keyword extraction
+ * - Duplicate detection to avoid re-processing
+ * - Simple error handling for user feedback
+ * 
+ * COMPARISON WITH BACKGROUND CRAWLER:
+ * - This version: Fast, simple, user-driven
+ * - Background version: Robust, automated, change-tracking
+ * 
+ * @see src/scripts/crawler/MagyarKozlonyCrawler.ts for the background processing version
+ */
+
 import { Browser, Page } from 'playwright';
 import { createLogger, format, transports } from 'winston';
 import { CrawlerConfig, DocumentMetadata, CrawlerStats, CrawlerError, ChangeDetectionResult } from './types.js';

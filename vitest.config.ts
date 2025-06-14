@@ -5,6 +5,9 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [react()],
   test: {
+    // This line is critical for fixing the 401 Unauthorized error.
+    // It runs our setup script *before* any tests, ensuring environment variables
+    // are loaded before the Supabase client or any other module is initialized.
     globalSetup: './src/test/globalSetup.ts',
     environment: 'jsdom',
     globals: true,
