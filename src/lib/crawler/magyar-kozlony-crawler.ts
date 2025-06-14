@@ -431,4 +431,146 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
       return true;
     });
   }
-} 
+}
+
+// Module Priority Implementation
+const implementationPhases = {
+  phase1_foundation: [
+    "Constitutional", "Criminal", "Civil", "Administrative", "Labor"
+  ],
+  phase2_economic: [
+    "Corporate", "Tax", "Financial", "Competition"
+  ],
+  phase3_specialized: [
+    "Environmental", "Healthcare", "Education", "Data Protection"
+  ],
+  phase4_remaining: [
+    "All other specialized domains"
+  ]
+};
+
+interface CrossDomainReferences {
+  criminal_civil: "Damages, restitution",
+  labor_tax: "Employment taxation",
+  corporate_tax: "Business taxation",
+  environmental_criminal: "Environmental crimes",
+  administrative_constitutional: "Administrative review"
+}
+
+// Proposed Legal Domain Structure
+const hungarianLegalDomains = {
+  // 1. CONSTITUTIONAL & ADMINISTRATIVE LAW
+  constitutional: {
+    code: 'constitutional',
+    name: 'Alkotmányjog és Közigazgatás',
+    sources: ['Constitutional Court', 'Administrative Courts', 'Ombudsman'],
+    agents: ['ConstitutionalAnalysisAgent', 'AdministrativeComplianceAgent'],
+    keywords: ['alaptörvény', 'alkotmány', 'közigazgatás', 'eljárás']
+  },
+
+  // 2. CRIMINAL LAW
+  criminal: {
+    code: 'criminal',
+    name: 'Büntetőjog',
+    sources: ['BTK', 'Be.', 'Criminal Courts'],
+    agents: ['CriminalLawAgent', 'CriminalProcedureAgent'],
+    keywords: ['btk', 'büntetőjog', 'bűncselekmény', 'eljárás']
+  },
+
+  // 3. CIVIL LAW
+  civil: {
+    code: 'civil',
+    name: 'Polgári Jog',
+    sources: ['PTK', 'Civil Courts', 'Notary Regulations'],
+    agents: ['CivilLawAgent', 'ContractAnalysisAgent', 'PropertyLawAgent'],
+    keywords: ['ptk', 'szerződés', 'tulajdon', 'kártérítés']
+  },
+
+  // 4. COMMERCIAL & CORPORATE LAW
+  commercial: {
+    code: 'commercial',
+    name: 'Társasági és Kereskedelmi Jog',
+    sources: ['Gt.', 'Commercial Courts', 'Company Registry'],
+    agents: ['CorporateLawAgent', 'CommercialContractAgent'],
+    keywords: ['gt', 'társaság', 'cég', 'kereskedelmi']
+  },
+
+  // 5. LABOR LAW
+  labor: {
+    code: 'labor',
+    name: 'Munkajog',
+    sources: ['Mt.', 'Labor Courts', 'Labor Inspectorate'],
+    agents: ['LaborLawAgent', 'EmploymentContractAgent'],
+    keywords: ['mt', 'munkajog', 'foglalkoztatás', 'bér']
+  },
+
+  // 6. TAX LAW
+  tax: {
+    code: 'tax',
+    name: 'Adójog',
+    sources: ['Tax Code', 'NAV', 'Tax Courts'],
+    agents: ['TaxLawAgent', 'TaxComplianceAgent'],
+    keywords: ['adó', 'áfa', 'nav', 'adózás']
+  },
+
+  // 7. FINANCIAL LAW
+  financial: {
+    code: 'financial',
+    name: 'Pénzügyi Jog',
+    sources: ['Hpt.', 'MNB', 'Financial Supervisory Authority'],
+    agents: ['BankingLawAgent', 'FinancialComplianceAgent'],
+    keywords: ['hpt', 'bank', 'pénzügy', 'mnb']
+  },
+
+  // 8. ENERGY LAW (Already implemented)
+  energy: {
+    code: 'energy',
+    name: 'Energiajog',
+    sources: ['MEKH', 'Energy Regulations', 'EU Energy Directives'],
+    agents: ['EnergyContractAgent', 'EnergyComplianceAgent'],
+    keywords: ['energia', 'mekh', 'villamos', 'gáz']
+  },
+
+  // 9. ENVIRONMENTAL LAW
+  environmental: {
+    code: 'environmental',
+    name: 'Környezetjog',
+    sources: ['Environmental Ministry', 'Environmental Courts'],
+    agents: ['EnvironmentalComplianceAgent', 'EnvironmentalImpactAgent'],
+    keywords: ['környezet', 'hulladék', 'levegő', 'víz']
+  },
+
+  // 10. DATA PROTECTION & IT LAW
+  dataProtection: {
+    code: 'data_protection',
+    name: 'Adatvédelem és IT Jog',
+    sources: ['NAIH', 'GDPR', 'IT Security Regulations'],
+    agents: ['DataProtectionAgent', 'CyberSecurityAgent'],
+    keywords: ['gdpr', 'adatvédelem', 'naih', 'informatika']
+  }
+};
+
+// Example: Labor Law Module
+export const laborLawDomain: LegalDomain = {
+  code: 'labor',
+  name: 'Munkajog',
+  description: 'Magyar munkajogi szabályozás és foglalkoztatási kérdések',
+  documentTypes: ['law', 'regulation', 'decision', 'contract'],
+  agentConfig: {
+    labor_analysis: {
+      keywords: ['mt', 'munkajog', 'foglalkoztatás', 'munkaszerződés', 'bér', 'munkaidő']
+    },
+    employment_contract: {
+      keywords: ['munkaszerződés', 'foglalkoztatás', 'próbaidő', 'felmondás']
+    },
+    labor_compliance: {
+      keywords: ['munkavédelem', 'bérminimum', 'munkaidő', 'szabadság']
+    }
+  },
+  sources: [
+    { name: 'Mt. (Munka Törvénykönyve)', url: 'https://net.jogtar.hu/jogszabaly?docid=A1200001.TV' },
+    { name: 'Munkaügyi Bíróságok', url: 'https://birosag.hu/munka' },
+    { name: 'Állami Foglalkoztatási Szolgálat', url: 'https://nfsz.munka.hu/' }
+  ],
+  active: true
+}; 
