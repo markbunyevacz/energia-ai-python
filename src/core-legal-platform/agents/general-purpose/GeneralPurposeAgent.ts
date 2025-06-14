@@ -2,7 +2,7 @@ import { BaseAgent, AgentConfig } from '../base-agents/BaseAgent';
 import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
 import { AgentTask, AgentResponse } from '../types';
 import { BaseLLM } from '@/llm/base-llm';
-import { OpenAILLM } from '@/llm/openai-llm';
+import { createTaskAI } from '@/llm/ai-factory';
 
 export const GENERAL_PURPOSE_AGENT_CONFIG: AgentConfig = {
     id: 'general-purpose-agent',
@@ -14,9 +14,8 @@ export const GENERAL_PURPOSE_AGENT_CONFIG: AgentConfig = {
 
 export class GeneralPurposeAgent extends BaseAgent {
   constructor(domainRegistry?: DomainRegistry) {
-    // For simplicity, we instantiate a default LLM here.
-    // In a real application, this would be injected.
-    const llm = new OpenAILLM(); 
+    // Use the AI factory to create an optimized service for reasoning tasks
+    const llm = createTaskAI('reasoning');
     super(GENERAL_PURPOSE_AGENT_CONFIG, llm, "You are a helpful legal assistant.", "General Purpose Agent", "A general purpose agent for handling miscellaneous legal questions.", domainRegistry);
   }
 

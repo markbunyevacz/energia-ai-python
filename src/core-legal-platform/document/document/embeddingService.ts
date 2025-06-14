@@ -35,18 +35,31 @@ class EmbeddingService {
     console.log(`Batch generating embeddings for ${texts.length} texts`);
 
     try {
+      // Import AI config for proper API key management
+      const { aiConfig } = await import('@/config/ai-config');
+      const apiKey = aiConfig.getApiKey('openai');
+      
+      if (!apiKey) {
+        console.warn('No OpenAI API key found, returning empty embeddings');
+        return texts.map(() => []);
+      }
+
       // Call OpenAI embeddings API for batch processing
       const response = await fetch('https://api.openai.com/v1/embeddings', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'text-embedding-ada-002',
+          model: 'text-embedding-3-small', // Updated to newer model
           input: texts,
         }),
       });
+
+      if (!response.ok) {
+        throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+      }
 
       const data = await response.json();
       return data.data.map((item: any) => item.embedding);

@@ -10,6 +10,7 @@ import { LovableFrontend } from './components/LovableFrontend';
 import { Session } from '@supabase/supabase-js';
 import Dashboard from './pages/Dashboard';
 import NotFoundPage from './pages/NotFound';
+import AISetupPage from './pages/AISetupPage';
 import './App.css';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { MoEProvider } from './contexts/MoEProvider';
@@ -89,6 +90,16 @@ export function App() {
               element={
                 <ProtectedRoute requiredRole="admin">
                   <div>Admin Dashboard</div>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* AI Setup - Model and API key management */}
+            <Route
+              path="/ai-setup"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AISetupPage />
                 </ProtectedRoute>
               }
             />

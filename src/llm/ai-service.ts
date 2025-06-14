@@ -2,8 +2,9 @@ import { BaseLLM, LLMConfig, LLMResult } from './base-llm';
 import OpenAI from 'openai';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 
-export type AIProvider = 'openai' | 'claude' | 'gemini';
+export type AIProvider = 'openai' | 'claude' | 'gemini' | 'deepseek';
 
 export interface AIServiceConfig {
   provider: AIProvider;
@@ -28,6 +29,7 @@ export class AIService implements BaseLLM {
   private openaiClient?: OpenAI;
   private claudeClient?: Anthropic;
   private geminiClient?: GoogleGenerativeAI;
+  private deepseekApiKey?: string;
   private provider: AIProvider;
   private model: string;
   private temperature: number;
@@ -61,6 +63,9 @@ export class AIService implements BaseLLM {
       case 'gemini':
         this.geminiClient = new GoogleGenerativeAI(config.apiKey);
         break;
+      case 'deepseek':
+        this.deepseekApiKey = config.apiKey;
+        break;
       default:
         throw new Error(`Unsupported AI provider: ${config.provider}`);
     }
@@ -85,6 +90,8 @@ export class AIService implements BaseLLM {
         return this.generateClaude(prompt, { temperature, maxTokens, ...options });
       case 'gemini':
         return this.generateGemini(prompt, { temperature, maxTokens, ...options });
+      case 'deepseek':
+        return this.generateDeepseek(prompt, { temperature, maxTokens, ...options });
       default:
         throw new Error(`Unsupported provider: ${this.provider}`);
     }
@@ -169,38 +176,118 @@ export class AIService implements BaseLLM {
   }
 
   private async generateGemini(prompt: string, options: any): Promise<AIServiceResult> {
-    // Placeholder for Gemini implementation
-    // Will need to install @google/generative-ai package
-    throw new Error('Gemini implementation not yet available - please install @google/generative-ai package');
+    if (!this.geminiClient) {
+      throw new Error('Gemini client not initialized');
+    }
+
+    try {
+      const model = this.geminiClient.getGenerativeModel({ 
+        model: this.model,
+        generationConfig: {
+          temperature: options.temperature,
+          maxOutputTokens: options.maxTokens,
+        }
+      });
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const content = response.text();
+
+      if (!content) {
+        throw new Error('No content received from Gemini');
+      }
+
+      return {
+        content,
+        provider: 'gemini',
+        model: this.model,
+        tokenUsage: response.usageMetadata ? {
+          promptTokens: response.usageMetadata.promptTokenCount || 0,
+          completionTokens: response.usageMetadata.candidatesTokenCount || 0,
+          totalTokens: response.usageMetadata.totalTokenCount || 0,
+        } : undefined,
+        metadata: {
+          usage: response.usageMetadata,
+          finishReason: response.candidates?.[0]?.finishReason,
+        },
+      };
+    } catch (error) {
+      console.error('Gemini API Error:', error);
+      throw new Error(`Gemini API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  private async generateDeepseek(prompt: string, options: any): Promise<AIServiceResult> {
+    if (!this.deepseekApiKey) {
+      throw new Error('Deepseek API key not initialized');
+    }
+
+    try {
+      const response = await axios.post('https://api.deepseek.com/v1/chat/completions', {
+        model: this.model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: options.temperature,
+        max_tokens: options.maxTokens,
+        ...options,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${this.deepseekApiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const content = response.data.choices[0]?.message?.content;
+      if (!content) {
+        throw new Error('No content received from Deepseek');
+      }
+
+      return {
+        content,
+        provider: 'deepseek',
+        model: this.model,
+        tokenUsage: response.data.usage ? {
+          promptTokens: response.data.usage.prompt_tokens,
+          completionTokens: response.data.usage.completion_tokens,
+          totalTokens: response.data.usage.total_tokens,
+        } : undefined,
+        metadata: {
+          usage: response.data.usage,
+          finishReason: response.data.choices[0]?.finish_reason,
+        },
+      };
+    } catch (error) {
+      console.error('Deepseek API Error:', error);
+      throw new Error(`Deepseek API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   // Static factory methods for creating services with latest models
-  static createOpenAIService(apiKey: string, model: string = 'gpt-4-turbo-preview'): AIService {
+  static createOpenAIService(apiKey: string, model: string = 'gpt-4o-mini-high'): AIService {
     return new AIService({
       provider: 'openai',
       apiKey,
       model,
-      temperature: 0.7,
+      temperature: 0.1,
       maxTokens: 4000,
     });
   }
 
-  static createClaudeService(apiKey: string, model: string = 'claude-3-5-sonnet-20241022'): AIService {
+  static createClaudeService(apiKey: string, model: string = 'claude-4-sonnet-thinking'): AIService {
     return new AIService({
       provider: 'claude',
       apiKey,
       model,
-      temperature: 0.7,
+      temperature: 0.1,
       maxTokens: 4000,
     });
   }
 
-  static createGeminiService(apiKey: string, model: string = 'gemini-2.0-flash-exp'): AIService {
+  static createGeminiService(apiKey: string, model: string = 'gemini-2.5-pro'): AIService {
     return new AIService({
       provider: 'gemini',
       apiKey,
       model,
-      temperature: 0.7,
+      temperature: 0.1,
       maxTokens: 4000,
     });
   }

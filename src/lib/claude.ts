@@ -21,18 +21,31 @@ export class ClaudeService {
   private anthropic: Anthropic;
   // private readonly MAX_TOKENS = 100000; // Unused constant
   private readonly CHUNK_SIZE = 4000;
+  private model: string;
 
-  constructor(apiKey: string) {
-    this.anthropic = new Anthropic({
-      apiKey,
-    });
+  constructor(apiKey?: string, model: string = 'claude-3-5-sonnet-20241022') {
+    // If no API key provided, try to get from config
+    if (!apiKey) {
+      // Import config dynamically to avoid circular dependencies
+      import('../config/ai-config').then(({ aiConfig }) => {
+        const configApiKey = aiConfig.getApiKey('claude');
+        if (!configApiKey) {
+          throw new Error('No Claude API key found in configuration');
+        }
+        this.anthropic = new Anthropic({ apiKey: configApiKey });
+      });
+    } else {
+      this.anthropic = new Anthropic({ apiKey });
+    }
+    
+    this.model = model;
   }
 
   private async processChunk(chunk: string, context: string): Promise<DocumentMetadata> {
     const prompt = getMetadataExtractionPrompt(chunk, context);
 
     const response = await this.anthropic.messages.create({
-      model: 'claude-3-opus-20240229',
+      model: this.model,
       max_tokens: 1000,
       messages: [{ role: 'user', content: prompt }],
     });

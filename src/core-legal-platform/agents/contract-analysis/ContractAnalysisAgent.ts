@@ -67,15 +67,13 @@ export class ContractAnalysisAgent extends BaseAgent {
 
   private async queryLanguageModel(prompt: string): Promise<any> {
     try {
-        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-         model: 'gpt-4',
-         messages: [{ role: 'user', content: prompt }]
-        }, {
-            headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` }
-        });
-        const content = response.data.choices[0].message.content;
+        // Import the AI factory for dynamic creation
+        const { createTaskAI } = await import('@/llm/ai-factory');
+        const aiService = createTaskAI('analysis');
+        
+        const result = await aiService.generate(prompt);
         // The LLM returns a stringified JSON, so we need to parse it.
-        return JSON.parse(content);
+        return JSON.parse(result.content);
     } catch (error) {
         console.error('Error querying language model:', error);
         throw new ContractAnalysisError('Failed to get analysis from language model.', ErrorCodes.API_ERROR);
