@@ -21,5 +21,7 @@
     "http",
     "net"
   ],
-  "git.autofetch": "all"
+  "git.autofetch": "all",
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
 }
