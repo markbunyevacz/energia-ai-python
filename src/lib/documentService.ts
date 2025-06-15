@@ -1,5 +1,5 @@
 import { ClaudeService, ProcessedDocument } from './claude.js';
-import { DocumentProcessor } from './documentProcessor.js';
+import { DocumentProcessor as DocumentUtils } from './DocumentUtils.js';
 
 export class DocumentService {
   private claudeService: ClaudeService;
@@ -13,9 +13,9 @@ export class DocumentService {
    */
   public async processDocument(file: File): Promise<ProcessedDocument | null> {
     try {
-      const text = await DocumentProcessor.extractTextFromDocument(file);
+      const text = await DocumentUtils.extractTextFromDocument(file);
       
-      if (!DocumentProcessor.isValidLegalDocument(text)) {
+      if (!DocumentUtils.isValidLegalDocument(text)) {
         throw new Error('Invalid legal document');
       }
 
@@ -36,8 +36,8 @@ export class DocumentService {
     // First, validate and extract text from all documents
     for (const file of files) {
       try {
-        const text = await DocumentProcessor.extractTextFromDocument(file);
-        if (DocumentProcessor.isValidLegalDocument(text)) {
+        const text = await DocumentUtils.extractTextFromDocument(file);
+        if (DocumentUtils.isValidLegalDocument(text)) {
           validDocuments.push(text);
         }
       } catch (error) {

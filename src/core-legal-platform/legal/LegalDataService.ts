@@ -45,7 +45,7 @@ const toLegalDocument = (dbDoc: DbLegalDocument): LegalDocument => {
     };
 };
 
-export class LegalDocumentService {
+export class LegalDataService {
   // Legal Documents
   async createLegalDocument(document: Omit<LegalDocument, 'id'>): Promise<LegalDocument> {
     const docToInsert: LegalDocumentInsert = {

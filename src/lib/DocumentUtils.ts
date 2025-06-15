@@ -1,4 +1,4 @@
-export class DocumentProcessor {
+export class DocumentUtils {
   /**
    * Cleans and normalizes document text
    */

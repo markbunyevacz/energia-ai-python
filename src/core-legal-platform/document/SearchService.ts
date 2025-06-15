@@ -8,7 +8,7 @@ import { cacheService } from './document/cacheService.js';
 import type { SearchRequest, SearchResult } from './document/types.js';
 import { supabase } from '@/integrations/supabase/client.js';
 
-class OptimizedDocumentService {
+class SearchService {
   private searchBatchProcessor: BatchProcessor<SearchRequest, SearchResult>;
 
   constructor() {
@@ -135,4 +135,4 @@ class OptimizedDocumentService {
   }
 }
 
-export default new OptimizedDocumentService();
+export const searchService = new SearchService();
