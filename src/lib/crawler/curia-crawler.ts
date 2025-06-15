@@ -1,5 +1,5 @@
 import { BaseCrawler } from './base-crawler';
-import type { CrawlerConfig, CrawlerResult } from './types';
+import type { CrawlerConfig, CrawlerResult, CrawlerProxy } from './types';
 import { Page } from 'playwright';
 
 export const CURIA_CRAWLER_CONFIG: CrawlerConfig = {
@@ -18,8 +18,8 @@ export const CURIA_CRAWLER_CONFIG: CrawlerConfig = {
 export class CURIACrawler extends BaseCrawler {
   private readonly searchTerms = ['energy', 'electricity', 'natural gas'];
 
-  constructor() {
-    super(CURIA_CRAWLER_CONFIG);
+  constructor(proxies: CrawlerProxy[] = []) {
+    super(CURIA_CRAWLER_CONFIG, proxies);
   }
 
   private async searchAndScrape(page: Page) {

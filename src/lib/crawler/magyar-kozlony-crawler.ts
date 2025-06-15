@@ -28,9 +28,24 @@
  */
 
 import { BaseCrawler } from './base-crawler';
-import type { CrawlerResult, DocumentMetadata, CrawlerConfig } from './types';
+import type { CrawlerResult, CrawlerConfig, CrawlerProxy } from './types';
 import { supabase } from '@/integrations/supabase/client';
-// import { PDFDocument } from 'pdf-lib'; // Unused import
+import type { Locator } from 'playwright';
+
+// Custom interface for Magyar Közlöny documents
+interface MagyarKozlonyDocument {
+  title: string;
+  url: string;
+  content: string;
+  publishedDate: string;
+  documentType: string;
+  issuingAuthority: string;
+  documentNumber: string;
+  keywords: string[];
+  language: string;
+  jurisdiction: string;
+  source: string;
+}
 
 export const MAGYAR_KOZLONY_CRAWLER_CONFIG: CrawlerConfig = {
   name: 'MagyarKozlonyCrawler',
@@ -50,38 +65,45 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
   private readonly searchUrl = `${this.baseUrl}/kereses`;
   private readonly advancedSearchUrl = `${this.baseUrl}/kereses/reszletes`;
 
-  constructor() {
-    super(MAGYAR_KOZLONY_CRAWLER_CONFIG);
+  constructor(proxies: CrawlerProxy[] = []) {
+    super(MAGYAR_KOZLONY_CRAWLER_CONFIG, proxies);
   }
 
   async crawl(): Promise<CrawlerResult> {
     const startTime = new Date();
-    const documents: DocumentMetadata[] = [];
+    const documents: MagyarKozlonyDocument[] = [];
     const errors: string[] = [];
 
     try {
+      await this.initialize();
+      if (!this.page) {
+        throw new Error('Failed to initialize browser page');
+      }
+
       await this.page.goto(this.baseUrl, { waitUntil: 'networkidle' });
+      await this.handleCookieBanner();
       
-      // Strategy 1: Recent publications (most common user pattern)
       const recentDocs = await this.crawlRecentPublications();
       documents.push(...recentDocs);
 
-      // Strategy 2: Search by major legal categories
       const categoryDocs = await this.crawlByCategories();
       documents.push(...categoryDocs);
 
-      // Strategy 3: Search by issuing authorities
       const authorityDocs = await this.crawlByAuthorities();
       documents.push(...authorityDocs);
 
     } catch (error) {
       const errorMsg = `Magyar Közlöny crawler error: ${error instanceof Error ? error.message : String(error)}`;
-      console.error(errorMsg);
+      this.logger.error(errorMsg, error);
       errors.push(errorMsg);
+    } finally {
+      await this.cleanup();
     }
 
+    this.logger.info(`Crawl finished. Found ${documents.length} documents.`);
     return {
-      source: { name: 'Magyar Közlöny', url: this.baseUrl },
+      success: errors.length === 0,
+      source: { id: 'magyar_kozlony', name: 'Magyar Közlöny', url: this.baseUrl, type: 'official_gazette', crawlFrequency: 1440 },
       documents: this.removeDuplicates(documents),
       errors,
       startTime,
@@ -89,114 +111,133 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
     };
   }
 
-  /**
-   * Crawl recent publications - matches most common user behavior
-   */
-  private async crawlRecentPublications(): Promise<DocumentMetadata[]> {
-    const documents: DocumentMetadata[] = [];
-    
+  private async humanLikeWait(min: number = 500, max: number = 1500): Promise<void> {
+    if (!this.page) return;
+    await this.page.waitForTimeout(Math.random() * (max - min) + min);
+  }
+
+  private async handleCookieBanner(): Promise<void> {
+    if (!this.page) return;
+    const cookieSelectors = [
+        'button:has-text("Elfogadom")',
+        'button:has-text("Accept all")',
+        '#cookie-accept',
+        '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll'
+    ];
     try {
-      // Navigate to search page
+        this.logger.info('Looking for a cookie banner...');
+        let clicked = false;
+        for (const selector of cookieSelectors) {
+            const button = this.page.locator(selector).first();
+            if (await button.isVisible({ timeout: 2000 })) {
+                this.logger.info(`Cookie banner found with selector "${selector}", clicking...`);
+                await button.click();
+                await this.page.waitForLoadState('networkidle', { timeout: 5000 });
+                this.logger.info('Clicked cookie banner and waited for network idle.');
+                clicked = true;
+                break;
+            }
+        }
+        if (!clicked) {
+            this.logger.info('No cookie banner found matching known selectors.');
+        }
+    } catch (e) {
+        this.logger.info('No cookie banner visible or an error occurred while handling it.');
+    }
+  }
+
+  private async crawlRecentPublications(): Promise<MagyarKozlonyDocument[]> {
+    if (!this.page) return [];
+    this.logger.info('Crawling recent publications...');
+    const documents: MagyarKozlonyDocument[] = [];
+    try {
       await this.page.goto(this.searchUrl, { waitUntil: 'networkidle' });
-      
-      // Set date filter to last 30 days (common user pattern)
+      await this.humanLikeWait();
+
+      this.logger.info('Setting date filter...');
+      await this.page.waitForSelector('input[name="datum_tol"]', { timeout: 10000 });
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      
       await this.page.fill('input[name="datum_tol"]', this.formatDate(thirtyDaysAgo));
       await this.page.fill('input[name="datum_ig"]', this.formatDate(new Date()));
       
-      // Submit search
-      await this.page.click('button[type="submit"], input[type="submit"]');
+      this.logger.info('Submitting search...');
+      await this.page.locator('button[type="submit"], input[type="submit"]').first().click();
       await this.page.waitForLoadState('networkidle');
       
-      // Extract documents from results
       const resultDocs = await this.extractDocumentsFromResults();
       documents.push(...resultDocs);
-      
     } catch (error) {
-      console.error('Error crawling recent publications:', error);
+      this.logger.error('Error crawling recent publications:', error);
+      await this.page.screenshot({ path: `error_recent_publications_${Date.now()}.png` });
     }
-    
     return documents;
   }
 
-  /**
-   * Crawl by major legal categories that users commonly search for
-   */
-  private async crawlByCategories(): Promise<DocumentMetadata[]> {
-    const documents: DocumentMetadata[] = [];
-    
-    // Common legal categories based on user behavior analysis
-    const categories = [
-      'adózás', 'egészségügy', 'oktatás', 'környezetvédelem', 
-      'közigazgatás', 'gazdaság', 'munkaügy', 'szociális'
-    ];
+  private async crawlByCategories(): Promise<MagyarKozlonyDocument[]> {
+    if (!this.page) return [];
+    this.logger.info('Crawling by categories...');
+    const documents: MagyarKozlonyDocument[] = [];
+    const categories = ['adózás', 'egészségügy', 'oktatás', 'környezetvédelem', 'közigazgatás', 'gazdaság', 'munkaügy', 'szociális'];
     
     for (const category of categories) {
       try {
         await this.page.goto(this.searchUrl, { waitUntil: 'networkidle' });
-        
-        // Search by category
+        this.logger.info(`Searching for category: ${category}`);
+        await this.page.waitForSelector('input[name="szoveg"], input[name="keresoszo"]', { timeout: 10000 });
         await this.page.fill('input[name="szoveg"], input[name="keresoszo"]', category);
-        await this.page.click('button[type="submit"], input[type="submit"]');
+        await this.humanLikeWait();
+        await this.page.locator('button[type="submit"], input[type="submit"]').first().click();
         await this.page.waitForLoadState('networkidle');
         
         const categoryDocs = await this.extractDocumentsFromResults();
         documents.push(...categoryDocs);
-        
-        // Respect rate limiting
-        await this.page.waitForTimeout(1000);
-        
       } catch (error) {
-        console.error(`Error crawling category ${category}:`, error);
+        this.logger.error(`Error crawling category ${category}:`, error);
+        await this.page.screenshot({ path: `error_category_${category}_${Date.now()}.png` });
       }
     }
-    
     return documents;
   }
 
-  /**
-   * Crawl by major issuing authorities
-   */
-  private async crawlByAuthorities(): Promise<DocumentMetadata[]> {
-    const documents: DocumentMetadata[] = [];
-    
-    // Major Hungarian government authorities
-    const authorities = [
-      'Kormány', 'Belügyminisztérium', 'Pénzügyminisztérium',
-      'Igazságügyi Minisztérium', 'Egészségügyi Minisztérium'
-    ];
+  private async crawlByAuthorities(): Promise<MagyarKozlonyDocument[]> {
+    if (!this.page) return [];
+    this.logger.info('Crawling by authorities...');
+    const documents: MagyarKozlonyDocument[] = [];
+    const authorities = ['Kormány', 'Belügyminisztérium', 'Pénzügyminisztérium', 'Igazságügyi Minisztérium', 'Egészségügyi Minisztérium'];
     
     for (const authority of authorities) {
       try {
         await this.page.goto(this.advancedSearchUrl, { waitUntil: 'networkidle' });
-        
-        // Search by issuing authority
+        this.logger.info(`Searching for authority: ${authority}`);
+        await this.page.waitForSelector('input[name="kiado"], select[name="kiado"]', { timeout: 10000 });
         await this.page.fill('input[name="kiado"], select[name="kiado"]', authority);
-        await this.page.click('button[type="submit"], input[type="submit"]');
+        await this.humanLikeWait();
+        await this.page.locator('button[type="submit"], input[type="submit"]').first().click();
         await this.page.waitForLoadState('networkidle');
         
         const authorityDocs = await this.extractDocumentsFromResults();
         documents.push(...authorityDocs);
-        
-        await this.page.waitForTimeout(1000);
-        
       } catch (error) {
-        console.error(`Error crawling authority ${authority}:`, error);
+        this.logger.error(`Error crawling authority ${authority}:`, error);
+        await this.page.screenshot({ path: `error_authority_${authority}_${Date.now()}.png` });
       }
     }
-    
     return documents;
   }
 
   /**
    * Enhanced document extraction with better selectors and metadata
    */
-  private async extractDocumentsFromResults(): Promise<DocumentMetadata[]> {
-    const documents: DocumentMetadata[] = [];
+  private async extractDocumentsFromResults(): Promise<MagyarKozlonyDocument[]> {
+    const documents: MagyarKozlonyDocument[] = [];
     
     try {
+      // Add null check for this.page
+      if (!this.page) {
+        throw new Error('Browser page not initialized');
+      }
+      
       // Wait for results to load
       await this.page.waitForSelector('.talalat, .eredmeny, .dokumentum, .result-item', { timeout: 5000 });
       
@@ -210,7 +251,7 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
         '.search-result'
       ];
       
-      let resultElements = [];
+      let resultElements: Locator[] = [];
       for (const selector of resultSelectors) {
         resultElements = await this.page.locator(selector).all();
         if (resultElements.length > 0) break;
@@ -237,7 +278,7 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
   /**
    * Enhanced metadata extraction with better field recognition
    */
-  private async extractDocumentMetadata(element: any): Promise<DocumentMetadata | null> {
+  private async extractDocumentMetadata(element: Locator): Promise<MagyarKozlonyDocument | null> {
     try {
       // Extract title with multiple strategies
       const titleSelectors = [
@@ -420,7 +461,7 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
   /**
    * Remove duplicate documents based on title and URL
    */
-  private removeDuplicates(documents: DocumentMetadata[]): DocumentMetadata[] {
+  private removeDuplicates(documents: MagyarKozlonyDocument[]): MagyarKozlonyDocument[] {
     const seen = new Set<string>();
     return documents.filter(doc => {
       const key = `${doc.title}|${doc.url}`;
@@ -550,27 +591,5 @@ const hungarianLegalDomains = {
   }
 };
 
-// Example: Labor Law Module
-export const laborLawDomain: LegalDomain = {
-  code: 'labor',
-  name: 'Munkajog',
-  description: 'Magyar munkajogi szabályozás és foglalkoztatási kérdések',
-  documentTypes: ['law', 'regulation', 'decision', 'contract'],
-  agentConfig: {
-    labor_analysis: {
-      keywords: ['mt', 'munkajog', 'foglalkoztatás', 'munkaszerződés', 'bér', 'munkaidő']
-    },
-    employment_contract: {
-      keywords: ['munkaszerződés', 'foglalkoztatás', 'próbaidő', 'felmondás']
-    },
-    labor_compliance: {
-      keywords: ['munkavédelem', 'bérminimum', 'munkaidő', 'szabadság']
-    }
-  },
-  sources: [
-    { name: 'Mt. (Munka Törvénykönyve)', url: 'https://net.jogtar.hu/jogszabaly?docid=A1200001.TV' },
-    { name: 'Munkaügyi Bíróságok', url: 'https://birosag.hu/munka' },
-    { name: 'Állami Foglalkoztatási Szolgálat', url: 'https://nfsz.munka.hu/' }
-  ],
-  active: true
-}; 
+// Example domain configuration (for reference only)
+export const hungarianLegalDomainsConfig = hungarianLegalDomains; 

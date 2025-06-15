@@ -33,6 +33,7 @@ export interface CrawlerConfig {
   baseUrl: string;
   maxRequestsPerMinute: number;
   minDelayBetweenRequests: number;
+  timeout?: number;
   retryConfig: {
     maxAttempts: number;
     initialDelay: number;

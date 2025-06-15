@@ -3,24 +3,39 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Shield, FileText } from 'lucide-react';
 
 interface ContractInputProps {
-  onAnalyze: (contractText: string) => void;
+  onAnalyze: (contractContent: string, contractTitle?: string) => void;
   isAnalyzing: boolean;
 }
 
+/**
+ * @component ContractInput
+ * @description Input component for contract analysis with title and content fields.
+ * 
+ * This component provides a user interface for inputting contract data including
+ * both title and content. It supports sample contract loading and real-time
+ * character counting for better user experience.
+ * 
+ * @author Jogi AI
+ * @version 2.0.0 - Enhanced with title input and better UX
+ */
 export function ContractInput({ onAnalyze, isAnalyzing }: ContractInputProps) {
   const [contractText, setContractText] = useState('');
+  const [contractTitle, setContractTitle] = useState('');
 
   const handleAnalyze = () => {
     if (!contractText.trim()) return;
-    onAnalyze(contractText);
+    onAnalyze(contractText, contractTitle.trim() || undefined);
     setContractText('');
+    setContractTitle('');
   };
 
   const handleLoadSample = () => {
+    setContractTitle('Energiaszolgáltatási Szerződés - Minta');
     setContractText(getMockContractText());
   };
 
@@ -34,6 +49,12 @@ export function ContractInput({ onAnalyze, isAnalyzing }: ContractInputProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
+          <Input
+            value={contractTitle}
+            onChange={(e) => setContractTitle(e.target.value)}
+            placeholder="Szerződés címe (opcionális)"
+            disabled={isAnalyzing}
+          />
           <Textarea
             value={contractText}
             onChange={(e) => setContractText(e.target.value)}

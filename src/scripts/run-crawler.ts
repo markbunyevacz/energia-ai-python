@@ -2,15 +2,30 @@ import { BHTCrawler } from '../lib/crawler/bht-crawler';
 import { CURIACrawler } from '../lib/crawler/curia-crawler';
 import { MagyarKozlonyCrawler } from '../lib/crawler/magyar-kozlony-crawler';
 import { BaseCrawler } from '../lib/crawler/base-crawler';
+import type { CrawlerProxy } from '../lib/crawler/types';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const CRAWLERS: { [key: string]: new () => BaseCrawler } = {
+const CRAWLERS: { [key: string]: new (proxies: CrawlerProxy[]) => BaseCrawler } = {
   bht: BHTCrawler,
   curia: CURIACrawler,
   magyarkozlony: MagyarKozlonyCrawler,
 };
+
+function parseProxies(proxyString: string | undefined): CrawlerProxy[] {
+  if (!proxyString) {
+    return [];
+  }
+  return proxyString.split(',').map(p => {
+    const url = new URL(p.trim());
+    return {
+      server: `${url.protocol}//${url.hostname}:${url.port}`,
+      username: url.username,
+      password: url.password,
+    };
+  });
+}
 
 async function main() {
   const crawlerArg = process.argv[2];
@@ -39,10 +54,13 @@ async function main() {
   process.env.SUPABASE_URL = supabaseUrl;
   process.env.SUPABASE_KEY = supabaseKey;
 
-  const crawler = new CrawlerClass();
+  // Parse proxies from environment
+  const proxies = parseProxies(process.env.PROXY_LIST);
+
+  const crawler = new CrawlerClass(proxies);
   
   try {
-    console.log(`Starting crawler...`);
+    console.log(`Starting ${crawlerArg} crawler...`);
     const result = await crawler.crawl();
     
     if (result.success) {
