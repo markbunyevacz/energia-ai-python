@@ -39,7 +39,7 @@ class WebSocketService {
       this.ws = new WebSocket(this.websocketUrl);
       
       this.ws.onopen = () => {
-        console.log(`WebSocket connected to ${this.websocketUrl}`);
+        // console.log(`WebSocket connected to ${this.websocketUrl}`);
         this.reconnectAttempts = 0;
       };
 
@@ -48,20 +48,20 @@ class WebSocketService {
           const message: WebSocketMessage = JSON.parse(event.data);
           this.handleMessage(message);
         } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
+          // console.error('Error parsing WebSocket message:', error);
         }
       };
 
       this.ws.onclose = () => {
-        console.log('WebSocket disconnected');
+        // console.log('WebSocket disconnected');
         this.reconnect();
       };
 
       this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        // console.error('WebSocket error:', error);
       };
     } catch (error) {
-      console.error('Failed to connect WebSocket:', error);
+      // console.error('Failed to connect WebSocket:', error);
       this.reconnect();
     }
   }
@@ -76,11 +76,11 @@ class WebSocketService {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       setTimeout(() => {
         this.reconnectAttempts++;
-        console.log(`Reconnecting... attempt ${this.reconnectAttempts}`);
+        // console.log(`Reconnecting... attempt ${this.reconnectAttempts}`);
         this.connect();
       }, this.reconnectDelay * Math.pow(2, this.reconnectAttempts)); // Exponential backoff
     } else {
-      console.error('WebSocket reconnection failed after maximum attempts.');
+      // console.error('WebSocket reconnection failed after maximum attempts.');
     }
   }
 
@@ -134,7 +134,7 @@ class WebSocketService {
       };
       this.ws.send(JSON.stringify(message));
     } else {
-      console.error('WebSocket is not connected. Cannot send message.');
+      // console.error('WebSocket is not connected. Cannot send message.');
     }
   }
 

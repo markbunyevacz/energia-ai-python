@@ -18,7 +18,7 @@ class EmbeddingService {
     // Check cache first
     const cached = chunkCache.get(cacheKey);
     if (cached) {
-      console.log('Cache hit for embedding generation');
+      // console.log('Cache hit for embedding generation');
       return cached;
     }
 
@@ -32,7 +32,7 @@ class EmbeddingService {
   }
 
   private async batchGenerateEmbeddings(texts: string[]): Promise<number[][]> {
-    console.log(`Batch generating embeddings for ${texts.length} texts`);
+    // console.log(`Batch generating embeddings for ${texts.length} texts`);
 
     try {
       // Import AI config for proper API key management
@@ -40,7 +40,7 @@ class EmbeddingService {
       const apiKey = aiConfig.getApiKey('openai');
       
       if (!apiKey) {
-        console.warn('No OpenAI API key found, returning empty embeddings');
+        // console.warn('No OpenAI API key found, returning empty embeddings');
         return texts.map(() => []);
       }
 
@@ -64,7 +64,7 @@ class EmbeddingService {
       const data = await response.json();
       return data.data.map((item: any) => item.embedding);
     } catch (error) {
-      console.error('Batch embedding generation failed:', error);
+      // console.error('Batch embedding generation failed:', error);
       // Return empty embeddings as fallback
       return texts.map(() => []);
     }

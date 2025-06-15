@@ -1,6 +1,70 @@
+/**
+ * @fileoverview Base Agent Abstract Class - Foundation for All AI Legal Agents
+ * @description Abstract base class that provides the core infrastructure and standardized interface
+ * for all specialized AI agents in the legal platform. Implements common functionality including
+ * telemetry, security, batch processing, and LLM integration.
+ * 
+ * AGENT ARCHITECTURE:
+ * - Abstract base class with template method pattern
+ * - Standardized agent lifecycle (initialize → process → cleanup)
+ * - Built-in telemetry and performance monitoring
+ * - Security layer with role-based access control
+ * - Error handling with graceful degradation
+ * 
+ * CORE CAPABILITIES:
+ * - Document processing with multi-format support
+ * - LLM integration with prompt engineering
+ * - Vector store integration for semantic search
+ * - Conversation context management
+ * - Batch processing for high-volume operations
+ * - Performance metrics and feedback collection
+ * 
+ * SECURITY FEATURES:
+ * - Authentication requirement enforcement
+ * - Role-based permission checking
+ * - Domain-specific access control
+ * - Secure batch processing validation
+ * 
+ * TELEMETRY & MONITORING:
+ * - Response time tracking
+ * - Confidence score logging
+ * - Reasoning chain capture
+ * - Interaction metrics collection
+ * - Error tracking and reporting
+ * 
+ * EXTENSIBILITY POINTS:
+ * - performTask(): Core agent-specific logic implementation
+ * - initialize(): Agent-specific setup and configuration
+ * - getDomain(): Domain registry integration
+ * - Custom error handling and validation
+ * 
+ * INTEGRATION SERVICES:
+ * - LegalDataService: Document CRUD operations
+ * - VectorStoreService: Semantic search and embeddings
+ * - EmbeddingService: Text vectorization
+ * - FeedbackService: User feedback and ratings
+ * - DomainRegistry: Legal domain management
+ * 
+ * USAGE PATTERN:
+ * 1. Extend BaseAgent with domain-specific implementation
+ * 2. Implement performTask() with agent logic
+ * 3. Configure agent settings and security
+ * 4. Register with MixtureOfExpertsRouter
+ * 5. Deploy and monitor performance
+ * 
+ * CONCRETE IMPLEMENTATIONS:
+ * - ContractAnalysisAgent: Contract review and risk assessment
+ * - GeneralPurposeAgent: General legal queries and research
+ * - LegalResearchAgent: Case law and statute analysis
+ * - ComplianceAgent: Regulatory compliance checking
+ * 
+ * @author Legal AI Team
+ * @version 2.1.0
+ * @since 2024
+ */
 import { LegalDocument, DocumentType } from '@/core-legal-platform/legal-domains/types';
 import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
-import { LegalDocumentService } from '@/core-legal-platform/legal/legalDocumentService';
+import { LegalDataService } from '@/core-legal-platform/legal/LegalDataService';
 import type { Database, Json } from '@/integrations/supabase/types';
 import { v4 as uuidv4 } from 'uuid';
 import { FeedbackService } from '@/core-legal-platform/feedback/FeedbackService';
@@ -31,7 +95,7 @@ export interface BatchProcessingResult {
 export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends AgentResponse = AgentResponse> {
   protected config: AgentConfig;
   protected domainRegistry: DomainRegistry;
-  protected documentService: LegalDocumentService;
+  protected documentService: LegalDataService;
   protected vectorStoreService: VectorStoreService;
   protected embeddingService: EmbeddingService;
   protected batchQueue: LegalDocument[] = [];
@@ -55,7 +119,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
   ) {
     this.config = config;
     this.domainRegistry = domainRegistry || DomainRegistry.getInstance();
-    this.documentService = new LegalDocumentService();
+    this.documentService = new LegalDataService();
     this.supabase = supabaseClient;
     this.vectorStoreService = vectorStoreService;
     this.embeddingService = new EmbeddingService();
@@ -131,7 +195,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       await this.feedbackService.submitInteractionMetrics(interactionMetrics);
     } catch (error) {
       // Log silently to avoid disrupting agent processing
-      console.error('Error logging interaction metrics:', (error as Error).message);
+      // console.error('Error logging interaction metrics:', (error as Error).message);
     }
   }
 
@@ -209,7 +273,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
       try {
         await this.logInteractionMetrics(interactionMetrics, interactionId);
       } catch (error) {
-        console.error(`[${this.config.name}] Failed to submit interaction metrics:`, error);
+        // console.error(`[${this.config.name}] Failed to submit interaction metrics:`, error);
       }
 
       return result;
@@ -416,7 +480,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
    * Handle errors during agent operations
    */
   public handleError(error: Error, context: AgentContext): AgentResult {
-    console.error(`[${this.config.name}] Error processing task:`, error, 'Context:', context);
+    // console.error(`[${this.config.name}] Error processing task:`, error, 'Context:', context);
     // Basic error handling, can be customized in subclasses
     return {
       success: false,
@@ -487,7 +551,7 @@ export abstract class BaseAgent<T extends AgentTask = AgentTask, U extends Agent
         similarity: result.similarity,
       }));
     } catch (error) {
-      console.error('Error searching long-term memory:', error);
+      // console.error('Error searching long-term memory:', error);
       return [];
     }
   }

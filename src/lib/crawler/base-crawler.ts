@@ -1,4 +1,4 @@
-import { Browser, BrowserContext, Page } from 'playwright';
+import { BrowserContext, Page } from 'playwright';
 import { chromium } from 'playwright-extra';
 import stealth from 'puppeteer-extra-plugin-stealth';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,8 +12,7 @@ import { Logger } from '../logging/logger';
 chromium.use(stealth());
 
 export abstract class BaseCrawler {
-  protected browser: Browser | null = null;
-  protected context: BrowserContext | null = null;
+  protected browser: BrowserContext | null = null;
   protected page: Page | null = null;
   protected readonly config: CrawlerConfig;
   protected readonly rateLimiter: RateLimiter;
@@ -58,13 +57,11 @@ export abstract class BaseCrawler {
       }
 
       this.browser = await chromium.launch(launchOptions);
-      this.context = await this.browser.newContext({
+      this.page = await this.browser.newContext({
         extraHTTPHeaders: headers,
         viewport: { width: 1920, height: 1080 },
         ignoreHTTPSErrors: true, // Useful for some proxy setups
-      });
-      
-      this.page = await this.context.newPage();
+      }).newPage();
       // Spoof webdriver property
       await this.page.addInitScript(() => {
         Object.defineProperty(navigator, 'webdriver', {
@@ -78,7 +75,7 @@ export abstract class BaseCrawler {
         this.proxyManager.reportFailure(this.currentProxy.server);
       }
       this.logger.error('Failed to initialize browser:', error);
-      console.error('Error in initialize:', error);
+      // console.error('Error in initialize:', error);
       throw error;
     }
   }
@@ -87,10 +84,6 @@ export abstract class BaseCrawler {
     if (this.page) {
       await this.page.close();
       this.page = null;
-    }
-    if (this.context) {
-      await this.context.close();
-      this.context = null;
     }
     if (this.browser) {
       await this.browser.close();

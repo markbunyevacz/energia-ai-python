@@ -1,3 +1,42 @@
+/**
+ * @fileoverview Badge UI Component - Status Indicators and Labels
+ * 
+ * This file provides a flexible badge component system for displaying status indicators,
+ * labels, and categorical information throughout the Legal AI platform interface.
+ * 
+ * Key Features:
+ * - Multiple badge variants for different status types and contexts
+ * - Consistent styling with platform design system
+ * - Accessible color contrast and text sizing
+ * - Responsive design with proper focus states
+ * - Flexible content support for text, numbers, and icons
+ * 
+ * Badge Variants:
+ * - default: Primary status badges with brand colors
+ * - secondary: Neutral status badges for general information
+ * - destructive: Error, warning, or critical status indicators
+ * - outline: Subtle badges with border styling
+ * 
+ * Usage Examples:
+ * - Legal document status indicators (draft, reviewed, approved)
+ * - Contract analysis confidence scores and ratings
+ * - User role and permission level displays
+ * - Notification counts and unread message indicators
+ * - Legal domain and practice area tags
+ * - Processing status for AI analysis tasks
+ * 
+ * Integration Points:
+ * - Used throughout platform for status communication
+ * - Integrates with legal document workflow systems
+ * - Supports Hungarian localization for legal status terms
+ * - Consistent with platform's accessibility and design standards
+ * - Works with notification and alert systems
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 

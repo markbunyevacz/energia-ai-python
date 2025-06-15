@@ -1,3 +1,41 @@
+/**
+ * @fileoverview Tooltip UI Component - Contextual Information on Hover
+ * 
+ * This file provides a tooltip component system built on Radix UI primitives,
+ * offering accessible, highly customizable tooltips to provide contextual
+ * information on hover for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Fully accessible with proper ARIA attributes for screen readers
+ * - Intelligent positioning with collision detection
+ * - Smooth entrance and exit animations
+ * - Customizable delay and duration for hover activation
+ * - Portal rendering to avoid z-index issues
+ * - Built on Radix UI for robust, accessible tooltip behavior
+ * 
+ * Components Exported:
+ * - TooltipProvider: Manages tooltip state for a component tree
+ * - Tooltip: The root component for a tooltip instance
+ * - TooltipTrigger: The element that triggers the tooltip on hover
+ * - TooltipContent: The content of the tooltip with styling and animations
+ * 
+ * Usage Examples:
+ * - Explaining icons or buttons with no visible text label
+ * - Providing definitions for legal terminology (e.g., "force majeure")
+ * - Showing full text for truncated content
+ * - Displaying metadata for legal documents or case files
+ * - Guidance for complex form fields or AI parameters
+ * 
+ * Integration Points:
+ * - Used throughout the platform to enhance clarity and provide help text
+ * - Supports Hungarian localization for legal term definitions
+ * - Integrates with the design system for consistent styling
+ * - Essential for maintaining a clean UI while offering deep context
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 

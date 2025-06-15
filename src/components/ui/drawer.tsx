@@ -1,3 +1,51 @@
+/**
+ * @fileoverview Drawer UI Component - Mobile-First Slide-Up Panels
+ * 
+ * This file provides a complete drawer implementation built on Vaul,
+ * offering accessible slide-up panels optimized for mobile interfaces
+ * in the Legal AI platform.
+ * 
+ * Key Features:
+ * - Mobile-optimized slide-up drawer with touch gestures
+ * - Accessible modal behavior with focus management
+ * - Backdrop overlay with optional background scaling
+ * - Drag handle indicator for intuitive interaction
+ * - Flexible content layout with header and footer sections
+ * - Smooth animations and spring physics
+ * - Portal rendering for proper z-index layering
+ * - Built on Vaul for robust mobile drawer behavior
+ * 
+ * Components Exported:
+ * - Drawer: Root drawer container with configuration options
+ * - DrawerTrigger: Element that opens the drawer
+ * - DrawerContent: Main drawer content container with drag handle
+ * - DrawerHeader: Header section for titles and descriptions
+ * - DrawerFooter: Footer section for actions and buttons
+ * - DrawerTitle: Drawer title with proper heading semantics
+ * - DrawerDescription: Descriptive text for the drawer content
+ * - DrawerClose: Close button or trigger element
+ * - DrawerOverlay: Background overlay component
+ * 
+ * Usage Examples:
+ * - Mobile legal document quick actions and details
+ * - Contract analysis results and recommendations
+ * - User profile and settings panels on mobile
+ * - Legal form inputs and data collection
+ * - AI agent selection and configuration
+ * - Mobile navigation and menu systems
+ * 
+ * Integration Points:
+ * - Used throughout platform for mobile-optimized interfaces
+ * - Integrates with legal document management and analysis systems
+ * - Supports Hungarian localization for drawer content
+ * - Consistent with platform's accessibility and design standards
+ * - Works with responsive design patterns and mobile workflows
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 

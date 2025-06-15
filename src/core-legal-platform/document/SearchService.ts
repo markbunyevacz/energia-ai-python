@@ -25,7 +25,7 @@ class SearchService {
     // Check cache first
     const cached = chunkCache.get(cacheKey);
     if (cached) {
-      console.log('Cache hit for search query:', query);
+      // console.log('Cache hit for search query:', query);
       return cached;
     }
 
@@ -43,7 +43,7 @@ class SearchService {
   }
 
   private async batchSearch(requests: SearchRequest[]): Promise<SearchResult[]> {
-    console.log(`Batch searching ${requests.length} queries`);
+    // console.log(`Batch searching ${requests.length} queries`);
     const startTime = performance.now();
 
     const results: SearchResult[] = [];
@@ -55,7 +55,7 @@ class SearchService {
         
         // If no vector results, fallback to text search
         if (!searchResult.chunks.length) {
-          console.log('No vector results, falling back to text search');
+          // console.log('No vector results, falling back to text search');
           searchResult = await textSearchService.performTextSearch(request);
         }
 
@@ -65,7 +65,7 @@ class SearchService {
           processingTime: performance.now() - startTime
         });
       } catch (error) {
-        console.error('Search error:', error);
+        // console.error('Search error:', error);
         results.push({
           chunks: [],
           totalResults: 0,
@@ -107,27 +107,27 @@ class SearchService {
   }
 
   async reindexAllDocuments(): Promise<void> {
-    console.log("Starting full codebase reindexing...");
+    // console.log("Starting full codebase reindexing...");
     // Clear cache first
     this.clearCache();
     // Fetch all document IDs from the documents table
     const { data: documents, error } = await supabase.from('documents').select('id');
     if (error) {
-      console.error("Failed to fetch documents:", error);
+      // console.error("Failed to fetch documents:", error);
       throw error;
     }
     // For each document, fetch its chunks and regenerate embeddings
     for (const doc of documents) {
       const { data: chunks, error: chunkError } = await supabase.from('document_chunks').select('id, chunk_text').eq('document_id', doc.id);
       if (chunkError) {
-        console.error(`Failed to fetch chunks for document ${doc.id}:`, chunkError);
+        // console.error(`Failed to fetch chunks for document ${doc.id}:`, chunkError);
         continue;
       }
       for (const chunk of chunks) {
         const embedding = await this.generateEmbedding(chunk.chunk_text);
         const { error: updateError } = await supabase.from('document_chunks').update({ embedding: JSON.stringify(embedding) }).eq('id', chunk.id);
         if (updateError) {
-          console.error(`Failed to update embedding for chunk ${chunk.id}:`, updateError);
+          // console.error(`Failed to update embedding for chunk ${chunk.id}:`, updateError);
           continue;
         }
       }

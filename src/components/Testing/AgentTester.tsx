@@ -35,7 +35,7 @@ export function AgentTester({ onTestComplete }: AgentTesterProps) {
       });
       toast.success('Teszt sikeresen lefutott');
     } catch (error) {
-      console.error('Agent test error:', error);
+      // console.error('Agent test error:', error);
       toast.error('Hiba a teszt futtatása során');
     } finally {
       setIsLoading(false);

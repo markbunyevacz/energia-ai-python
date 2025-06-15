@@ -97,7 +97,7 @@ export class LoggingService {
 
     // In production, you would send this to your logging service
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[${level.toUpperCase()}] ${message}`, {
+      // console.log(`[${level.toUpperCase()}] ${message}`, {
         error,
         context,
         metadata
@@ -125,7 +125,7 @@ export class LoggingService {
       // Example: Report to analytics service
       await this.reportToAnalytics();
     } catch (error) {
-      console.error('Failed to report to external services:', error);
+      // console.error('Failed to report to external services:', error);
     }
   }
 
@@ -197,7 +197,7 @@ export class LoggingService {
   private triggerPatternAlert(pattern: ErrorPattern) {
     // In production, you would send this to your monitoring service
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`Error pattern detected for ${pattern.code}:`, {
+      // console.warn(`Error pattern detected for ${pattern.code}:`, {
         count: pattern.occurrences.length,
         timeWindow: pattern.timeWindow,
         occurrences: pattern.occurrences
@@ -208,7 +208,7 @@ export class LoggingService {
   private triggerErrorAlert(error: ContractAnalysisError) {
     // In production, you would send this to your monitoring service
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`Error threshold reached for ${error.code}:`, {
+      // console.warn(`Error threshold reached for ${error.code}:`, {
         count: this.errorCount.get(error.code as ErrorCode),
         error
       });

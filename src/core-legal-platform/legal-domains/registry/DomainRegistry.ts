@@ -21,7 +21,7 @@ export class DomainRegistry {
       .eq('active', true);
 
     if (error) {
-      console.error('Error loading domains:', error);
+      // console.error('Error loading domains:', error);
       throw new Error('Could not load legal domains from the database.');
     }
 
@@ -53,9 +53,9 @@ export class DomainRegistry {
 
   public registerDomain(domain: LegalDomain): void {
     if (this.domains.has(domain.code)) {
-        console.warn(`Domain with code "${domain.code}" is already registered. Overwriting.`);
+        // console.warn(`Domain with code "${domain.code}" is already registered. Overwriting.`);
     }
     this.domains.set(domain.code, domain);
-    console.log(`Domain "${domain.name}" registered successfully.`);
+    // console.log(`Domain "${domain.name}" registered successfully.`);
   }
 } 

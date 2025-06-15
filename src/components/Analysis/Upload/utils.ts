@@ -23,7 +23,7 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
       const pdf = await getDocument({ data: uint8Array }).promise;
       
       let text = '';
-      let textMatches: string[] = [];
+      const textMatches: string[] = [];
       
       // Try simple text extraction first
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -76,13 +76,12 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
     // For unsupported file types
     throw new Error(`Nem támogatott fájltípus: ${file.type}`);
   } catch (error: unknown) {
-    console.error('Error extracting text from file:', error);
+    // console.error('Error extracting text from file:', error);
     const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba';
     throw new Error(`Hiba történt a fájl feldolgozása során: ${errorMessage}`);
   }
 };
 
-export const processFile = async (file: File, setPreview: (preview: string | null) => void, setTextContent: (text: string) => void) => {
-    const fileType = file.type;
+export const processFile = async (file: File) => {
     // ... existing code ...
 };

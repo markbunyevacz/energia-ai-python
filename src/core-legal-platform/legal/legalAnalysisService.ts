@@ -24,7 +24,7 @@ const cache = new LRU<string, any>({
   },
   dispose: (key, _value) => {
     // Cache törléskor felszabadítjuk a memóriát
-    console.log(`Cache entry removed: ${key}`);
+    // console.log(`Cache entry removed: ${key}`);
   }
 });
 
@@ -310,7 +310,7 @@ export class LegalAnalysisService {
     //     metadata: metrics as Json,
     //   });
     // } catch (error) {
-    //   console.error('Error storing performance metrics:', error);
+    //   // console.error('Error storing performance metrics:', error);
     // }
   }
 

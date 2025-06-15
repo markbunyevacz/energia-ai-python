@@ -33,7 +33,7 @@ export class DocumentProcessingService {
     // The original logic for citation processing is preserved.
     // You can add calls to other processing steps like language detection here.
     const processingResult = await this.analyzeText(document.content);
-    console.log(`Detected language: ${processingResult.detectedLanguage}`);
+    // console.log(`Detected language: ${processingResult.detectedLanguage}`);
     
     // Process citations
     await this.citationBuilder.processDocument(document);

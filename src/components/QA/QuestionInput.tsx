@@ -47,7 +47,7 @@ export function QuestionInput({
             role: profile?.role || 'jogász',
             permissions: []
         },
-        // @ts-ignore
+        // @ts-expect-error - Expected type mismatch for component props
         previousQuestions: conversation?.messages.slice(-3).map(m => m.question) || []
       };
 
@@ -74,7 +74,7 @@ export function QuestionInput({
         setQuestion('');
         onQuestionChange('');
       } catch (error) {
-        console.error("Error analyzing question:", error);
+        // console.error("Error analyzing question:", error);
         toast({
           title: "Hiba a kérdés elemzése során",
           description: "Nem sikerült meghatározni a megfelelő AI ágenst. Kérjük, próbálja újra.",

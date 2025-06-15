@@ -1,6 +1,59 @@
 // import React from 'react';
 
 /**
+ * @fileoverview Error Message Component - User-Friendly Error Display System
+ * @description Comprehensive error display component that provides consistent, accessible,
+ * and actionable error messaging across the Legal AI platform. Features multiple error
+ * types, retry mechanisms, and Hungarian localization support.
+ * 
+ * ERROR HANDLING FEATURES:
+ * - Multiple error severity levels (info, warning, error, critical)
+ * - Actionable error messages with retry buttons
+ * - Automatic error categorization and formatting
+ * - Hungarian and English error message support
+ * - Dismissible and persistent error modes
+ * 
+ * ERROR TYPES SUPPORTED:
+ * - Network connectivity errors
+ * - Authentication and authorization failures
+ * - File upload and processing errors
+ * - AI service unavailability
+ * - Database operation failures
+ * - Validation and input errors
+ * 
+ * USER EXPERIENCE FEATURES:
+ * - Clear, non-technical error descriptions
+ * - Suggested actions for error resolution
+ * - Visual error severity indicators
+ * - Smooth animations and transitions
+ * - Responsive design for all screen sizes
+ * 
+ * ACCESSIBILITY COMPLIANCE:
+ * - ARIA live regions for screen reader announcements
+ * - High contrast color schemes
+ * - Keyboard navigation support
+ * - Focus management for error dialogs
+ * - Semantic HTML structure
+ * 
+ * INTEGRATION CAPABILITIES:
+ * - Error boundary integration
+ * - Global error handling system
+ * - Logging and telemetry support
+ * - Custom error action handlers
+ * - Theme and styling customization
+ * 
+ * LOCALIZATION SUPPORT:
+ * - Hungarian legal terminology
+ * - Context-aware error messages
+ * - Cultural adaptation for legal professionals
+ * - Fallback to English for untranslated errors
+ * 
+ * @author Legal AI Team
+ * @version 1.2.0
+ * @since 2024
+ */
+
+/**
  * Error Message Component Props
  * 
  * Configuration options for displaying error messages with optional retry functionality

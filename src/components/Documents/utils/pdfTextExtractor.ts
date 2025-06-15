@@ -50,7 +50,7 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
     return `Dokumentum: ${file.name}. PDF tartalom feldolgozás alatt.`;
     
   } catch (error) {
-    console.error('PDF text extraction error:', error);
+    // console.error('PDF text extraction error:', error);
     return `Dokumentum: ${file.name}. Szöveg kivonás sikertelen, de a fájl feltöltve.`;
   }
 };

@@ -45,19 +45,19 @@ export class LegalResearchAgent extends BaseAgent<LegalResearchTask, LegalResear
   }
 
   public async initialize(): Promise<void> {
-    console.log(`[${this.config.name}] Initializing...`);
+    // console.log(`[${this.config.name}] Initializing...`);
     // Initialization logic for this agent, e.g., connecting to legal databases
   }
 
   protected async performTask(task: LegalResearchTask, interactionId: string): Promise<LegalResearchResponse> {
-    console.log(`[${this.config.name}] Performing legal research for query: "${task.query}"`);
+    // console.log(`[${this.config.name}] Performing legal research for query: "${task.query}"`);
 
     const queryEmbedding = await this.embeddingService.getEmbedding(task.query);
 
     const { data: documents, error } = await vectorStoreService.similaritySearch(queryEmbedding, 0.7, 10);
 
     if (error) {
-      console.error(`[${this.config.name}] Error searching for documents:`, error);
+      // console.error(`[${this.config.name}] Error searching for documents:`, error);
       throw new Error(`Failed to perform similarity search: ${error.message}`);
     }
 

@@ -14,14 +14,8 @@ import { useMoE } from '@/contexts/MoEProvider';
 import { ThumbsUp, ThumbsDown, MessageSquarePlus } from 'lucide-react';
 import { FeedbackService } from '@/core-legal-platform/feedback/FeedbackService';
 import { UserFeedback, FeedbackCategory, FeedbackRating } from '@/core-legal-platform/feedback/types';
-import { v4 as uuidv4 } from 'uuid';
-import { DomainRegistry } from '@/core-legal-platform/legal-domains/registry/DomainRegistry';
-import { energyDomain } from '@/core-legal-platform/domains/energy/energy.domain';
-import { generalDomain } from '@/core-legal-platform/domains/general/general.domain';
-import { ContractAnalysisAgent } from '@/core-legal-platform/agents/contract-analysis/ContractAnalysisAgent';
-import { GeneralPurposeAgent } from '@/core-legal-platform/agents/general-purpose/GeneralPurposeAgent';
 import { MixtureOfExpertsRouter, AgentScore, MoEContext } from '@/core-legal-platform/routing/MixtureOfExpertsRouter';
-import { BaseAgent, AgentContext, AgentResult } from '@/core-legal-platform/agents/base-agents/BaseAgent';
+import { BaseAgent, AgentContext } from '@/core-legal-platform/agents/base-agents/BaseAgent';
 import { conversationContextManager } from '@/core-legal-platform/common/conversationContext';
 import { LegalDocument } from '@/core-legal-platform/legal-domains/types';
 
@@ -129,7 +123,7 @@ async function extractTextFromFile(file: File): Promise<string> {
  */
 export function LovableFrontend() {
   const { user } = useAuth();
-  const { router: moeRouter, agentPool, isInitialized } = useMoE();
+  const { router: moeRouter, isInitialized } = useMoE();
   // ============================================================================
   // STATE MANAGEMENT
   // ============================================================================
@@ -164,8 +158,7 @@ export function LovableFrontend() {
    * TODO: Define proper TypeScript interface for result structure
    */
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [analysisId, setAnalysisId] = useState<string | null>(null);
-  const [progress, setProgress] = useState<string | null>(null);
+  const [progress] = useState<string | null>(null);
   
   /** 
    * MoE Router state
@@ -356,7 +349,7 @@ export function LovableFrontend() {
 
     } catch (err: any) {
       setError(`Hiba történt az ügynökök keresése közben: ${err.message}`);
-      console.error(err);
+      // // console.error(err);
     } finally {
       setLoading(false);
     }
@@ -426,7 +419,7 @@ export function LovableFrontend() {
         setError(agentResult.message);
       }
     } catch (err: any) {
-      console.error("Analysis execution error:", err);
+      // // console.error("Analysis execution error:", err);
       setError(err.message || 'Ismeretlen hiba történt az elemzés során.');
     } finally {
       setLoading(false);
@@ -445,7 +438,7 @@ export function LovableFrontend() {
     try {
       await feedbackService.collectFeedback(feedback);
     } catch (err) {
-      console.error('Hiba a visszajelzés küldésekor:', err);
+              // // console.error('Hiba a visszajelzés küldésekor:', err);
     }
   };
 
@@ -469,7 +462,7 @@ export function LovableFrontend() {
       setFeedbackComment('');
       setFeedbackSuggestion('');
     } catch (err) {
-      console.error('Hiba a részletes visszajelzés küldésekor:', err);
+              // // console.error('Hiba a részletes visszajelzés küldésekor:', err);
       // Optionally show an error to the user
     }
   };

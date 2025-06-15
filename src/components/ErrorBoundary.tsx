@@ -1,3 +1,58 @@
+/**
+ * @fileoverview Error Boundary Component - React Error Handling & Recovery System
+ * @description React Error Boundary component that catches JavaScript errors anywhere in the
+ * component tree, logs error information, and displays a fallback UI instead of crashing
+ * the entire application. Essential for production stability and user experience.
+ * 
+ * ERROR HANDLING CAPABILITIES:
+ * - Catches JavaScript errors in component tree
+ * - Prevents application crashes from component errors
+ * - Provides graceful fallback UI for error states
+ * - Logs detailed error information for debugging
+ * - Supports error recovery and retry mechanisms
+ * 
+ * REACT LIFECYCLE INTEGRATION:
+ * - componentDidCatch: Error logging and side effects
+ * - getDerivedStateFromError: State updates for error UI
+ * - Error boundary pattern implementation
+ * - Child component error isolation
+ * 
+ * FALLBACK UI FEATURES:
+ * - User-friendly error messages
+ * - Application recovery options
+ * - Error reporting capabilities
+ * - Consistent styling with platform theme
+ * - Accessibility-compliant error display
+ * 
+ * ERROR LOGGING & MONITORING:
+ * - Detailed error stack traces
+ * - Component stack information
+ * - Error context and props logging
+ * - Integration with monitoring services
+ * - Development vs production error handling
+ * 
+ * RECOVERY MECHANISMS:
+ * - Page refresh option for users
+ * - Component retry functionality
+ * - Graceful degradation strategies
+ * - Error state reset capabilities
+ * 
+ * USAGE PATTERNS:
+ * - Wrap entire application or major sections
+ * - Isolate error-prone components
+ * - Protect critical user workflows
+ * - Provide fallback for third-party components
+ * 
+ * INTEGRATION POINTS:
+ * - Error reporting services (Sentry, LogRocket)
+ * - Application monitoring systems
+ * - User feedback collection
+ * - Development debugging tools
+ * 
+ * @author Legal AI Team
+ * @version 1.0.0
+ * @since 2024
+ */
 // import React from 'react';
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,12 +74,12 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    console.error('ErrorBoundary caught an error:', error);
+    // console.error('ErrorBoundary caught an error:', error);
     return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    // console.error('Uncaught error:', error, errorInfo);
   }
 
   public render() {

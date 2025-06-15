@@ -1,3 +1,52 @@
+/**
+ * @fileoverview Loading Spinner Component - Animated Loading State Indicator
+ * @description Reusable loading spinner component that provides visual feedback during
+ * asynchronous operations. Features customizable sizing, colors, and overlay modes
+ * for consistent loading states across the Legal AI platform.
+ * 
+ * VISUAL FEATURES:
+ * - Smooth CSS animations with hardware acceleration
+ * - Multiple size variants (small, medium, large)
+ * - Customizable colors and themes
+ * - Optional overlay mode for full-screen loading
+ * - Accessibility-compliant with ARIA labels
+ * 
+ * COMPONENT VARIANTS:
+ * - Inline spinner for button loading states
+ * - Overlay spinner for page-level loading
+ * - Card spinner for component-level loading
+ * - Custom sizing and color options
+ * 
+ * ACCESSIBILITY FEATURES:
+ * - ARIA live regions for screen readers
+ * - Semantic HTML structure
+ * - Keyboard navigation support
+ * - High contrast mode compatibility
+ * - Reduced motion support for accessibility
+ * 
+ * PERFORMANCE OPTIMIZATIONS:
+ * - CSS-only animations (no JavaScript)
+ * - Hardware-accelerated transforms
+ * - Minimal DOM footprint
+ * - Efficient re-rendering patterns
+ * 
+ * USAGE SCENARIOS:
+ * - Document upload and processing
+ * - AI analysis operations
+ * - Database queries and updates
+ * - Authentication state changes
+ * - Route transitions
+ * 
+ * INTEGRATION POINTS:
+ * - Used across all async operations
+ * - Integrated with error boundaries
+ * - Compatible with loading states
+ * - Supports theme customization
+ * 
+ * @author Legal AI Team
+ * @version 1.0.0
+ * @since 2024
+ */
 // import React from 'react';
 
 /**

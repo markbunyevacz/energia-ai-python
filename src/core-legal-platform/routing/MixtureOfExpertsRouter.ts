@@ -1,3 +1,53 @@
+/**
+ * @fileoverview Mixture of Experts Router - Intelligent AI Agent Selection System
+ * @description Advanced routing system that intelligently selects the most appropriate AI agents
+ * for legal queries using multi-factor scoring algorithms and machine learning techniques.
+ * 
+ * CORE ALGORITHM:
+ * The router uses a weighted scoring system that evaluates agents based on:
+ * - Keyword matching (35%): Domain-specific terminology analysis
+ * - Context relevance (15%): Document type and user role alignment  
+ * - Historical performance (15%): Previous successful interactions
+ * - Vector similarity (15%): Semantic similarity to stored documents
+ * - User feedback (20%): Performance ratings and user satisfaction
+ * 
+ * INTELLIGENT FEATURES:
+ * - Dynamic confidence threshold adjustment
+ * - Agent performance tracking with feedback integration
+ * - Conversation context awareness for multi-turn interactions
+ * - Vector store integration for semantic document matching
+ * - Real-time agent scoring and ranking
+ * 
+ * SCORING METHODOLOGY:
+ * 1. Keyword Score: Matches query terms against agent domain keywords
+ * 2. Context Score: Evaluates document type and user role compatibility
+ * 3. History Score: Considers recent agent usage patterns (last 5 messages)
+ * 4. Vector Score: Uses embedding similarity for semantic matching
+ * 5. Feedback Score: Incorporates user ratings and performance metrics
+ * 
+ * AGENT SELECTION PROCESS:
+ * 1. Query analysis and embedding generation
+ * 2. Multi-factor scoring for all enabled agents
+ * 3. Confidence threshold filtering
+ * 4. Ranking by composite score
+ * 5. Return top 1-3 agents for execution
+ * 
+ * PERFORMANCE OPTIMIZATION:
+ * - Caches agent performance scores for fast lookup
+ * - Batch processes similarity searches
+ * - Maintains conversation context for efficiency
+ * - Implements score normalization for fair comparison
+ * 
+ * INTEGRATION POINTS:
+ * - Vector Store Service for semantic search
+ * - Embedding Service for query vectorization
+ * - Domain Registry for agent-domain mapping
+ * - Conversation Context Manager for history tracking
+ * 
+ * @author Legal AI Team
+ * @version 2.0.0
+ * @since 2024
+ */
 import { BaseAgent, AgentContext } from '../agents/base-agents/BaseAgent';
 import { DomainRegistry } from '../legal-domains/registry/DomainRegistry';
 import { LegalDomain } from '../legal-domains/types';
@@ -94,7 +144,7 @@ export class MixtureOfExpertsRouter {
       performance.score = Math.max(0.1, Math.min(2.0, performance.score + adjustment));
       performance.feedbackCount++;
       this.agentPerformanceScores.set(agentId, performance);
-      console.log(`[MoE] Adjusted score for ${agentId} to ${performance.score.toFixed(2)}`);
+      // console.log(`[MoE] Adjusted score for ${agentId} to ${performance.score.toFixed(2)}`);
     }
   }
 

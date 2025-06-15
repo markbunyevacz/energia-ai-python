@@ -1,7 +1,8 @@
 {
-  "name": "jogi-ai-demo",
+  "name": "energia-legal-ai-demo",
+  "description": "Advanced Legal AI Platform - Intelligent contract analysis, legal research, and compliance monitoring system with multi-agent architecture, real-time legal change detection, and Hungarian localization. Features include AI-powered document analysis, risk assessment, proactive recommendations, and role-based access control for legal professionals.",
+  "private": true,
   "version": "1.0.0",
-  "description": "Jogi AI Demo Project",
   "type": "module",
   "main": "index.js",
   "scripts": {

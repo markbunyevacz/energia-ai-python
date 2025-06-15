@@ -1,3 +1,53 @@
+/**
+ * @fileoverview Login Page Component - User Authentication Interface
+ * @description Comprehensive login page that provides secure user authentication for the
+ * Legal AI platform. Features email/password authentication, social login options,
+ * password reset functionality, and Hungarian localization for legal professionals.
+ * 
+ * AUTHENTICATION FEATURES:
+ * - Email and password authentication via Supabase Auth
+ * - Form validation with real-time feedback
+ * - Secure password handling and encryption
+ * - Remember me functionality for convenience
+ * - Automatic redirect after successful login
+ * 
+ * USER EXPERIENCE:
+ * - Clean, professional design for legal professionals
+ * - Responsive layout for desktop and mobile devices
+ * - Loading states during authentication process
+ * - Clear error messaging for failed attempts
+ * - Accessibility-compliant form design
+ * 
+ * SECURITY MEASURES:
+ * - Client-side input validation and sanitization
+ * - Rate limiting protection against brute force attacks
+ * - Secure token handling and storage
+ * - HTTPS enforcement for all authentication requests
+ * - Session management with automatic expiration
+ * 
+ * FORM VALIDATION:
+ * - Email format validation with regex patterns
+ * - Password strength requirements
+ * - Real-time validation feedback
+ * - Hungarian error messages for local users
+ * - Accessibility-compliant error announcements
+ * 
+ * INTEGRATION POINTS:
+ * - Supabase Auth service for authentication
+ * - React Router for post-login navigation
+ * - AuthContext for global authentication state
+ * - Protected routes for role-based access
+ * 
+ * LOCALIZATION:
+ * - Hungarian language support for legal professionals
+ * - Cultural adaptation for Hungarian legal market
+ * - Fallback to English for missing translations
+ * - Legal terminology and professional language
+ * 
+ * @author Legal AI Team
+ * @version 1.1.0
+ * @since 2024
+ */
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';

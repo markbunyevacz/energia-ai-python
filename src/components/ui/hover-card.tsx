@@ -1,3 +1,43 @@
+/**
+ * @fileoverview Hover Card UI Component - Contextual Information Popover
+ * 
+ * This file provides a hover card component built on Radix UI primitives,
+ * offering accessible contextual information display on hover interactions
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible hover interactions with proper ARIA attributes
+ * - Intelligent positioning with collision detection and side preferences
+ * - Smooth fade and zoom animations for content appearance
+ * - Configurable delay and timing for hover activation
+ * - Portal rendering for proper z-index layering
+ * - Built on Radix UI for robust cross-browser compatibility
+ * 
+ * Components Exported:
+ * - HoverCard: Root hover card container
+ * - HoverCardTrigger: Element that triggers the hover card on hover
+ * - HoverCardContent: Content container with positioning and animations
+ * 
+ * Usage Examples:
+ * - Legal professional profile previews on name hover
+ * - Legal document metadata and summary previews
+ * - Contract clause explanations and definitions
+ * - Legal term glossary and definition tooltips
+ * - AI analysis confidence score details
+ * - User avatar information cards
+ * 
+ * Integration Points:
+ * - Used throughout platform for contextual information display
+ * - Integrates with legal document management and user systems
+ * - Supports Hungarian localization for hover card content
+ * - Consistent with platform's accessibility and design standards
+ * - Works with legal glossary and knowledge management systems
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 

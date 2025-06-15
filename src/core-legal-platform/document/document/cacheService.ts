@@ -4,7 +4,7 @@ import { chunkCache } from '../chunkCache';
 
 export class CacheService {
   async preloadDocumentChunks(documentIds: string[]): Promise<void> {
-    console.log(`Preloading chunks for ${documentIds.length} documents`);
+    // console.log(`Preloading chunks for ${documentIds.length} documents`);
 
     const { data, error } = await supabase
       .from('document_chunks')
@@ -12,7 +12,7 @@ export class CacheService {
       .in('document_id', documentIds);
 
     if (error) {
-      console.error('Error preloading chunks:', error);
+      // console.error('Error preloading chunks:', error);
       return;
     }
 
@@ -22,7 +22,7 @@ export class CacheService {
       chunkCache.set(cacheKey, chunk, 10 * 60 * 1000); // 10 minutes
     });
 
-    console.log(`Preloaded ${data?.length || 0} chunks into cache`);
+    // console.log(`Preloaded ${data?.length || 0} chunks into cache`);
   }
 
   clearCache(): void {

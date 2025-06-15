@@ -1,3 +1,52 @@
+/**
+ * @fileoverview Context Menu UI Component - Right-Click Contextual Actions
+ * 
+ * This file provides a complete context menu implementation built on Radix UI primitives,
+ * offering accessible right-click contextual menus with rich interaction patterns
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible context menus with proper ARIA attributes and keyboard navigation
+ * - Right-click and keyboard activation support
+ * - Nested submenus with smooth animations and positioning
+ * - Checkbox and radio item support for toggleable options
+ * - Keyboard shortcuts display and handling
+ * - Flexible content composition with separators and labels
+ * - Portal rendering for proper z-index layering
+ * - Built on Radix UI for robust cross-browser compatibility
+ * 
+ * Components Exported:
+ * - ContextMenu: Root context menu container
+ * - ContextMenuTrigger: Element that triggers the context menu
+ * - ContextMenuContent: Main menu content container
+ * - ContextMenuItem: Individual menu items with actions
+ * - ContextMenuCheckboxItem: Toggleable checkbox menu items
+ * - ContextMenuRadioItem: Radio button menu items for exclusive selection
+ * - ContextMenuLabel: Section labels and headers
+ * - ContextMenuSeparator: Visual separators between menu sections
+ * - ContextMenuShortcut: Keyboard shortcut display
+ * - ContextMenuSub: Nested submenu containers
+ * 
+ * Usage Examples:
+ * - Legal document right-click actions (copy, delete, share, analyze)
+ * - Contract clause context menus (edit, comment, highlight, extract)
+ * - File management operations in document libraries
+ * - User management context actions in admin interfaces
+ * - Legal case file operations and workflow actions
+ * - Dashboard widget configuration menus
+ * 
+ * Integration Points:
+ * - Used throughout platform for contextual actions and shortcuts
+ * - Integrates with legal document management and workflow systems
+ * - Supports Hungarian localization for menu items and shortcuts
+ * - Consistent with platform's accessibility and design standards
+ * - Works with permission systems for role-based menu visibility
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"

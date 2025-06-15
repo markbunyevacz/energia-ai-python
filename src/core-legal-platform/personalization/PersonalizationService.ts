@@ -116,7 +116,7 @@ export class PersonalizationService {
       };
     }).filter(Boolean);
 
-    // @ts-ignore
+    // @ts-expect-error - Expected type mismatch for legacy API
     return recommendations;
   }
 

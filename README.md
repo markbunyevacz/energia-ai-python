@@ -1,3 +1,29 @@
+# Energia Legal AI Demo - Advanced Legal Intelligence Platform
+
+## 🏛️ Project Overview
+
+**Energia Legal AI Demo** is a sophisticated legal intelligence platform that combines artificial intelligence, real-time monitoring, and expert legal knowledge to provide comprehensive contract analysis, legal research, and compliance monitoring services. Built specifically for the Hungarian legal market with energy sector specialization.
+
+### 🎯 Core Mission
+Transform legal document analysis and compliance monitoring through intelligent AI agents, proactive legal change detection, and personalized recommendations for legal professionals.
+
+### 🏗️ Architecture Highlights
+- **Multi-Agent AI System**: Mixture of Experts router with specialized legal agents
+- **Real-time Legal Monitoring**: Supabase-powered change detection and notifications  
+- **Role-Based Access Control**: Secure multi-tenant architecture for different user types
+- **Hungarian Localization**: Native language support for Hungarian legal professionals
+- **Energy Sector Focus**: Specialized domain knowledge for energy industry contracts
+
+### 🚀 Key Features
+- **Intelligent Contract Analysis**: AI-powered risk assessment and clause extraction
+- **Proactive Legal Alerts**: Real-time monitoring of legal changes affecting contracts
+- **Multi-Language Support**: Document processing in Hungarian and English
+- **Semantic Search**: Vector-based document similarity and retrieval
+- **Performance Analytics**: Comprehensive telemetry and user feedback systems
+- **Scalable Architecture**: Serverless backend with edge function deployment
+
+---
+
 # Energia Jogi AI
 
 A modern web application for legal document analysis and contract management, built with React, TypeScript, and AI capabilities.

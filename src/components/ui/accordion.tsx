@@ -1,3 +1,40 @@
+/**
+ * @fileoverview Accordion UI Component - Collapsible Content Sections
+ * 
+ * This file provides a complete accordion implementation built on Radix UI primitives,
+ * offering accessible and customizable collapsible content sections for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible accordion with keyboard navigation and screen reader support
+ * - Smooth expand/collapse animations with chevron rotation indicators
+ * - Flexible single or multiple panel expansion modes
+ * - Consistent styling with platform design system
+ * - Built on Radix UI for robust accessibility and behavior
+ * 
+ * Components Exported:
+ * - Accordion: Root container component
+ * - AccordionItem: Individual accordion section wrapper
+ * - AccordionTrigger: Clickable header with expand/collapse functionality
+ * - AccordionContent: Collapsible content area with smooth animations
+ * 
+ * Usage Examples:
+ * - FAQ sections in help documentation
+ * - Legal document section navigation
+ * - Contract clause organization
+ * - Settings panel groupings
+ * - Dashboard widget organization
+ * 
+ * Integration Points:
+ * - Used throughout the platform for organizing complex information
+ * - Integrates with legal document viewers for section navigation
+ * - Supports Hungarian localization for legal professional workflows
+ * - Consistent with platform's accessibility standards
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"

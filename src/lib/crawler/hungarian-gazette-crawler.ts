@@ -3,7 +3,7 @@ import type { CrawlerConfig, CrawlerResult, LegalSource } from './types.js';
 import type { Page } from 'playwright';
 import { writeFile, readFile } from 'fs/promises';
 import { join } from 'path';
-import { createRequire } from 'module';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 
 // Add DOMMatrix polyfill for Node.js
 if (typeof global.DOMMatrix === 'undefined') {
@@ -39,11 +39,8 @@ if (typeof global.DOMMatrix === 'undefined') {
   } as any;
 }
 
-const require = createRequire(import.meta.url);
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-
 // Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.js');
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsLib.workerSrc;
 
 // export class HungarianGazetteCrawler extends BaseCrawler {
 //   ...
@@ -106,7 +103,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
       
       return filepath;
     } catch (error) {
-      console.error('PDF download error:', error);
+      // console.error('PDF download error:', error);
       throw error;
     }
   }
@@ -125,7 +122,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
       
       return text;
     } catch (error) {
-      console.error('PDF text extraction error:', error);
+      // console.error('PDF text extraction error:', error);
       throw error;
     }
   }
@@ -139,7 +136,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
           return content;
         }
       } catch (e) {
-        console.log(`Selector ${selector} not found, trying next...`);
+        // console.log(`Selector ${selector} not found, trying next...`);
       }
     }
     throw new Error('Could not find document content with any known selector');
@@ -240,7 +237,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
         throw new Error('Failed to initialize browser page');
       }
 
-      console.log('Navigating to NJT main page...');
+      // console.log('Navigating to NJT main page...');
       await this.page.goto('https://njt.hu', { waitUntil: 'networkidle' });
       
       // Wait for the search form to be visible
@@ -250,7 +247,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
       const now = new Date();
       const currentYear = now.getFullYear();
 
-      console.log(`Searching for documents from year: ${currentYear}`);
+      // console.log(`Searching for documents from year: ${currentYear}`);
       
       // Enter search criteria
       await this.page.fill('#search-input', currentYear.toString());
@@ -263,7 +260,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
       
       // Get all document links
       const documentLinks = await this.page.$$('.search-results a[href*="/jogszabaly/"]');
-      console.log(`Found ${documentLinks.length} document links`);
+      // console.log(`Found ${documentLinks.length} document links`);
 
       for (const link of documentLinks) {
         try {
@@ -272,7 +269,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
           if (!href) continue;
 
           const fullUrl = new URL(href, 'https://njt.hu').toString();
-          console.log(`Processing document at ${fullUrl}`);
+          // console.log(`Processing document at ${fullUrl}`);
           
           // Navigate to the document page with retry logic
           let retryCount = 0;
@@ -304,7 +301,7 @@ export class HungarianGazetteCrawler extends BaseCrawler {
             } catch (error) {
               retryCount++;
               if (retryCount === maxRetries) throw error;
-              console.log(`Navigation failed, retrying (${retryCount}/${maxRetries})...`);
+              // console.log(`Navigation failed, retrying (${retryCount}/${maxRetries})...`);
               await new Promise(resolve => setTimeout(resolve, 2000));
             }
           }
@@ -322,14 +319,14 @@ export class HungarianGazetteCrawler extends BaseCrawler {
             const pdfUrl = await pdfLink.evaluate(el => el.getAttribute('href'));
             if (pdfUrl) {
               const fullPdfUrl = new URL(pdfUrl, 'https://njt.hu').toString();
-              console.log(`Downloading PDF from ${fullPdfUrl}`);
+              // console.log(`Downloading PDF from ${fullPdfUrl}`);
               
               try {
                 pdfPath = await this.downloadPDF(this.page, fullPdfUrl);
                 pdfContent = await this.extractTextFromPDF(pdfPath);
-                console.log('Successfully extracted text from PDF');
+                // console.log('Successfully extracted text from PDF');
               } catch (error) {
-                console.error('Failed to process PDF:', error);
+                // console.error('Failed to process PDF:', error);
               }
             }
           }
@@ -352,12 +349,12 @@ export class HungarianGazetteCrawler extends BaseCrawler {
             try {
               await this.logCrawlResult(fullUrl, 'success');
             } catch (error) {
-              console.error('Failed to log crawl result:', error);
+              // console.error('Failed to log crawl result:', error);
             }
             
-            console.log(`Successfully processed document: ${title}`);
+            // console.log(`Successfully processed document: ${title}`);
           } else {
-            console.log(`Skipping document at ${fullUrl} - missing title or content`);
+            // console.log(`Skipping document at ${fullUrl} - missing title or content`);
           }
 
           // Add a small delay between requests
@@ -368,9 +365,9 @@ export class HungarianGazetteCrawler extends BaseCrawler {
           try {
             await this.logCrawlResult(link.toString(), 'error', errorMessage);
           } catch (logError) {
-            console.error('Failed to log error:', logError);
+            // console.error('Failed to log error:', logError);
           }
-          console.error(`Error processing document: ${errorMessage}`);
+          // console.error(`Error processing document: ${errorMessage}`);
         }
       }
     } catch (error) {
@@ -379,9 +376,9 @@ export class HungarianGazetteCrawler extends BaseCrawler {
       try {
         await this.logCrawlResult(this.source.url, 'error', errorMessage);
       } catch (logError) {
-        console.error('Failed to log error:', logError);
+        // console.error('Failed to log error:', logError);
       }
-      console.error(`Error crawling main page: ${errorMessage}`);
+      // console.error(`Error crawling main page: ${errorMessage}`);
     } finally {
       await this.cleanup();
     }

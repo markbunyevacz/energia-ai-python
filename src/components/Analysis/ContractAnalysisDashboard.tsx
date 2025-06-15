@@ -40,7 +40,7 @@ export function ContractAnalysisDashboard({ analyses, onAnalysisSelect }: Contra
   }, [analyses, searchTerm, filterRisk, sortBy]);
 
   const handleAnalysisSelect = (analysis: ContractAnalysis) => {
-    console.log('Analysis selected:', analysis.id);
+    // console.log('Analysis selected:', analysis.id);
     setSelectedAnalysis(analysis);
     if (onAnalysisSelect) {
       onAnalysisSelect(analysis);

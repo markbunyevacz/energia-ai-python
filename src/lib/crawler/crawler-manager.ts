@@ -26,7 +26,7 @@ export class CrawlerManager {
         // Wait for 1 minute before checking for next source
         await new Promise(resolve => setTimeout(resolve, 60000));
       } catch (error) {
-        console.error('Error in crawler manager:', error);
+        // console.error('Error in crawler manager:', error);
         // Wait for 5 minutes before retrying after an error
         await new Promise(resolve => setTimeout(resolve, 300000));
       }
@@ -66,7 +66,7 @@ export class CrawlerManager {
       .single();
 
     if (jobError || !job) {
-      console.error('Error creating crawler job:', jobError);
+      // console.error('Error creating crawler job:', jobError);
       return;
     }
 
@@ -123,7 +123,7 @@ export class CrawlerManager {
         throw new Error(result.errors?.[0] || 'Unknown error occurred');
       }
     } catch (error) {
-      console.error('Error crawling source:', error);
+      // console.error('Error crawling source:', error);
       await supabase
         .from('crawler_jobs')
         .update({
@@ -139,7 +139,7 @@ export class CrawlerManager {
 
   private createCrawler(source: LegalSource) {
     switch (source.type) {
-      case 'magyar_kozlony':
+      case 'magyar_kozlony': {
         const config = {
           name: source.name,
           baseUrl: source.url,
@@ -153,6 +153,7 @@ export class CrawlerManager {
           }
         };
         return new MagyarKozlonyCrawler(config);
+      }
       // Add more crawler implementations here
       default:
         throw new Error(`No crawler implementation for source type: ${source.type}`);

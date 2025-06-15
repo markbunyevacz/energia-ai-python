@@ -13,7 +13,7 @@ async function createTestData() {
       publication_date: new Date().toISOString()
     });
 
-    console.log("Created legal document:", document.id);
+    // console.log("Created legal document:", document.id);
 
     // Create legal changes
     const changes = await Promise.all([
@@ -31,7 +31,7 @@ async function createTestData() {
       })
     ]);
 
-    console.log("Created legal changes:", changes.map(c => c.id));
+    // console.log("Created legal changes:", changes.map(c => c.id));
 
     // Create contracts
     const contracts = await Promise.all([
@@ -49,7 +49,7 @@ async function createTestData() {
       })
     ]);
 
-    console.log("Created contracts:", contracts.map(c => c.id));
+    // console.log("Created contracts:", contracts.map(c => c.id));
 
     // Create contract impacts
     const impacts = await Promise.all([
@@ -57,11 +57,11 @@ async function createTestData() {
       service.analyzeContractImpact(contracts[1].id, changes[1].id)
     ]);
 
-    console.log("Created contract impacts:", impacts.map(i => i.id));
+    // console.log("Created contract impacts:", impacts.map(i => i.id));
 
-    console.log("\nTest data creation completed successfully!");
+    // console.log("\nTest data creation completed successfully!");
   } catch (error) {
-    console.error("Error creating test data:", error);
+    // console.error("Error creating test data:", error);
   }
 }
 

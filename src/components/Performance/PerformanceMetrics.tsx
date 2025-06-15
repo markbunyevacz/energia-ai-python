@@ -4,10 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import optimizedDocumentService from '@/core-legal-platform/document/optimizedDocumentService';
 import { Activity, Database, Clock, Zap } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
 export function PerformanceMetrics() {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<{
+    cache: { hitRate: number; hits: number; totalItems: number };
+    searchQueue: number;
+    embeddingQueue: number;
+    isProcessing: { search: boolean; embedding: boolean };
+  } | null>(null);
 
   useEffect(() => {
     const updateStats = () => {

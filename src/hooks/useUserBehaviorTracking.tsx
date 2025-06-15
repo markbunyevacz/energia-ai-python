@@ -1,3 +1,48 @@
+/**
+ * @fileoverview useUserBehaviorTracking Hook - Advanced User Behavior Analytics
+ * 
+ * This custom React hook provides sophisticated user behavior tracking and session management
+ * for the Legal AI platform, capturing detailed interaction patterns, engagement metrics,
+ * and user journey analytics for UX optimization and business intelligence.
+ * 
+ * Key Features:
+ * - Comprehensive session management with unique session identification
+ * - Real-time user interaction tracking (clicks, keystrokes, mouse movements)
+ * - Scroll depth analysis and engagement measurement
+ * - Page visibility and focus tracking for attention analytics
+ * - Inactivity detection and session timeout management
+ * - Feature usage tracking for product optimization
+ * - Conversion event tracking for business metrics
+ * - Privacy-conscious data collection with user consent
+ * 
+ * Behavioral Metrics:
+ * - Session duration and activity patterns
+ * - Interaction frequency and engagement depth
+ * - Scroll behavior and content consumption
+ * - Feature adoption and usage patterns
+ * - User journey mapping and flow analysis
+ * - Conversion funnel optimization data
+ * 
+ * Usage Examples:
+ * - Legal document reading behavior analysis
+ * - AI tool usage pattern optimization
+ * - Legal professional workflow efficiency tracking
+ * - Platform feature adoption measurement
+ * - User experience optimization insights
+ * - Legal service conversion tracking
+ * 
+ * Integration Points:
+ * - Used throughout platform for behavioral data collection
+ * - Integrates with analytics tracking and business intelligence
+ * - Supports Hungarian legal professional behavior analysis
+ * - Works with A/B testing and feature flag systems
+ * - Connects to user experience optimization tools
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { useEffect, useRef } from 'react';
 import { useAnalyticsTracking } from './useAnalyticsTracking';
 

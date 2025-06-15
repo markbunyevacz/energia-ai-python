@@ -65,7 +65,7 @@ export function FeedbackModal({
       onClose(); // Close modal on success
     } catch (err) {
       setError('Hiba történt a visszajelzés beküldése közben.');
-      console.error(err);
+      // console.error(err);
     } finally {
       setIsSubmitting(false);
     }

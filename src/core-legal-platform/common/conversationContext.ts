@@ -56,7 +56,7 @@ class ConversationContextManager {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Error loading conversation history:', error);
+      // console.error('Error loading conversation history:', error);
       return null;
     }
 
@@ -113,7 +113,7 @@ class ConversationContextManager {
       .single();
 
     if (error) {
-      console.error('Error saving conversation message:', error);
+      // console.error('Error saving conversation message:', error);
       return context; // Return context without the new message if DB save fails
     }
 

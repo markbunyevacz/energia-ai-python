@@ -1,3 +1,55 @@
+/**
+ * @fileoverview Feedback Types & Interfaces - Type Definitions for User Feedback System
+ * @description Comprehensive type definitions for the feedback and analytics system,
+ * including user feedback, performance metrics, interaction telemetry, and
+ * analytics data structures used throughout the Legal AI platform.
+ * 
+ * TYPE CATEGORIES:
+ * - User Feedback: Ratings, comments, and satisfaction data
+ * - Performance Metrics: Response times, accuracy, and system performance
+ * - Interaction Telemetry: User behavior and workflow analytics
+ * - Analytics Data: Aggregated insights and reporting structures
+ * 
+ * FEEDBACK TYPES:
+ * - FeedbackRating: Thumbs up/down and star rating enums
+ * - FeedbackCategory: Categorized feedback for targeted improvements
+ * - UserFeedback: Complete user feedback with metadata
+ * - FeedbackAnalytics: Aggregated feedback insights and trends
+ * 
+ * PERFORMANCE TYPES:
+ * - InteractionMetrics: Agent performance and response data
+ * - PerformanceData: System-wide performance measurements
+ * - AgentMetrics: Individual agent performance tracking
+ * - SystemHealth: Overall platform health indicators
+ * 
+ * ANALYTICS TYPES:
+ * - UserBehavior: User interaction patterns and workflows
+ * - FeatureUsage: Feature adoption and usage statistics
+ * - TrendAnalysis: Time-series data for trend identification
+ * - InsightData: Actionable insights from analytics processing
+ * 
+ * DATA STRUCTURES:
+ * - Timestamp-based data for temporal analysis
+ * - User-centric data for personalization
+ * - Agent-specific data for performance optimization
+ * - System-wide data for platform monitoring
+ * 
+ * INTEGRATION INTERFACES:
+ * - Database schema compatibility
+ * - API request/response structures
+ * - Event tracking and logging formats
+ * - Analytics pipeline data formats
+ * 
+ * TYPE SAFETY:
+ * - Strict TypeScript interfaces for compile-time validation
+ * - Enum types for controlled vocabularies
+ * - Optional fields for flexible data collection
+ * - Union types for polymorphic data structures
+ * 
+ * @author Legal AI Team
+ * @version 1.1.0
+ * @since 2024
+ */
 // src/core-legal-platform/feedback/types.ts
 
 /**

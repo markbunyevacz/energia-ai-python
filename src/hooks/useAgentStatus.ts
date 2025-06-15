@@ -1,3 +1,42 @@
+/**
+ * @fileoverview useAgentStatus Hook - AI Agent Health Monitoring
+ * 
+ * This custom React hook provides real-time monitoring of AI agent status and health
+ * for the Legal AI platform, tracking agent availability, performance, and connectivity.
+ * 
+ * Key Features:
+ * - Real-time agent status monitoring with automatic polling
+ * - Online/offline detection based on recent activity timestamps
+ * - Error handling and fallback status reporting
+ * - Configurable polling intervals for performance optimization
+ * - Integration with Supabase system health tracking
+ * - Last activity timestamp tracking for agent availability
+ * 
+ * Status Types:
+ * - Online: Agent is active and responding within the last 5 minutes
+ * - Offline: Agent hasn't responded recently or is unavailable
+ * - Error: Failed to retrieve agent status information
+ * - Unknown: No status data available for the agent
+ * 
+ * Usage Examples:
+ * - Contract analysis agent status monitoring
+ * - Legal research agent availability checking
+ * - General purpose agent health dashboard
+ * - AI system reliability monitoring
+ * - Agent performance analytics and reporting
+ * 
+ * Integration Points:
+ * - Used throughout platform for AI agent status display
+ * - Integrates with system health monitoring and alerting
+ * - Supports Hungarian localization for status messages
+ * - Works with AI agent routing and load balancing systems
+ * - Connects to Supabase real-time monitoring infrastructure
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
 
@@ -25,7 +64,7 @@ export function useAgentStatus(agentId: string): AgentStatus {
         .single();
 
       if (error) {
-        console.error('Error fetching agent status:', error);
+        // console.error('Error fetching agent status:', error);
         setStatus('Error');
         setIsOnline(false);
         return;

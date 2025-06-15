@@ -9,13 +9,13 @@ async function processLegalDocuments() {
     try {
       await documentProcessor.processDocument(doc);
       processedCount++;
-      console.log(`Processed document: ${doc.metadata.title}`);
+      // console.log(`Processed document: ${doc.metadata.title}`);
     } catch (error) {
       console.error(`Failed to process ${doc.metadata.title}:`, error);
     }
   }
   
-  console.log(`Successfully processed ${processedCount}/${documents.length} documents`);
+  // console.log(`Successfully processed ${processedCount}/${documents.length} documents`);
 }
 
 processLegalDocuments(); 

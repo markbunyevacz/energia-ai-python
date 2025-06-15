@@ -1,3 +1,40 @@
+/**
+ * @fileoverview Popover UI Component - Floating Content Panel
+ * 
+ * This file provides a popover component system built on Radix UI primitives.
+ * Popovers are used to display floating content in relation to a trigger element,
+ * ideal for menus, information displays, and other contextual UIs.
+ * 
+ * Key Features:
+ * - Fully accessible with focus management and keyboard navigation
+ * - Intelligent positioning with collision detection and alignment options
+ * - Triggered by a click or other user interaction
+ * - Smooth entrance and exit animations
+ * - Portal rendering to avoid z-index and clipping issues
+ * - Built on Radix UI for robust and accessible popover behavior
+ * 
+ * Components Exported:
+ * - Popover: The root component for a popover instance
+ * - PopoverTrigger: The element that opens the popover on click
+ * - PopoverContent: The floating content panel with styling and animations
+ * 
+ * Usage Examples:
+ * - Date picker calendar that appears when clicking an input field
+ * - Color picker for highlighting or annotations
+ * - A "share" menu with social media links for a legal document
+ * - Complex filter selection for a search interface
+ * - User profile menu in the application header
+ * 
+ * Integration Points:
+ * - A versatile building block for many other UI components
+ * - Used to create complex, interactive UI without cluttering the main layout
+ * - Supports Hungarian localization within the popover content
+ * - Adheres to the platform's design system for a consistent look and feel
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 

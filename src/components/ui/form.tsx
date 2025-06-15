@@ -1,3 +1,63 @@
+/**
+ * @fileoverview Form Component System - Advanced Form Management
+ * @description Comprehensive form system built on React Hook Form with validation,
+ * error handling, and accessibility features. Provides structured form layouts
+ * with consistent styling and behavior across the Legal AI platform.
+ * 
+ * FORM COMPONENTS:
+ * - Form: Root form provider with validation context
+ * - FormField: Individual field wrapper with validation
+ * - FormItem: Container for field with proper spacing
+ * - FormLabel: Accessible label with required indicators
+ * - FormControl: Input wrapper with error state management
+ * - FormDescription: Helper text and field descriptions
+ * - FormMessage: Error and validation message display
+ * 
+ * VALIDATION FEATURES:
+ * - Real-time validation with React Hook Form
+ * - Custom validation rules and schemas
+ * - Field-level and form-level validation
+ * - Async validation support
+ * - Error message localization
+ * 
+ * ACCESSIBILITY FEATURES:
+ * - Proper label and input associations
+ * - ARIA attributes for screen readers
+ * - Error announcements and descriptions
+ * - Focus management and navigation
+ * - Keyboard accessibility compliance
+ * 
+ * FORM PATTERNS:
+ * - Multi-step form workflows
+ * - Dynamic field addition/removal
+ * - Conditional field visibility
+ * - File upload integration
+ * - Auto-save and draft functionality
+ * 
+ * STYLING SYSTEM:
+ * - Consistent field spacing and alignment
+ * - Error state styling and indicators
+ * - Responsive form layouts
+ * - Dark mode compatibility
+ * - Loading and disabled states
+ * 
+ * USAGE SCENARIOS:
+ * - User registration and authentication
+ * - Document metadata and settings
+ * - Legal analysis configuration
+ * - Search and filter interfaces
+ * - Profile and preference management
+ * 
+ * INTEGRATION POINTS:
+ * - React Hook Form for state management
+ * - Zod or Yup for validation schemas
+ * - UI components for consistent styling
+ * - API services for form submission
+ * 
+ * @author Legal AI Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"

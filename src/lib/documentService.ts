@@ -21,7 +21,7 @@ export class DocumentService {
 
       return await this.claudeService.processDocument(text);
     } catch (error) {
-      console.error('Error processing document:', error);
+      // console.error('Error processing document:', error);
       return null;
     }
   }
@@ -41,7 +41,7 @@ export class DocumentService {
           validDocuments.push(text);
         }
       } catch (error) {
-        console.error(`Error processing file ${file.name}:`, error);
+        // console.error(`Error processing file ${file.name}:`, error);
       }
     }
 

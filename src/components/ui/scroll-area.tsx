@@ -1,3 +1,37 @@
+/**
+ * @fileoverview Scroll Area UI Component - Styled Scrollable Container
+ * 
+ * This file provides a scroll area component built on Radix UI primitives.
+ * It enhances a standard scrollable container with custom-styled scrollbars,
+ * offering a consistent look and feel across different browsers and operating systems.
+ * 
+ * Key Features:
+ * - Provides custom-styled scrollbars for both vertical and horizontal scrolling
+ * - Hides default browser scrollbars while maintaining functionality
+ * - Fully accessible and keyboard-navigable
+ * - Supports both vertical and horizontal orientations
+ * - Lightweight and performant, built on Radix UI for reliability
+ * 
+ * Components Exported:
+ * - ScrollArea: The main container that provides the scrollable viewport
+ * - ScrollBar: The custom-styled scrollbar component
+ * 
+ * Usage Examples:
+ * - Displaying long legal documents or contract clauses in a fixed-height container
+ * - Creating scrollable sidebars for navigation or tool palettes
+ * - Scrollable dropdown menus or select component options
+ * - Presenting tables with many rows or columns inside a card or dialog
+ * - Displaying long lists of search results or notifications
+ * 
+ * Integration Points:
+ * - Used in various components like `Select`, `Dialog`, and `Sheet` to manage overflowing content
+ * - Ensures a consistent visual design for scrollable elements platform-wide
+ * - Improves the aesthetics of the UI, particularly on Windows where scrollbars are more prominent
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 

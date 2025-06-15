@@ -38,7 +38,7 @@ export class MessageQueue extends EventEmitter {
       try {
         await this.processNextBatch();
       } catch (error) {
-        console.error('Error processing message batch:', error);
+        // console.error('Error processing message batch:', error);
         this.emit('error', error);
       }
       await new Promise(resolve => setTimeout(resolve, this.processingInterval));
@@ -60,7 +60,7 @@ export class MessageQueue extends EventEmitter {
       try {
         await this.processMessage(message);
       } catch (error: any) {
-        console.error(`Error processing message ${message.id}:`, error);
+        // console.error(`Error processing message ${message.id}:`, error);
         await this.updateMessageStatus(message.id, 'failed', error.message);
       }
     }

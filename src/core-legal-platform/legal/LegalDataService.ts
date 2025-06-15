@@ -1,3 +1,69 @@
+/**
+ * @fileoverview Legal Data Service - Comprehensive Legal Document & Contract Management
+ * @description Central data access layer that provides CRUD operations and business logic for
+ * legal documents, contracts, legal changes, and impact analysis. Integrates with Supabase
+ * database and vector store for comprehensive legal data management.
+ * 
+ * CORE ENTITIES MANAGED:
+ * - Legal Documents: Laws, regulations, policies, decisions, and other legal texts
+ * - Legal Changes: Tracked modifications to legal documents with impact assessment
+ * - Contracts: Commercial agreements with risk analysis and metadata
+ * - Contract Impacts: Analysis of how legal changes affect existing contracts
+ * 
+ * DATA OPERATIONS:
+ * - Full CRUD operations for all legal entities
+ * - Automatic vector store synchronization for semantic search
+ * - Type-safe database interactions with TypeScript
+ * - Metadata handling with JSON serialization
+ * - Relationship management between entities
+ * 
+ * BUSINESS LOGIC:
+ * - Contract impact analysis with automated risk calculation
+ * - Priority level determination based on risk factors
+ * - Action requirement generation for contract updates
+ * - Legal change impact assessment
+ * 
+ * INTEGRATION FEATURES:
+ * - Supabase database integration with type safety
+ * - Vector store automatic document indexing
+ * - Real-time change detection support
+ * - Error handling with graceful degradation
+ * 
+ * DOCUMENT TYPE MAPPING:
+ * - Domain types ↔ Database enum conversion
+ * - Hungarian legal document classification
+ * - Extensible type system for new document categories
+ * 
+ * IMPACT ANALYSIS ALGORITHM:
+ * - Multi-factor risk scoring (contract risk × change impact)
+ * - Priority classification (low, medium, high, urgent)
+ * - Automated action requirement generation
+ * - Scalable scoring methodology
+ * 
+ * VECTOR STORE INTEGRATION:
+ * - Automatic document embedding on creation
+ * - Semantic search capability
+ * - Content synchronization with error handling
+ * - Background processing for performance
+ * 
+ * USAGE PATTERNS:
+ * - Document lifecycle management
+ * - Contract portfolio analysis
+ * - Legal change monitoring
+ * - Compliance impact assessment
+ * - Risk management workflows
+ * 
+ * DATABASE SCHEMA DEPENDENCIES:
+ * - legal_documents table
+ * - legal_changes table  
+ * - contracts table
+ * - contract_impacts table
+ * - Vector store collections
+ * 
+ * @author Legal AI Team
+ * @version 1.3.0
+ * @since 2024
+ */
 import { supabase } from '../../integrations/supabase/client.js';
 import type { Database } from '../../integrations/supabase/types.js';
 import { LegalDocument, DocumentType } from '@/core-legal-platform/legal-domains/types';
@@ -68,7 +134,7 @@ export class LegalDataService {
 
     if (newDoc.content) {
       vectorStoreService.addDocument({ id: newDoc.id, content: newDoc.content })
-        .catch(err => console.error(`Failed to add document ${newDoc.id} to vector store:`, err));
+        .catch(err => // console.error(`Failed to add document ${newDoc.id} to vector store:`, err));
     }
     
     return newDoc;

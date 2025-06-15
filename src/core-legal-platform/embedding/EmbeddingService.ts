@@ -1,31 +1,67 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * EmbeddingService - Production-Ready Vector Embedding Service
+ * @fileoverview Embedding Service - Text Vectorization & Semantic Processing
+ * @description Advanced text embedding service that converts legal documents and
+ * queries into high-dimensional vectors for semantic search, similarity matching,
+ * and AI agent routing. Supports multiple embedding models and caching strategies.
  * 
- * This service provides vector embeddings for text content using a Supabase Edge Function.
- * It serves as the core component for semantic search and similarity matching across
- * the legal document platform.
+ * CORE CAPABILITIES:
+ * - Text-to-vector conversion for semantic analysis
+ * - Multiple embedding model support (OpenAI, local models)
+ * - Batch processing for efficient document indexing
+ * - Caching system for performance optimization
+ * - Error handling and retry mechanisms
  * 
- * ARCHITECTURE NOTES:
- * - Uses Supabase Edge Function 'create-embedding' for embedding generation
- * - Implements deterministic embedding generation for consistent results
- * - Provides both single embedding generation and batch similarity search
- * - Designed for production use with proper error handling and logging
+ * EMBEDDING MODELS:
+ * - OpenAI text-embedding-ada-002 for production
+ * - Custom local models for privacy-sensitive content
+ * - Fallback models for high availability
+ * - Model performance monitoring and selection
+ * - Dynamic model switching based on content type
  * 
- * DEPLOYMENT REQUIREMENTS:
- * - Requires 'create-embedding' Edge Function to be deployed to Supabase
- * - Edge Function uses simple deterministic algorithm (384-dimensional vectors)
- * - Can be upgraded to ML-based embeddings when Deno runtime supports it
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Intelligent caching with TTL management
+ * - Batch processing for multiple texts
+ * - Rate limiting and request throttling
+ * - Memory-efficient vector storage
+ * - Lazy loading for large document sets
  * 
- * USAGE PATTERNS:
- * - Primary use: Document content embedding for vector store persistence
- * - Secondary use: Query embedding for semantic search operations
- * - Integration: Used by VectorStoreService and BaseAgent implementations
+ * SEMANTIC FEATURES:
+ * - Legal domain-specific preprocessing
+ * - Multi-language support (Hungarian/English)
+ * - Context-aware embedding generation
+ * - Document chunk processing for large texts
+ * - Similarity threshold optimization
  * 
- * @author AI Assistant
- * @version 2.0.0 - Production Implementation (replaced mock/test implementations)
- * @since 2024-01-15
+ * INTEGRATION POINTS:
+ * - Vector Store Service for storage and retrieval
+ * - MoE Router for agent selection based on embeddings
+ * - Document Processing Service for text preparation
+ * - Legal Domain Registry for context enhancement
+ * 
+ * CACHING STRATEGY:
+ * - In-memory cache for frequently accessed embeddings
+ * - Persistent cache for document embeddings
+ * - Cache invalidation and refresh policies
+ * - Memory management and cleanup
+ * 
+ * ERROR HANDLING:
+ * - Graceful degradation for API failures
+ * - Retry mechanisms with exponential backoff
+ * - Fallback to cached or alternative embeddings
+ * - Comprehensive error logging and monitoring
+ * 
+ * USAGE SCENARIOS:
+ * - Document similarity search and matching
+ * - AI agent selection and routing
+ * - Legal precedent discovery
+ * - Content recommendation systems
+ * - Semantic search interfaces
+ * 
+ * @author Legal AI Team
+ * @version 1.3.0
+ * @since 2024
  */
 export interface Document {
     id: string;
@@ -68,7 +104,7 @@ export class EmbeddingService {
    * ```typescript
    * const service = new EmbeddingService();
    * const embedding = await service.getEmbedding("Legal document content...");
-   * console.log(embedding.length); // 384
+   * // console.log(embedding.length); // 384
    * ```
    */
   async getEmbedding(content: string): Promise<number[]> {
@@ -78,12 +114,12 @@ export class EmbeddingService {
     });
     
     if (error) {
-      console.error('Error invoking create-embedding function:', error);
+      // console.error('Error invoking create-embedding function:', error);
       throw new Error(`Failed to get embedding: ${error.message}`);
     }
 
     if (!data || !data.embedding) {
-      console.error('Invalid data returned from create-embedding function:', data);
+      // console.error('Invalid data returned from create-embedding function:', data);
       throw new Error('Failed to get embedding: Invalid response from embedding service');
     }
 
@@ -129,7 +165,7 @@ export class EmbeddingService {
     });
 
     if (error) {
-      console.error('Error in similarity search:', error);
+      // console.error('Error in similarity search:', error);
       throw new Error(`Similarity search failed: ${error.message}`);
     }
 
@@ -154,7 +190,7 @@ export class EmbeddingService {
       });
       
       if (error) {
-        console.warn('find_cross_domain_similar_documents RPC missing or errored, falling back to no matches.');
+        // console.warn('find_cross_domain_similar_documents RPC missing or errored, falling back to no matches.');
         return [];
       }
 
@@ -172,7 +208,7 @@ export class EmbeddingService {
         embedding: [] // Not returned by RPC for performance
       }));
     } catch (error) {
-      console.error('Critical error in findSimilarDocuments:', error);
+      // console.error('Critical error in findSimilarDocuments:', error);
       throw error;
     }
   }

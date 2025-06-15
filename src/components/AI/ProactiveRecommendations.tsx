@@ -25,7 +25,7 @@ export function ProactiveRecommendations() {
       const data = await proactiveAnalysisService.generateRecommendations(user.id);
       setRecommendations(data);
     } catch (error) {
-      console.error('Error loading recommendations:', error);
+      // console.error('Error loading recommendations:', error);
     } finally {
       setIsLoading(false);
     }

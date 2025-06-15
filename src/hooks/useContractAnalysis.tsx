@@ -13,47 +13,47 @@ import {
 } from './contractAnalysis/contractAnalysisActions';
 
 export function useContractAnalysis() {
-  console.log('useContractAnalysis: Hook called');
+  // console.log('useContractAnalysis: Hook called');
   
   const { user } = useAuth();
   const [analyses, setAnalyses] = useState<ContractAnalysis[]>([]);
   const [availableContracts, setAvailableContracts] = useState<StoredDocument[]>([]);
 
-  console.log('useContractAnalysis: Current state', {
+  // console.log('useContractAnalysis: Current state', {
     userId: user?.id,
     analysesCount: analyses.length,
     contractsCount: availableContracts.length
   });
 
   const fetchAnalyses = async () => {
-    console.log('useContractAnalysis: fetchAnalyses called');
+    // console.log('useContractAnalysis: fetchAnalyses called');
     if (!user) {
-      console.log('useContractAnalysis: No user, skipping fetchAnalyses');
+      // console.log('useContractAnalysis: No user, skipping fetchAnalyses');
       return;
     }
 
     try {
-      console.log('useContractAnalysis: Fetching analyses for user:', user.id);
+      // console.log('useContractAnalysis: Fetching analyses for user:', user.id);
       const analysesData = await fetchContractAnalyses(user.id);
-      console.log('useContractAnalysis: Analyses fetched:', analysesData.length);
+      // console.log('useContractAnalysis: Analyses fetched:', analysesData.length);
       setAnalyses(analysesData);
     } catch (error) {
-      console.error('useContractAnalysis: Error fetching contract analyses:', error);
+      // console.error('useContractAnalysis: Error fetching contract analyses:', error);
       toast.error('Hiba az elemzések betöltésekor');
     }
   };
 
   const fetchContracts = async () => {
-    console.log('useContractAnalysis: fetchContracts called');
+    // console.log('useContractAnalysis: fetchContracts called');
     if (!user) {
-      console.log('useContractAnalysis: No user, skipping fetchContracts');
+      // console.log('useContractAnalysis: No user, skipping fetchContracts');
       return;
     }
 
     try {
-      console.log('useContractAnalysis: Fetching contracts for user:', user.id);
+      // console.log('useContractAnalysis: Fetching contracts for user:', user.id);
       const contractsData = await fetchAvailableContracts(user.id);
-      console.log('useContractAnalysis: Contracts fetched:', contractsData.length);
+      // console.log('useContractAnalysis: Contracts fetched:', contractsData.length);
       setAvailableContracts(contractsData.map(contract => ({
         id: contract.id,
         title: contract.title,
@@ -65,7 +65,7 @@ export function useContractAnalysis() {
         analysis_error: contract.analysis_error
       })));
     } catch (error) {
-      console.error('useContractAnalysis: Error fetching available contracts:', error);
+      // console.error('useContractAnalysis: Error fetching available contracts:', error);
       toast.error('Hiba a szerződések betöltésekor');
     }
   };
@@ -75,7 +75,7 @@ export function useContractAnalysis() {
     status: StoredDocument['analysis_status'], 
     error?: string
   ) => {
-    console.log('useContractAnalysis: Status update', { documentId, status, error });
+    // console.log('useContractAnalysis: Status update', { documentId, status, error });
     // Update local state
     setAvailableContracts(prev => prev.map(doc => 
       doc.id === documentId 
@@ -85,9 +85,9 @@ export function useContractAnalysis() {
   };
 
   const analyzeContract = async (document: StoredDocument) => {
-    console.log('useContractAnalysis: analyzeContract called for document:', document.id);
+    // console.log('useContractAnalysis: analyzeContract called for document:', document.id);
     if (!user) {
-      console.log('useContractAnalysis: No user for analyze');
+      // console.log('useContractAnalysis: No user for analyze');
       return;
     }
     
@@ -100,9 +100,9 @@ export function useContractAnalysis() {
   };
 
   const saveDocumentAndAnalyze = async (file: File, content: string) => {
-    console.log('useContractAnalysis: saveDocumentAndAnalyze called');
+    // console.log('useContractAnalysis: saveDocumentAndAnalyze called');
     if (!user) {
-      console.log('useContractAnalysis: No user for save and analyze');
+      // console.log('useContractAnalysis: No user for save and analyze');
       return;
     }
     
@@ -116,15 +116,15 @@ export function useContractAnalysis() {
   };
 
   useEffect(() => {
-    console.log('useContractAnalysis: useEffect triggered', { hasUser: !!user, userId: user?.id });
+    // console.log('useContractAnalysis: useEffect triggered', { hasUser: !!user, userId: user?.id });
     if (user) {
-      console.log('User authenticated, fetching data for user:', user.id);
+      // console.log('User authenticated, fetching data for user:', user.id);
       fetchAnalyses();
       fetchContracts();
     }
   }, [user]);
 
-  console.log('useContractAnalysis: Returning hook data');
+  // console.log('useContractAnalysis: Returning hook data');
   return {
     analyses,
     availableContracts,

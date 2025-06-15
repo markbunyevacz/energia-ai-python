@@ -90,7 +90,7 @@ export class LegalTranslationManager {
    */
   public async translateWithContext(term: LegalTerm, context: string, targetLanguage: LanguageCode): Promise<LegalTerm> {
     // if (!this.openAIApi) { // OpenAI not available
-      console.warn('OpenAI API not configured. Falling back to direct translation.');
+      // console.warn('OpenAI API not configured. Falling back to direct translation.');
       return this.translate(term, targetLanguage);
     // }
 
@@ -113,7 +113,7 @@ export class LegalTranslationManager {
     //   return translatedTerm || this.translate(term, targetLanguage); // Fallback
 
     // } catch (error) {
-    //   console.error("Error during context-aware translation:", error);
+    //   // console.error("Error during context-aware translation:", error);
     //   // Fallback to simple translation in case of an error
     //   return this.translate(term, targetLanguage);
     // }
@@ -189,7 +189,7 @@ export class LegalTranslationManager {
     //   return translatedText;
 
     // } catch (error) {
-    //   console.error("Error during full document translation:", error);
+    //   // console.error("Error during full document translation:", error);
     //   if (error instanceof Error) {
     //     throw new Error(`Failed to translate document: ${error.message}`);
     //   }

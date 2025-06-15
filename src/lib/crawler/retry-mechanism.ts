@@ -46,7 +46,7 @@ export class RetryMechanism {
         }
 
         const delay = this.calculateDelay(attempt);
-        console.log(
+        // console.log(
           `Retry attempt ${attempt}/${this.config.maxAttempts} for ${context ?? 'operation'} ` +
           `after ${delay}ms due to: ${(error as Error).message}`
         );

@@ -15,15 +15,15 @@ export default function Testing() {
   useEffect(() => {
     // Only check permissions after profile is loaded and we haven't checked yet
     if (!isLoading && profile && !hasCheckedPermissions) {
-      console.log('Checking permissions for user:', profile);
-      console.log('User role:', profile.role);
+      // console.log('Checking permissions for user:', profile);
+      // console.log('User role:', profile.role);
       
       if (profile.role !== 'it_vezető' && profile.role !== 'tulajdonos') {
-        console.log('Access denied for role:', profile.role);
+        // console.log('Access denied for role:', profile.role);
         toast.error('Nincs jogosultsága a tesztelési felülethez');
         navigate('/');
       } else {
-        console.log('Access granted for role:', profile.role);
+        // console.log('Access granted for role:', profile.role);
         toast.success('🧪 Tesztelési felület betöltése...');
       }
       setHasCheckedPermissions(true);

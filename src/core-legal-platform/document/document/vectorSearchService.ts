@@ -16,7 +16,7 @@ export class VectorSearchService {
       });
 
       if (error) {
-        console.error('Vector search error:', error);
+        // console.error('Vector search error:', error);
         throw error;
       }
 
@@ -46,7 +46,7 @@ export class VectorSearchService {
         avgSimilarity
       };
     } catch (error) {
-      console.error('Vector search failed:', error);
+      // console.error('Vector search failed:', error);
       throw error;
     }
   }

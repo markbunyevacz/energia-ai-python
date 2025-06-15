@@ -14,30 +14,30 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useEffect } from 'react';
 
 const ContractAnalysisPage = () => {
-  console.log('ContractAnalysisPage: Component rendering started');
+  // console.log('ContractAnalysisPage: Component rendering started');
   
   const { trackPageView } = useAnalyticsTracking();
   const [activeTab, setActiveTab] = useState("contracts");
   
-  console.log('ContractAnalysisPage: Calling useContractAnalysis hook');
+  // console.log('ContractAnalysisPage: Calling useContractAnalysis hook');
   const { analyses, availableContracts, analyzeContract } = useContractAnalysis();
   
-  console.log('ContractAnalysisPage: Hook data received', {
+  // console.log('ContractAnalysisPage: Hook data received', {
     analysesCount: analyses.length,
     contractsCount: availableContracts.length
   });
 
   useEffect(() => {
-    console.log('ContractAnalysisPage: useEffect for trackPageView running');
+    // console.log('ContractAnalysisPage: useEffect for trackPageView running');
     trackPageView('/contract-analysis');
   }, [trackPageView]);
 
   const handleSwitchToAnalyze = () => {
-    console.log('ContractAnalysisPage: Switching to analyze tab');
+    // console.log('ContractAnalysisPage: Switching to analyze tab');
     setActiveTab("analyze");
   };
 
-  console.log('ContractAnalysisPage: About to render JSX');
+  // console.log('ContractAnalysisPage: About to render JSX');
 
   return (
     <ErrorBoundary>

@@ -1,3 +1,50 @@
+/**
+ * @fileoverview Command UI Component - Command Palette and Search Interface
+ * 
+ * This file provides a complete command palette implementation built on CMDK,
+ * offering accessible command interfaces, search functionality, and keyboard navigation
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible command palette with keyboard navigation and screen reader support
+ * - Fast fuzzy search with real-time filtering
+ * - Grouped command organization with separators and labels
+ * - Modal dialog integration for overlay command interfaces
+ * - Keyboard shortcuts display and handling
+ * - Empty state handling for no results
+ * - Flexible content composition with custom command items
+ * 
+ * Components Exported:
+ * - Command: Root command container with search and filtering
+ * - CommandDialog: Modal dialog wrapper for command palette
+ * - CommandInput: Search input with icon and placeholder support
+ * - CommandList: Scrollable list container for command results
+ * - CommandEmpty: Empty state display when no commands match
+ * - CommandGroup: Grouped command sections with headers
+ * - CommandItem: Individual command items with selection states
+ * - CommandSeparator: Visual separator between command groups
+ * - CommandShortcut: Keyboard shortcut display component
+ * 
+ * Usage Examples:
+ * - Global command palette for quick navigation (Ctrl+K)
+ * - Legal document search and quick access
+ * - AI agent selection and command execution
+ * - Settings and preference quick access
+ * - Legal template and form selection
+ * - Contract analysis tool selection
+ * 
+ * Integration Points:
+ * - Used throughout platform for quick access and navigation
+ * - Integrates with legal document management and search systems
+ * - Supports Hungarian localization for command labels and shortcuts
+ * - Consistent with platform's accessibility and design standards
+ * - Works with AI system routing and legal workflow automation
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"
@@ -21,7 +68,9 @@ const Command = React.forwardRef<
 ))
 Command.displayName = CommandPrimitive.displayName
 
-interface CommandDialogProps extends DialogProps {}
+interface CommandDialogProps extends DialogProps {
+  children?: React.ReactNode;
+}
 
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
@@ -39,7 +88,7 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+  <div className="flex items-center border-b px-3" data-cmdk-input-wrapper="">
     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
     <CommandPrimitive.Input
       ref={ref}

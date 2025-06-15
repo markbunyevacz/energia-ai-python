@@ -115,7 +115,7 @@ export class CitationGraphBuilder {
    */
   public async buildGraph(documents: Document[]): Promise<void> {
     try {
-      console.log(`Building citation graph for ${documents.length} documents`);
+      // console.log(`Building citation graph for ${documents.length} documents`);
       
       // Store documents for reference
       documents.forEach(doc => {
@@ -135,7 +135,7 @@ export class CitationGraphBuilder {
       // Store individual edges for efficient querying
       await this.persistAllEdges();
       
-      console.log('Citation graph built successfully');
+      // console.log('Citation graph built successfully');
       
     } catch (error) {
       throw new Error(`Failed to build citation graph: ${error}`);
@@ -182,7 +182,7 @@ export class CitationGraphBuilder {
           }
         }
       } catch (error) {
-        console.warn(`Failed to process implicit citations for ${doc.id}:`, error);
+        // console.warn(`Failed to process implicit citations for ${doc.id}:`, error);
       }
     }
   }
@@ -258,7 +258,7 @@ export class CitationGraphBuilder {
    * @example
    * ```typescript
    * const impactChain = await builder.getImpactChain('doc-123', 3);
-   * console.log(`Document influences ${impactChain.length} other documents`);
+   * // console.log(`Document influences ${impactChain.length} other documents`);
    * ```
    */
   public async getImpactChain(sourceDocId: string, maxDepth: number = 5): Promise<string[]> {
@@ -443,7 +443,7 @@ export class CitationGraphBuilder {
       
       lastError = error;
       attempt++;
-      console.warn(`Save graph attempt ${attempt} failed, retrying...`, error);
+      // console.warn(`Save graph attempt ${attempt} failed, retrying...`, error);
       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     }
 
@@ -486,7 +486,7 @@ export class CitationGraphBuilder {
           .limit(1000);  // Prevent over-fetching
           
         if (error) {
-          console.error(`Error fetching edges for ${id}:`, error);
+          // console.error(`Error fetching edges for ${id}:`, error);
           continue;
         }
         

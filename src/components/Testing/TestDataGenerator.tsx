@@ -32,33 +32,33 @@ export function TestDataGenerator() {
     setProgress(0);
     
     try {
-      console.log('Starting test data generation for user:', user.id);
+      // console.log('Starting test data generation for user:', user.id);
       toast.info('Teszt adatok generálása elkezdődött...');
 
       // 1. Generate test documents (20%)
       setProgress(20);
       const testDocuments = await generateTestDocuments(user.id);
-      console.log('Generated documents:', testDocuments);
+      // console.log('Generated documents:', testDocuments);
       
       // 2. Generate QA sessions (40%)
       setProgress(40);
       const qaSessions = await generateQASessions(user.id);
-      console.log('Generated QA sessions:', qaSessions);
+      // console.log('Generated QA sessions:', qaSessions);
       
       // 3. Generate contract analyses (60%)
       setProgress(60);
       const contractAnalyses = await generateContractAnalyses(user.id);
-      console.log('Generated contract analyses:', contractAnalyses);
+      // console.log('Generated contract analyses:', contractAnalyses);
       
       // 4. Generate performance metrics (80%)
       setProgress(80);
       const performanceData = await generatePerformanceMetrics();
-      console.log('Generated performance data:', performanceData);
+      // console.log('Generated performance data:', performanceData);
       
       // 5. Generate analytics events (100%)
       setProgress(100);
       const analyticsData = await generateAnalyticsEvents(user.id);
-      console.log('Generated analytics data:', analyticsData);
+      // console.log('Generated analytics data:', analyticsData);
 
       setGeneratedData({
         documents: testDocuments,
@@ -71,7 +71,7 @@ export function TestDataGenerator() {
       toast.success('Teszt adatok sikeresen generálva!');
       
     } catch (error: any) {
-      console.error('Error generating test data:', error);
+      // console.error('Error generating test data:', error);
       toast.error(`Hiba a teszt adatok generálása során: ${error.message}`);
     } finally {
       setIsGenerating(false);

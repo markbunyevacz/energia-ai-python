@@ -174,7 +174,7 @@ export function BatchAnalysisProcessor() {
         risks
       };
     } catch (error) {
-      console.error(`Error processing file ${file.name}:`, error);
+      // console.error(`Error processing file ${file.name}:`, error);
       
       // Return error analysis result
       return {
@@ -388,7 +388,7 @@ export function BatchAnalysisProcessor() {
       toast.success(`Kötegelt elemzés sikeresen befejeződött. ${processedResults.length} fájl feldolgozva.`);
       
     } catch (error) {
-      console.error('Error processing batch analysis:', error);
+      // console.error('Error processing batch analysis:', error);
       setBatchJobs(prev => prev.map(job => 
         job.id === newJob.id 
           ? { ...job, status: 'error' }

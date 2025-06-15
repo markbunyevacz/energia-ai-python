@@ -1,3 +1,79 @@
+/**
+ * @fileoverview Contract Analysis Supabase Edge Function - AI-Powered Legal Document Analysis
+ * @description Serverless function that provides comprehensive contract analysis using OpenAI GPT-4,
+ * with multi-language support, role-based security, and asynchronous processing capabilities.
+ * 
+ * CORE FUNCTIONALITY:
+ * - AI-powered contract analysis using OpenAI GPT-4 Turbo
+ * - Multi-language document processing and detection
+ * - Structured JSON response with risk assessment
+ * - Asynchronous processing with status tracking
+ * - Role-based security enforcement
+ * 
+ * ANALYSIS CAPABILITIES:
+ * - Risk level assessment (low, medium, high)
+ * - Document summarization
+ * - Risk identification with severity classification
+ * - Recommendation generation
+ * - Section-specific analysis
+ * - Multi-type analysis support (contract, legal, summary)
+ * 
+ * SECURITY FEATURES:
+ * - Server-side role verification (legal_manager required)
+ * - User authentication validation
+ * - CORS headers for cross-origin requests
+ * - Input parameter validation
+ * - Error handling with secure error messages
+ * 
+ * PROCESSING WORKFLOW:
+ * 1. Request validation and parameter extraction
+ * 2. Language detection using DocumentProcessor
+ * 3. Initial analysis record creation (status: processing)
+ * 4. Immediate response to client (HTTP 202 Accepted)
+ * 5. Asynchronous AI analysis execution
+ * 6. Database update with results (status: completed/failed)
+ * 7. Risk records creation for identified issues
+ * 
+ * AI INTEGRATION:
+ * - OpenAI GPT-4 Turbo with JSON mode
+ * - Structured prompt engineering for consistent output
+ * - Temperature control for deterministic results
+ * - Error handling for AI service failures
+ * 
+ * DATABASE OPERATIONS:
+ * - contract_analyses table for analysis tracking
+ * - risks table for identified risk storage
+ * - user_roles table for permission verification
+ * - Transactional updates with error rollback
+ * 
+ * RESPONSE STRUCTURE:
+ * - risk_level: Overall document risk assessment
+ * - summary: Comprehensive document analysis
+ * - recommendations: Actionable improvement suggestions
+ * - risks: Array of specific risks with severity and recommendations
+ * 
+ * MULTI-LANGUAGE SUPPORT:
+ * - Automatic language detection
+ * - Language-aware analysis prompts
+ * - Localized response generation
+ * - Translation manager integration
+ * 
+ * ERROR HANDLING:
+ * - Graceful degradation for AI service failures
+ * - Database transaction rollback on errors
+ * - Detailed error logging for debugging
+ * - User-friendly error messages
+ * 
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Asynchronous processing to prevent timeouts
+ * - Immediate response for better UX
+ * - Background task execution
+ * - Efficient database operations
+ * 
+ * @author Legal AI Team
+ * @version 2.0.0
+ * @since 2024
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'

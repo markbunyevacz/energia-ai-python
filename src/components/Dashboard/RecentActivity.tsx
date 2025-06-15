@@ -97,7 +97,7 @@ export function RecentActivity({ role }: RecentActivityProps) {
 
       setActivities(formattedActivities);
     } catch (err) {
-      console.error('Error fetching activities:', err);
+      // console.error('Error fetching activities:', err);
       setError('Nem sikerült betölteni a tevékenységeket');
       setActivities(getStaticActivitiesForRole(role));
     } finally {

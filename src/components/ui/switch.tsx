@@ -1,3 +1,35 @@
+/**
+ * @fileoverview Switch UI Component - On/Off Toggle Control
+ * 
+ * This file provides a switch component built on Radix UI primitives,
+ * offering an accessible and stylish on/off toggle control for the 
+ * Legal AI platform. It's used for boolean settings and preferences.
+ * 
+ * Key Features:
+ * - Fully accessible toggle with ARIA roles and states
+ * - Smooth transition animation between checked and unchecked states
+ * - Consistent styling with the platform's design system
+ * - Supports disabled state for read-only scenarios
+ * - Keyboard navigable and easily integrated into forms
+ * - Built on Radix UI for robust, accessible switch behavior
+ * 
+ * Usage Examples:
+ * - Enabling or disabling AI analysis features
+ * - Toggling notification preferences in user settings
+ * - Activating or deactivating specific legal search filters
+ * - User consent for terms and conditions
+ * - Dark mode / light mode theme switching
+ * 
+ * Integration Points:
+ * - Used in settings pages, forms, and preference panels
+ * - Integrates with form state management libraries
+ * - Supports localization of associated labels
+ * - A key component for user-configurable features
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
 

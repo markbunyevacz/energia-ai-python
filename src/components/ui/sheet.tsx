@@ -1,3 +1,45 @@
+/**
+ * @fileoverview Sheet UI Component - Side Panel for Contextual Content
+ *
+ * This file provides a sheet component, also known as a side panel or drawer,
+ * built on Radix UI's Dialog primitive. It is used to display supplementary
+ * content, forms, or details without navigating away from the main view.
+ *
+ * Key Features:
+ * - Can be anchored to any side of the screen (top, bottom, left, right)
+ * - Accessible, with focus trapping and keyboard navigation
+ * - Includes an overlay to dim the background content
+ * - Smooth slide-in and slide-out animations
+ * - Comes with a close button and can be closed by pressing the Escape key
+ * - Composite components for a structured layout (Header, Title, Description, Footer)
+ *
+ * Components Exported:
+ * - Sheet: The root container for the sheet
+ * - SheetTrigger: A button or element to open the sheet
+ * - SheetClose: A button to close the sheet
+ * - SheetContent: The main panel that slides into view
+ * - SheetHeader: A container for the title and description
+ * - SheetTitle: The title of the sheet
+ * - SheetDescription: A description or subtitle for the sheet
+ * - SheetFooter: A container for action buttons (e.g., Save, Cancel)
+ * - SheetOverlay: The background overlay
+ *
+ * Usage Examples:
+ * - Displaying detailed information about a selected legal document
+ * - An editing form for a contract clause or annotation
+ * - A settings or configuration panel
+ * - Displaying a help or support interface
+ * - A list of notifications or user activity
+ *
+ * Integration Points:
+ * - Used to provide rich, contextual UIs without a full page navigation
+ * - Integrates with forms and data display components
+ * - Supports Hungarian localization within the sheet content
+ *
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"

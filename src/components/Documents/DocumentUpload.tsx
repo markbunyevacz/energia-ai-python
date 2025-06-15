@@ -45,7 +45,7 @@ export function DocumentUpload() {
       .order('upload_date', { ascending: false });
 
     if (error) {
-      console.error('Error fetching documents:', error);
+      // console.error('Error fetching documents:', error);
     } else {
       const typedDocuments = (data || []).map(doc => ({
         id: doc.id,

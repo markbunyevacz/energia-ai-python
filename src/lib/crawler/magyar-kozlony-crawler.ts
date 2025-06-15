@@ -264,12 +264,12 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
             documents.push(doc);
           }
         } catch (error) {
-          console.error('Error extracting document metadata:', error);
+          // console.error('Error extracting document metadata:', error);
         }
       }
       
     } catch (error) {
-      console.error('Error extracting documents from results:', error);
+      // console.error('Error extracting documents from results:', error);
     }
     
     return documents;
@@ -385,7 +385,7 @@ export class MagyarKozlonyCrawler extends BaseCrawler {
       };
       
     } catch (error) {
-      console.error('Error extracting document metadata:', error);
+      // console.error('Error extracting document metadata:', error);
       return null;
     }
   }

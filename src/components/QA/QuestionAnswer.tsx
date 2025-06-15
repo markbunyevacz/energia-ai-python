@@ -9,8 +9,7 @@ import { toast } from 'sonner';
 import { QuestionInput } from './QuestionInput';
 import { SuggestedQuestions } from './SuggestedQuestions';
 import { QAHistory } from './QAHistory';
-import { Button } from '@/components/ui/button';
-import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
+
 
 interface QASession {
   id: string;
@@ -20,7 +19,7 @@ interface QASession {
   confidence: number;
   created_at: string;
   agent_type?: string;
-  conversation_context?: any;
+  conversation_context?: Record<string, unknown>;
 }
 
 export function QuestionAnswer() {
@@ -46,7 +45,7 @@ export function QuestionAnswer() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching sessions:', error);
+      // // console.error('Error fetching sessions:', error);
       toast.error('Hiba a korábbi kérdések betöltésekor');
     } else {
       setSessions(data?.map(session => ({
@@ -62,7 +61,7 @@ export function QuestionAnswer() {
     }
   };
 
-  const handleQuestionSubmit = async (question: string, agentType?: string, conversationContext?: any) => {
+  const handleQuestionSubmit = async (question: string, agentType?: string, conversationContext?: Record<string, unknown>) => {
     if (!user) return;
 
     setIsLoading(true);
@@ -113,7 +112,7 @@ export function QuestionAnswer() {
         throw new Error(data.error || 'Ismeretlen hiba');
       }
     } catch (error) {
-      console.error('Error processing question:', error);
+      // // console.error('Error processing question:', error);
       toast.error('Hiba a kérdés feldolgozásakor. Kérjük próbálja újra.');
     } finally {
       setIsLoading(false);

@@ -2,16 +2,60 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/supabase';
 
 /**
- * Supabase Configuration and Client Setup
+ * @fileoverview Supabase Client Configuration - Backend-as-a-Service Integration
+ * @description Centralized Supabase client configuration and utility functions for the
+ * Legal AI platform. Provides database access, authentication, real-time subscriptions,
+ * and file storage capabilities with type safety and error handling.
  * 
- * This module handles:
- * - Supabase client initialization with type safety
- * - User role management and authentication
- * - Password reset and email verification functionality
+ * SUPABASE SERVICES:
+ * - PostgreSQL database with type-safe queries
+ * - Authentication and user management
+ * - Real-time subscriptions for live updates
+ * - File storage for document uploads
+ * - Edge functions for serverless computing
  * 
- * Environment Variables Required:
- * - VITE_SUPABASE_URL: Your Supabase project URL
- * - VITE_SUPABASE_KEY: Your Supabase anon public key
+ * CLIENT CONFIGURATION:
+ * - Environment-based configuration management
+ * - Connection pooling and optimization
+ * - Automatic retry mechanisms
+ * - Error handling and logging
+ * - Type-safe database operations
+ * 
+ * DATABASE FEATURES:
+ * - Row Level Security (RLS) for data protection
+ * - Real-time change detection and notifications
+ * - Full-text search capabilities
+ * - JSON data type support for metadata
+ * - Automated backups and point-in-time recovery
+ * 
+ * AUTHENTICATION INTEGRATION:
+ * - JWT token management
+ * - Role-based access control
+ * - Social authentication providers
+ * - Password reset and email verification
+ * - Session management and persistence
+ * 
+ * REAL-TIME CAPABILITIES:
+ * - WebSocket connections for live updates
+ * - Table change subscriptions
+ * - Presence tracking for collaborative features
+ * - Broadcast messaging for real-time communication
+ * 
+ * TYPE SAFETY:
+ * - Generated TypeScript types from database schema
+ * - Compile-time query validation
+ * - IntelliSense support for database operations
+ * - Runtime type checking for data integrity
+ * 
+ * UTILITY FUNCTIONS:
+ * - Database query helpers and abstractions
+ * - Error handling and retry logic
+ * - Connection status monitoring
+ * - Performance optimization utilities
+ * 
+ * @author Legal AI Team
+ * @version 1.3.0
+ * @since 2024
  */
 
 // Load Supabase configuration from environment variables
@@ -81,13 +125,13 @@ export const getUserRole = async (userId: string): Promise<UserRole | null> => {
       .single();
 
     if (error) {
-      console.error('Error fetching user role:', error.message, error.details);
+      // console.error('Error fetching user role:', error.message, error.details);
       return null;
     }
 
     return data?.role || null;
   } catch (error) {
-    console.error('Unexpected error fetching user role:', error);
+    // console.error('Unexpected error fetching user role:', error);
     return null;
   }
 };

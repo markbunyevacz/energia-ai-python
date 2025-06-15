@@ -1,3 +1,45 @@
+/**
+ * @fileoverview Breadcrumb UI Component - Navigation Path Indicators
+ * 
+ * This file provides a complete breadcrumb navigation system for displaying hierarchical
+ * navigation paths and current page location within the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible navigation with proper ARIA labels and semantics
+ * - Flexible separator customization with default chevron icons
+ * - Ellipsis support for truncating long navigation paths
+ * - Responsive design with proper text wrapping
+ * - Current page indication with disabled link styling
+ * - Support for custom link components via Radix Slot
+ * 
+ * Components Exported:
+ * - Breadcrumb: Root navigation container with accessibility labels
+ * - BreadcrumbList: Ordered list container for breadcrumb items
+ * - BreadcrumbItem: Individual breadcrumb item wrapper
+ * - BreadcrumbLink: Clickable navigation links with hover states
+ * - BreadcrumbPage: Current page indicator (non-clickable)
+ * - BreadcrumbSeparator: Visual separator between breadcrumb items
+ * - BreadcrumbEllipsis: Truncation indicator for long paths
+ * 
+ * Usage Examples:
+ * - Legal document hierarchy navigation (Contracts > Energy > 2024 > Document.pdf)
+ * - Dashboard section navigation (Dashboard > Analytics > Performance)
+ * - Settings page navigation (Settings > User Management > Roles)
+ * - Legal case file navigation (Cases > Energy Sector > Case Details)
+ * - Document review workflow navigation
+ * 
+ * Integration Points:
+ * - Used throughout platform for hierarchical navigation
+ * - Integrates with routing system for dynamic path generation
+ * - Supports Hungarian localization for legal navigation terms
+ * - Consistent with platform's accessibility and design standards
+ * - Works with legal document management and case organization
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, MoreHorizontal } from "lucide-react"

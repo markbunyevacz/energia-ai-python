@@ -10,7 +10,7 @@ async function processLegalDocuments() {
     const processedDoc = await documentService.processDocument(file);
     
     if (processedDoc) {
-      console.log('Processed document metadata:', processedDoc.metadata);
+      // console.log('Processed document metadata:', processedDoc.metadata);
     }
 
     // Example: Process multiple documents in batch
@@ -23,14 +23,14 @@ async function processLegalDocuments() {
     
     // Get statistics about the processed documents
     const stats = documentService.getDocumentStats(processedDocs);
-    console.log('Document statistics:', stats);
+    // console.log('Document statistics:', stats);
 
     // Export processed documents to JSON
     const jsonOutput = documentService.exportToJson(processedDocs);
-    console.log('JSON output:', jsonOutput);
+    // console.log('JSON output:', jsonOutput);
 
   } catch (error) {
-    console.error('Error processing documents:', error);
+    // console.error('Error processing documents:', error);
   }
 }
 

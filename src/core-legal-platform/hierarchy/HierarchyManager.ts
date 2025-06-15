@@ -238,20 +238,20 @@ export class HierarchyManager {
 
   public registerDocument(doc: LegalDocument): void {
     if (!doc || typeof doc.id !== 'string' || typeof doc.hierarchyLevel === 'undefined') {
-        console.error("Attempted to register an invalid or incomplete document.", doc);
+        // console.error("Attempted to register an invalid or incomplete document.", doc);
         // Optionally throw an error: throw new Error("Invalid document for registration.");
         return;
     }
     doc.isValid = doc.isValid !== undefined ? doc.isValid : true; // Default to valid if not specified
     doc.lastModified = doc.lastModified || new Date();
     this.documents.set(doc.id, doc);
-    console.log(`Document ${doc.id} registered. Level: ${LegalHierarchyLevel[doc.hierarchyLevel]}, Valid: ${doc.isValid}`);
+    // console.log(`Document ${doc.id} registered. Level: ${LegalHierarchyLevel[doc.hierarchyLevel]}, Valid: ${doc.isValid}`);
   }
 
   public checkConflicts(newDoc: LegalDocument): ConflictReport {
     const conflicts: Conflict[] = [];
     if (!newDoc || !newDoc.content) {
-        console.warn("Cannot check conflicts for a document without content.", newDoc);
+        // console.warn("Cannot check conflicts for a document without content.", newDoc);
         return { hasConflicts: false, conflicts: [] };
     }
     
@@ -287,7 +287,7 @@ export class HierarchyManager {
     
     const report = { hasConflicts: conflicts.length > 0, conflicts };
     if (report.hasConflicts) {
-        console.warn(`Conflict check for ${newDoc.id} found ${report.conflicts.length} conflicts.`);
+        // console.warn(`Conflict check for ${newDoc.id} found ${report.conflicts.length} conflicts.`);
     }
     return report;
   }
@@ -299,7 +299,7 @@ export class HierarchyManager {
     // and then cascade considers its previous valid state or the implications of its new (e.g. amended) content if it's still valid.
     // For simplicity, we assume changedDoc is the *newly validated and current version* of the document.
     if (!changedDoc || !changedDoc.isValid) {
-      console.log(`Cascade invalidation skipped: Document ${changedDocId} not found or is already invalid.`);
+      // console.log(`Cascade invalidation skipped: Document ${changedDocId} not found or is already invalid.`);
       return;
     }
 
@@ -318,7 +318,7 @@ export class HierarchyManager {
         doc.lastModified = new Date();
         if (previousIsValid) { // Only add to batch and log if it was previously valid
             invalidatedDocsBatch.push(doc);
-            console.log(`Document ${doc.id} (Level: ${LegalHierarchyLevel[doc.hierarchyLevel]}) marked as invalid due to changes in ${changedDoc.id} (Level: ${LegalHierarchyLevel[changedDoc.hierarchyLevel]}).`);
+            // console.log(`Document ${doc.id} (Level: ${LegalHierarchyLevel[doc.hierarchyLevel]}) marked as invalid due to changes in ${changedDoc.id} (Level: ${LegalHierarchyLevel[changedDoc.hierarchyLevel]}).`);
         }
       }
     }
@@ -329,9 +329,9 @@ export class HierarchyManager {
         // Ensure causedBy is the document that triggered the invalidation
         await this.notificationService.notifyInvalidation(invalidatedDoc, changedDoc);
       }
-      console.log(`${invalidatedDocsBatch.length} document(s) were invalidated and notifications sent.`);
+      // console.log(`${invalidatedDocsBatch.length} document(s) were invalidated and notifications sent.`);
     } else {
-        console.log(`No documents were invalidated by the change in ${changedDocId}.`);
+        // console.log(`No documents were invalidated by the change in ${changedDocId}.`);
     }
   }
 
@@ -342,7 +342,7 @@ export class HierarchyManager {
   //   if (document && document.isValid) { // Only act if document exists and is currently valid
   //     document.isValid = false;
   //     document.lastModified = new Date();
-  //     console.log(`Document ${docId} has been programmatically invalidated by ${causedBy.id}.`);
+  //     // console.log(`Document ${docId} has been programmatically invalidated by ${causedBy.id}.`);
   //     // No notification from here; cascadeInvalidation handles notifications.
   //   }
   // }
@@ -381,21 +381,21 @@ export class HierarchyManager {
        // Important: The document should be registered first to be part of the hierarchy for accurate conflict checking.
        // Consider if this method should auto-register or throw if not found.
        // For now, we proceed, but conflicts might be missed if it's not in `this.documents`.
-       console.warn(`Document ${document.id} is being validated but is not registered in HierarchyManager. Register it first for comprehensive checks.`);
+       // console.warn(`Document ${document.id} is being validated but is not registered in HierarchyManager. Register it first for comprehensive checks.`);
     }
     if (!document.isValid) {
-        console.log(`Document ${document.id} is already marked as invalid. Skipping conflict checks for processor validation.`);
+        // console.log(`Document ${document.id} is already marked as invalid. Skipping conflict checks for processor validation.`);
         return false; // Or true, depending on whether an invalid doc should pass "validation" (likely false)
     }
 
     const report = this.checkConflicts(document); 
     
     if (report.hasConflicts) {
-      console.log(`[VALIDATION FAIL] Document ${document.id} (Level: ${LegalHierarchyLevel[document.hierarchyLevel]}) has ${report.conflicts.length} conflicts:`);
+      // console.log(`[VALIDATION FAIL] Document ${document.id} (Level: ${LegalHierarchyLevel[document.hierarchyLevel]}) has ${report.conflicts.length} conflicts:`);
       report.conflicts.forEach(conflict => {
         const conflictingDoc = this.documents.get(conflict.documentId2);
         const conflictingDocLevel = conflictingDoc ? LegalHierarchyLevel[conflictingDoc.hierarchyLevel] : 'N/A';
-        console.log(`  - Conflicts with: ${conflict.documentId2} (Level: ${conflictingDocLevel}), Type: ${conflict.conflictType}, Details: ${conflict.details}`);
+        // console.log(`  - Conflicts with: ${conflict.documentId2} (Level: ${conflictingDocLevel}), Type: ${conflict.conflictType}, Details: ${conflict.details}`);
       });
       // Optionally, notify about conflicts found during this validation step using NotificationService
       // This depends on whether the caller or this method is responsible for notifications.
@@ -406,7 +406,7 @@ export class HierarchyManager {
       // }
       return false; // Validation fails if there are conflicts
     }
-    console.log(`[VALIDATION SUCCESS] Document ${document.id} passed hierarchy validation.`);
+    // console.log(`[VALIDATION SUCCESS] Document ${document.id} passed hierarchy validation.`);
     return true; // Validation passes if no conflicts
   }
 

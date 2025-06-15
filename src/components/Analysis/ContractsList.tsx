@@ -113,18 +113,18 @@ export function ContractsList({ contracts, onAnalyzeContract }: ContractsListPro
 
   const handleAnalyze = async (doc: StoredDocument) => {
     if (!doc.content) {
-      console.error('Document has no content:', doc.id);
+      // console.error('Document has no content:', doc.id);
       toast.error('A dokumentum tartalma nem elérhető az elemzéshez');
       return;
     }
 
-    console.log('Starting analysis for document:', doc.title);
+    // console.log('Starting analysis for document:', doc.title);
     setAnalyzingId(doc.id);
     
     try {
       await onAnalyzeContract(doc);
     } catch (error) {
-      console.error('Error analyzing contract:', error);
+      // console.error('Error analyzing contract:', error);
       toast.error('Hiba történt az elemzés során');
     } finally {
       setAnalyzingId(null);

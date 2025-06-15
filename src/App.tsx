@@ -1,3 +1,41 @@
+/**
+ * @fileoverview Main Application Component - Legal AI Platform Entry Point
+ * @description Root component that orchestrates the entire Legal AI application with role-based
+ * routing, authentication management, and session handling.
+ * 
+ * ARCHITECTURE OVERVIEW:
+ * - React Router for client-side routing with protected routes
+ * - Supabase authentication integration with automatic session management
+ * - Role-based access control (admin, legal_manager, analyst, viewer)
+ * - Context providers for global state management (Auth, MoE)
+ * 
+ * KEY FEATURES:
+ * - Automatic authentication state restoration on app load
+ * - Protected routes with role-based access control
+ * - Loading states during authentication checks
+ * - Automatic redirects for unauthenticated users
+ * - Hungarian localization support
+ * 
+ * ROUTE STRUCTURE:
+ * - /login - Public authentication page
+ * - /reset-password* - Public password reset flow
+ * - /admin - Admin dashboard (admin role only)
+ * - /ai-setup - AI configuration (admin role only)
+ * - /legal - Legal document analysis interface (legal_manager role)
+ * - /analyst - Data analysis dashboard (analyst role)
+ * - /dashboard - General dashboard (viewer+ roles)
+ * - /viewer - Read-only interface (viewer role)
+ * 
+ * DEPENDENCIES:
+ * - React Router for navigation
+ * - Supabase for authentication and backend services
+ * - Custom context providers for state management
+ * - UI components from Radix UI library
+ * 
+ * @author Legal AI Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './lib/AuthContext';
@@ -9,10 +47,8 @@ import { supabase } from '@/lib/supabase';
 import { LovableFrontend } from './components/LovableFrontend';
 import { Session } from '@supabase/supabase-js';
 import Dashboard from './pages/Dashboard';
-import NotFoundPage from './pages/NotFound';
 import AISetupPage from './pages/AISetupPage';
 import './App.css';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { MoEProvider } from './contexts/MoEProvider';
 
 /**
@@ -30,7 +66,7 @@ import { MoEProvider } from './contexts/MoEProvider';
  */
 export function App() {
   // Authentication state - stores current user session
-  const [_session, setSession] = useState<Session | null>(null);
+  const [, setSession] = useState<Session | null>(null);
   
   // Loading state - prevents rendering routes until auth check is complete
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,8 +81,8 @@ export function App() {
    */
   useEffect(() => {
     // Get current session on app initialization
-    supabase.auth.getSession().then(({ data: { session: _session } }) => {
-      setSession(_session);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
       setLoading(false);
     });
 

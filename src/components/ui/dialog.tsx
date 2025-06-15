@@ -1,3 +1,58 @@
+/**
+ * @fileoverview Dialog Component System - Modal Dialog Interface
+ * @description Comprehensive modal dialog system built on Radix UI primitives
+ * providing accessible, customizable dialogs for the Legal AI platform.
+ * Includes overlay, content, header, footer, and trigger components.
+ * 
+ * DIALOG COMPONENTS:
+ * - Dialog: Root dialog container with state management
+ * - DialogTrigger: Button or element that opens the dialog
+ * - DialogContent: Main dialog content with overlay
+ * - DialogHeader: Top section for title and description
+ * - DialogTitle: Primary dialog heading
+ * - DialogDescription: Subtitle or explanation text
+ * - DialogFooter: Bottom section for action buttons
+ * - DialogClose: Close button component
+ * 
+ * ACCESSIBILITY FEATURES:
+ * - Full keyboard navigation support
+ * - Focus trap within dialog content
+ * - ESC key to close dialog
+ * - Screen reader announcements
+ * - ARIA labels and descriptions
+ * - Focus restoration on close
+ * 
+ * INTERACTION PATTERNS:
+ * - Click outside to close (configurable)
+ * - Smooth open/close animations
+ * - Backdrop blur and overlay
+ * - Responsive sizing and positioning
+ * - Nested dialog support
+ * 
+ * STYLING FEATURES:
+ * - Consistent backdrop and overlay styling
+ * - Responsive dialog sizing
+ * - Smooth entrance/exit animations
+ * - Dark mode compatibility
+ * - Customizable content styling
+ * 
+ * USAGE SCENARIOS:
+ * - Confirmation dialogs for critical actions
+ * - Form dialogs for data input
+ * - Document preview and details
+ * - Settings and configuration modals
+ * - Error and warning notifications
+ * 
+ * INTEGRATION POINTS:
+ * - Form components for data collection
+ * - Button components for actions
+ * - Loading states for async operations
+ * - Error handling and validation
+ * 
+ * @author Legal AI Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"

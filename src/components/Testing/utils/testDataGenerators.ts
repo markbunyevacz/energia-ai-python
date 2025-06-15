@@ -27,21 +27,21 @@ export const generateTestDocuments = async (userId: string) => {
       }
     ];
 
-    console.log('Inserting documents with user_id:', userId);
+    // console.log('Inserting documents with user_id:', userId);
     const { data, error } = await supabase
       .from('documents')
       .insert(documents)
       .select();
 
     if (error) {
-      console.error('Document generation error:', error);
+      // console.error('Document generation error:', error);
       throw new Error(`Dokumentum generálási hiba: ${error.message}`);
     }
 
-    console.log('Successfully inserted documents:', data);
+    // console.log('Successfully inserted documents:', data);
     return data || [];
   } catch (error) {
-    console.error('Error in generateTestDocuments:', error);
+    // console.error('Error in generateTestDocuments:', error);
     throw error;
   }
 };
@@ -75,21 +75,21 @@ export const generateQASessions = async (userId: string) => {
       }
     ];
 
-    console.log('Inserting QA sessions with user_id:', userId);
+    // console.log('Inserting QA sessions with user_id:', userId);
     const { data, error } = await supabase
       .from('qa_sessions')
       .insert(sessions)
       .select();
 
     if (error) {
-      console.error('QA session generation error:', error);
+      // console.error('QA session generation error:', error);
       throw new Error(`QA session generálási hiba: ${error.message}`);
     }
 
-    console.log('Successfully inserted QA sessions:', data);
+    // console.log('Successfully inserted QA sessions:', data);
     return data || [];
   } catch (error) {
-    console.error('Error in generateQASessions:', error);
+    // console.error('Error in generateQASessions:', error);
     throw error;
   }
 };
@@ -117,21 +117,21 @@ export const generateContractAnalyses = async (userId: string) => {
       }
     ];
 
-    console.log('Inserting contract analyses with analyzed_by:', userId);
+    // console.log('Inserting contract analyses with analyzed_by:', userId);
     const { data, error } = await supabase
       .from('contract_analyses')
       .insert(analyses)
       .select();
 
     if (error) {
-      console.error('Contract analysis generation error:', error);
+      // console.error('Contract analysis generation error:', error);
       throw new Error(`Szerződéselemzés generálási hiba: ${error.message}`);
     }
 
-    console.log('Successfully inserted contract analyses:', data);
+    // console.log('Successfully inserted contract analyses:', data);
     return data || [];
   } catch (error) {
-    console.error('Error in generateContractAnalyses:', error);
+    // console.error('Error in generateContractAnalyses:', error);
     throw error;
   }
 };
@@ -157,21 +157,21 @@ export const generatePerformanceMetrics = async () => {
       }
     ];
 
-    console.log('Inserting performance metrics');
+    // console.log('Inserting performance metrics');
     const { data, error } = await supabase
       .from('performance_metrics')
       .insert(metrics)
       .select();
 
     if (error) {
-      console.error('Performance metrics generation error:', error);
+      // console.error('Performance metrics generation error:', error);
       throw new Error(`Teljesítmény metrika generálási hiba: ${error.message}`);
     }
 
-    console.log('Successfully inserted performance metrics:', data);
+    // console.log('Successfully inserted performance metrics:', data);
     return data || [];
   } catch (error) {
-    console.error('Error in generatePerformanceMetrics:', error);
+    // console.error('Error in generatePerformanceMetrics:', error);
     throw error;
   }
 };
@@ -196,21 +196,21 @@ export const generateAnalyticsEvents = async (userId: string) => {
       }
     ];
 
-    console.log('Inserting analytics events with user_id:', userId);
+    // console.log('Inserting analytics events with user_id:', userId);
     const { data, error } = await supabase
       .from('analytics_events')
       .insert(events)
       .select();
 
     if (error) {
-      console.error('Analytics events generation error:', error);
+      // console.error('Analytics events generation error:', error);
       throw new Error(`Analytics esemény generálási hiba: ${error.message}`);
     }
 
-    console.log('Successfully inserted analytics events:', data);
+    // console.log('Successfully inserted analytics events:', data);
     return data || [];
   } catch (error) {
-    console.error('Error in generateAnalyticsEvents:', error);
+    // console.error('Error in generateAnalyticsEvents:', error);
     throw error;
   }
 };

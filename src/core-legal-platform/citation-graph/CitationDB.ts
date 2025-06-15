@@ -60,7 +60,7 @@ export class CitationDB {
     for (const query of indexQueries) {
       const { error } = await this.supabase.rpc('execute_sql', { query });
       if (error) {
-        console.warn(`Failed to create index: ${error.message}`);
+        // console.warn(`Failed to create index: ${error.message}`);
       }
     }
   }

@@ -1,40 +1,55 @@
 /**
- * ProtectedRoute Component - Role-Based Access Control
- * 
- * This component implements comprehensive role-based access control (RBAC) for the Legal AI application.
- * It ensures that users can only access routes and components that match their assigned role,
- * providing security and proper user experience based on permissions.
+ * @fileoverview Protected Route Component - Role-Based Access Control for React Router
+ * @description Security wrapper component that enforces role-based access control for protected
+ * routes in the Legal AI platform. Integrates with Supabase authentication and provides
+ * granular permission management for different user roles.
  * 
  * SECURITY FEATURES:
- * - Authentication verification (user must be logged in)
- * - Role-based authorization (user must have required role)
- * - Automatic redirection for unauthorized access with state preservation
- * - Loading state handling during authentication checks
- * - Error state handling for authentication failures
+ * - Role-based access control (RBAC) enforcement
+ * - Authentication state validation
+ * - Automatic redirect for unauthorized users
+ * - Loading states during permission checks
+ * - Error handling for authentication failures
  * 
  * SUPPORTED ROLES:
- * - admin: Full system access and management capabilities
- * - legal_manager: Legal document management and analysis tools
- * - analyst: Data analysis and reporting functionality
+ * - admin: Full system access and configuration
+ * - legal_manager: Legal document analysis and management
+ * - analyst: Data analysis and reporting capabilities
  * - viewer: Read-only access to documents and reports
  * 
+ * COMPONENT ARCHITECTURE:
+ * - Higher-order component (HOC) pattern
+ * - React Router integration for seamless navigation
+ * - Supabase authentication context integration
+ * - Conditional rendering based on permissions
+ * 
+ * AUTHENTICATION FLOW:
+ * 1. Check if user is authenticated via Supabase
+ * 2. Validate user role against required role
+ * 3. Allow access if authorized, redirect if not
+ * 4. Handle loading and error states gracefully
+ * 
  * USAGE PATTERNS:
- * - Wrap route components that require authentication
- * - Specify required role for role-specific access
- * - Handles loading states during auth verification
- * - Preserves intended destination for post-login redirect
- * - Provides user-friendly error messages for access issues
+ * - Wrap route components that require specific roles
+ * - Automatic handling of authentication redirects
+ * - Seamless integration with React Router
+ * - Support for nested protected routes
  * 
  * INTEGRATION POINTS:
- * - AuthContext for user authentication state
- * - React Router for navigation and redirects with state
- * - Supabase user roles from database
- * - LoadingSpinner and ErrorMessage components for UX
+ * - Supabase Auth for user authentication
+ * - React Router for navigation control
+ * - AuthContext for global authentication state
+ * - Role management system in database
  * 
- * @fileoverview Role-based route protection component with comprehensive error handling
- * @author Legal AI Team / Lovable
- * @since 1.0.0
- * @version 1.0.0
+ * ERROR HANDLING:
+ * - Graceful degradation for auth failures
+ * - User-friendly error messages
+ * - Automatic retry mechanisms
+ * - Fallback routes for unauthorized access
+ * 
+ * @author Legal AI Team
+ * @version 1.1.0
+ * @since 2024
  */
 
 import React from 'react';

@@ -1,3 +1,67 @@
+/**
+ * @fileoverview AI Factory - Dynamic AI Model Creation & Management
+ * @description Factory pattern implementation for creating and managing AI service
+ * instances across the Legal AI platform. Provides centralized AI model configuration,
+ * task-specific optimization, and intelligent model selection based on requirements.
+ * 
+ * FACTORY CAPABILITIES:
+ * - Dynamic AI service creation based on task requirements
+ * - Multiple AI provider support (OpenAI, Anthropic, local models)
+ * - Task-specific model optimization and configuration
+ * - Intelligent model selection and fallback mechanisms
+ * - Performance monitoring and model health checks
+ * 
+ * SUPPORTED AI PROVIDERS:
+ * - OpenAI: GPT-4, GPT-3.5-turbo for general tasks
+ * - Anthropic: Claude models for complex reasoning
+ * - Local models: Privacy-sensitive and offline processing
+ * - Custom models: Domain-specific fine-tuned models
+ * - Fallback providers: Redundancy and reliability
+ * 
+ * TASK SPECIALIZATION:
+ * - analysis: Contract and document analysis tasks
+ * - research: Legal research and precedent discovery
+ * - summarization: Document summarization and extraction
+ * - translation: Multi-language content processing
+ * - classification: Document and content categorization
+ * 
+ * MODEL CONFIGURATION:
+ * - Temperature and creativity settings per task
+ * - Token limits and context window management
+ * - Response format and structure requirements
+ * - Performance vs accuracy trade-offs
+ * - Cost optimization and budget management
+ * 
+ * INTELLIGENT SELECTION:
+ * - Task complexity assessment for model matching
+ * - Performance history and success rate analysis
+ * - Cost-effectiveness optimization
+ * - Availability and latency considerations
+ * - User preference and requirement matching
+ * 
+ * RELIABILITY FEATURES:
+ * - Automatic failover to backup models
+ * - Health monitoring and performance tracking
+ * - Rate limiting and quota management
+ * - Error handling and retry mechanisms
+ * - Circuit breaker patterns for stability
+ * 
+ * INTEGRATION POINTS:
+ * - AI agents for specialized task processing
+ * - Configuration service for model settings
+ * - Monitoring service for performance tracking
+ * - Cost tracking and budget management
+ * 
+ * USAGE PATTERNS:
+ * - createTaskAI(): Task-specific AI service creation
+ * - Model selection based on requirements
+ * - Automatic configuration and optimization
+ * - Performance monitoring and feedback
+ * 
+ * @author Legal AI Team
+ * @version 1.4.0
+ * @since 2024
+ */
 import { AIService, AIProvider } from './ai-service';
 import { aiConfig } from '../config/ai-config';
 import { BaseLLM } from './base-llm';
@@ -139,13 +203,13 @@ export class AIFactory {
         results.set(provider, isWorking);
         
         if (isWorking) {
-          console.log(`✅ ${provider} service is working`);
+          // console.log(`✅ ${provider} service is working`);
         } else {
-          console.log(`❌ ${provider} service failed test`);
+          // console.log(`❌ ${provider} service failed test`);
         }
       } catch (error) {
         results.set(provider, false);
-        console.log(`❌ ${provider} service error:`, error);
+        // console.log(`❌ ${provider} service error:`, error);
       }
     }
     
@@ -169,7 +233,7 @@ export class AIFactory {
       throw new Error('No AI providers are configured. Please set up API keys.');
     }
 
-    console.warn(`Requested provider '${provider}' not available, falling back to '${availableProviders[0]}'`);
+    // console.warn(`Requested provider '${provider}' not available, falling back to '${availableProviders[0]}'`);
     return availableProviders[0];
   }
 

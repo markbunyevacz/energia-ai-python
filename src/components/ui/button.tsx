@@ -1,6 +1,58 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
+/**
+ * @fileoverview Button Component - Versatile Interactive Button Element
+ * @description Highly customizable button component built on Radix UI primitives with
+ * multiple variants, sizes, and states. Provides consistent styling and behavior
+ * across the Legal AI platform with accessibility features and loading states.
+ * 
+ * BUTTON VARIANTS:
+ * - default: Primary action button with solid background
+ * - destructive: Warning/danger actions with red styling
+ * - outline: Secondary actions with border styling
+ * - secondary: Subtle actions with muted background
+ * - ghost: Minimal styling for tertiary actions
+ * - link: Text-only button styled as a link
+ * 
+ * SIZE OPTIONS:
+ * - default: Standard button size for most use cases
+ * - sm: Small buttons for compact interfaces
+ * - lg: Large buttons for prominent actions
+ * - icon: Square buttons optimized for icons
+ * 
+ * ACCESSIBILITY FEATURES:
+ * - Full keyboard navigation support
+ * - Screen reader compatibility with ARIA attributes
+ * - Focus management and visual indicators
+ * - Disabled state handling
+ * - Loading state with appropriate announcements
+ * 
+ * STYLING SYSTEM:
+ * - Tailwind CSS with class variance authority
+ * - Consistent spacing and typography
+ * - Hover and focus state animations
+ * - Dark mode compatibility
+ * - Responsive design patterns
+ * 
+ * USAGE PATTERNS:
+ * - Form submissions and primary actions
+ * - Navigation and routing triggers
+ * - Modal and dialog controls
+ * - Toolbar and action bar buttons
+ * - Loading states during async operations
+ * 
+ * INTEGRATION POINTS:
+ * - React Router for navigation
+ * - Form libraries for submissions
+ * - Loading states for async operations
+ * - Icon libraries for enhanced UX
+ * 
+ * @author Legal AI Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"

@@ -1,3 +1,42 @@
+/**
+ * @fileoverview Table UI Component - Displaying Tabular Data
+ * 
+ * This file provides a set of components for creating accessible and consistently
+ * styled tables. It is designed to be a flexible foundation for displaying any
+ * kind of tabular data within the Legal AI platform.
+ * 
+ * Key Features:
+ * - Built with standard `<table>` semantics for maximum accessibility
+ * - Includes components for all parts of a table: Header, Body, Footer, Rows, Cells, and Caption
+ * - Styled to match the platform's design system, with hover states and proper spacing
+ * - The root `Table` component is wrapped in a `div` with `overflow-auto` to handle responsiveness
+ * - Supports data-heavy displays with clear and readable typography
+ * 
+ * Components Exported:
+ * - Table: The root `<table>` element, wrapped for responsiveness
+ * - TableHeader: The `<thead>` element for column headers
+ * - TableBody: The `<tbody>` element for table data rows
+ * - TableFooter: The `<tfoot>` element for summary rows
+ * - TableRow: The `<tr>` element for defining a row
+ * - TableHead: The `<th>` element for a header cell
+ * - TableCell: The `<td>` element for a data cell
+ * - TableCaption: The `<caption>` element for a table description
+ * 
+ * Usage Examples:
+ * - Displaying a list of legal documents with metadata (name, date, status)
+ * - Presenting results from a contract analysis, such as extracted clauses and risks
+ * - Showing user management data in the admin dashboard
+ * - Displaying logs or performance metrics
+ * 
+ * Integration Points:
+ * - Often used with pagination for navigating large datasets
+ * - Can be combined with sorting and filtering controls for interactive data exploration
+ * - A fundamental component for any data-grid or list view in the platform
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

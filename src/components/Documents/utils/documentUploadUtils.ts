@@ -54,7 +54,7 @@ export const uploadToSupabase = async (
     try {
       // Check if it's a PDF file
       if (file.file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-        console.log('Processing PDF file:', file.name);
+        // console.log('Processing PDF file:', file.name);
         content = await extractTextFromPDF(file.file);
       } else {
         // Handle text files
@@ -81,11 +81,11 @@ export const uploadToSupabase = async (
         throw new Error('Érvénytelen szöveg tartalom');
       }
 
-      console.log('Extracted content length:', content.length);
-      console.log('Content preview:', content.substring(0, 200));
+      // console.log('Extracted content length:', content.length);
+      // console.log('Content preview:', content.substring(0, 200));
 
     } catch (textError) {
-      console.error('Text extraction failed:', textError);
+      // console.error('Text extraction failed:', textError);
       // Fallback content if text extraction fails
       content = `Dokumentum: ${file.name}. Szöveg kivonás sikertelen, de a fájl feltöltésre került.`;
     }
@@ -112,7 +112,7 @@ export const uploadToSupabase = async (
       .single();
 
     if (dbError) {
-      console.error('Database error:', dbError);
+      // console.error('Database error:', dbError);
       updateProgress(file.id, 0, 'error');
       toast.error(`Adatbázis hiba: ${dbError.message}`);
       return;
@@ -123,7 +123,7 @@ export const uploadToSupabase = async (
     onComplete();
 
   } catch (error) {
-    console.error('Upload error:', error);
+    // console.error('Upload error:', error);
     updateProgress(file.id, 0, 'error');
     const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba';
     toast.error(`Hiba ${file.name} feltöltésekor: ${errorMessage}`);
@@ -153,7 +153,7 @@ export const analyzeContract = async (
       .eq('id', document.id);
 
     if (updateError) {
-      console.error('Error updating status:', updateError);
+      // console.error('Error updating status:', updateError);
       toast.error('Hiba az állapot frissítésekor');
       return;
     }
@@ -170,7 +170,7 @@ export const analyzeContract = async (
     });
 
     if (error) {
-      console.error('Analysis error:', error);
+      // console.error('Analysis error:', error);
       await supabase
         .from('documents')
         .update({ 
@@ -192,7 +192,7 @@ export const analyzeContract = async (
       toast.success('Szerződés elemzése sikeresen befejezve');
       navigate('/contract-analysis');
     } else {
-      console.error('Analysis failed:', data);
+      // console.error('Analysis failed:', data);
       const errorMessage = data?.error || 'Ismeretlen hiba történt az elemzés során';
       
       await supabase
@@ -207,7 +207,7 @@ export const analyzeContract = async (
     }
 
   } catch (error) {
-    console.error('Analysis error:', error);
+    // console.error('Analysis error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba';
     
     await supabase

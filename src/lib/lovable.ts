@@ -25,7 +25,7 @@ export const getLovableSession = async () => {
     const session = await lovable.auth.getSession();
     return session;
   } catch (error) {
-    console.error('Error getting Lovable.dev session:', error);
+    // console.error('Error getting Lovable.dev session:', error);
     return null;
   }
 };
@@ -39,7 +39,7 @@ export const signInWithLovable = async (email: string, password: string) => {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error signing in with Lovable.dev:', error);
+    // console.error('Error signing in with Lovable.dev:', error);
     throw error;
   }
 }; 

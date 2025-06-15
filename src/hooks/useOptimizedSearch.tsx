@@ -1,3 +1,45 @@
+/**
+ * @fileoverview useOptimizedSearch Hook - High-Performance Legal Document Search
+ * 
+ * This custom React hook provides optimized search functionality for legal documents
+ * with advanced caching, performance monitoring, and queue management for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Debounced search queries to prevent excessive API calls
+ * - Advanced caching system with hit/miss tracking
+ * - Real-time performance statistics and monitoring
+ * - Search and embedding queue management
+ * - Processing status tracking for UI feedback
+ * - Error handling and recovery mechanisms
+ * - Automatic search triggering with configurable delays
+ * 
+ * Performance Optimizations:
+ * - Query debouncing (300ms default) to reduce server load
+ * - Intelligent caching to avoid redundant searches
+ * - Queue monitoring for system load management
+ * - Performance metrics collection for optimization
+ * - Memory-efficient result handling
+ * 
+ * Usage Examples:
+ * - Legal document full-text search with semantic understanding
+ * - Contract clause search and extraction
+ * - Legal precedent and case law research
+ * - Regulatory compliance document search
+ * - AI-powered legal content discovery
+ * - Document similarity and recommendation systems
+ * 
+ * Integration Points:
+ * - Used throughout platform for document search functionality
+ * - Integrates with optimized document service and vector store
+ * - Supports Hungarian legal document search and analysis
+ * - Works with AI-powered semantic search and ranking
+ * - Connects to performance monitoring and analytics systems
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { useState, useCallback, useEffect } from 'react';
 import optimizedDocumentService from '@/core-legal-platform/document/optimizedDocumentService';
 import { useDebounce } from '@/hooks/useDebounce';

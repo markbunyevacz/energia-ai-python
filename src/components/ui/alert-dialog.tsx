@@ -1,3 +1,47 @@
+/**
+ * @fileoverview Alert Dialog UI Component - Modal Confirmation Dialogs
+ * 
+ * This file provides a complete alert dialog implementation built on Radix UI primitives,
+ * offering accessible modal dialogs for critical user confirmations and destructive actions
+ * in the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible modal dialogs with focus management and keyboard navigation
+ * - Backdrop overlay with smooth fade animations
+ * - Flexible content layout with header, body, and footer sections
+ * - Action and cancel button integration with consistent styling
+ * - Portal rendering for proper z-index layering
+ * - Built on Radix UI for robust accessibility and behavior
+ * 
+ * Components Exported:
+ * - AlertDialog: Root dialog container
+ * - AlertDialogTrigger: Button or element that opens the dialog
+ * - AlertDialogContent: Main dialog content container
+ * - AlertDialogHeader: Header section for title and description
+ * - AlertDialogFooter: Footer section for action buttons
+ * - AlertDialogTitle: Dialog title with proper heading semantics
+ * - AlertDialogDescription: Descriptive text for the dialog
+ * - AlertDialogAction: Primary action button (confirm, delete, etc.)
+ * - AlertDialogCancel: Cancel/dismiss button
+ * 
+ * Usage Examples:
+ * - Legal document deletion confirmations
+ * - Contract analysis cancellation warnings
+ * - User account management confirmations
+ * - Data export/import confirmations
+ * - System settings change confirmations
+ * 
+ * Integration Points:
+ * - Used throughout platform for destructive action confirmations
+ * - Integrates with legal document management workflows
+ * - Supports Hungarian localization for legal professional interfaces
+ * - Consistent with platform's accessibility and design standards
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 

@@ -59,7 +59,7 @@ export class FeedbackAnalytics {
    * @param dateRange - The date range for the report.
    */
   private async generateReportForDateRange(title: string, dateRange: DateRange): Promise<PerformanceReport> {
-    console.log(`[Analytics] Generating report: "${title}" for ${format(dateRange.startDate, 'yyyy-MM-dd')} to ${format(dateRange.endDate, 'yyyy-MM-dd')}`);
+    // console.log(`[Analytics] Generating report: "${title}" for ${format(dateRange.startDate, 'yyyy-MM-dd')} to ${format(dateRange.endDate, 'yyyy-MM-dd')}`);
     
     // In a real application, you would fetch all active agent IDs
     const agentIds = ['ContractAnalysisAgent', 'GeneralPurposeAgent']; 

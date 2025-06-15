@@ -13,7 +13,7 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
       const pdf = await getDocument({ data: uint8Array }).promise;
       
       let text = '';
-      let textMatches: string[] = [];
+      const textMatches: string[] = [];
       
       // Try simple text extraction first
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -52,7 +52,7 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
  
       return textMatches.join(' ').slice(0, 50000); // Limit to 50KB of text
     } catch (error) {
-      console.error('PDF text extraction error:', error);
+      // console.error('PDF text extraction error:', error);
       return `Dokumentum: ${file.name}. Szöveg kivonás sikertelen, de a fájl feltöltve.`;
     }
 }; 

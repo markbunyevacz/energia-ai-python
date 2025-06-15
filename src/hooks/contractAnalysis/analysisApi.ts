@@ -3,7 +3,7 @@ import { ContractAnalysis } from '@/types';
 import { StoredDocument } from './types';
 
 export const fetchContractAnalyses = async (userId: string) => {
-  console.log('Fetching analyses for user:', userId);
+  // console.log('Fetching analyses for user:', userId);
   
   const { data, error } = await supabase
     .from('contract_analyses')
@@ -27,11 +27,11 @@ export const fetchContractAnalyses = async (userId: string) => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching analyses:', error);
+    // console.error('Error fetching analyses:', error);
     return [];
   }
 
-  console.log('Fetched analyses data:', data);
+  // console.log('Fetched analyses data:', data);
 
   const transformedAnalyses: ContractAnalysis[] = data.map(item => ({
     id: item.id,
@@ -55,12 +55,12 @@ export const fetchContractAnalyses = async (userId: string) => {
     created_at: item.created_at || new Date().toISOString()
   }));
 
-  console.log('Transformed analyses:', transformedAnalyses);
+  // console.log('Transformed analyses:', transformedAnalyses);
   return transformedAnalyses;
 };
 
 export const fetchAvailableContracts = async (userId: string) => {
-  console.log('Fetching contracts for user:', userId);
+  // console.log('Fetching contracts for user:', userId);
   
   const { data, error } = await supabase
     .from('documents')
@@ -70,11 +70,11 @@ export const fetchAvailableContracts = async (userId: string) => {
     .order('upload_date', { ascending: false });
 
   if (error) {
-    console.error('Error fetching contracts:', error);
+    // console.error('Error fetching contracts:', error);
     throw new Error('Hiba a szerződések betöltésekor');
   }
 
-  console.log('Fetched contracts:', data);
+  // console.log('Fetched contracts:', data);
   // Type cast the analysis_status to ensure it matches our union type
   const typedContracts = (data || []).map(doc => ({
     ...doc,
@@ -98,7 +98,7 @@ export const updateDocumentAnalysisStatus = async (
     .eq('id', documentId);
 
   if (updateError) {
-    console.error('Error updating document status:', updateError);
+    // console.error('Error updating document status:', updateError);
     throw updateError;
   }
 };
@@ -108,7 +108,7 @@ export const saveDocumentToDatabase = async (
   content: string,
   userId: string
 ) => {
-  console.log('Saving document to database...');
+  // console.log('Saving document to database...');
 
   const { data: documentData, error: dbError } = await supabase
     .from('documents')
@@ -128,11 +128,11 @@ export const saveDocumentToDatabase = async (
     .single();
 
   if (dbError) {
-    console.error('Database error saving document:', dbError);
+    // console.error('Database error saving document:', dbError);
     throw new Error('Hiba a dokumentum mentésekor');
   }
 
-  console.log('Document saved successfully:', documentData.id);
+  // console.log('Document saved successfully:', documentData.id);
   return documentData;
 };
 
@@ -141,7 +141,7 @@ export const invokeContractAnalysis = async (
   content: string,
   userId: string
 ) => {
-  console.log('Starting contract analysis for document:', documentId);
+  // console.log('Starting contract analysis for document:', documentId);
   
   const { data, error } = await supabase.functions.invoke('analyze-contract', {
     body: {
@@ -152,10 +152,10 @@ export const invokeContractAnalysis = async (
   });
 
   if (error) {
-    console.error('Function invoke error:', error);
+    // console.error('Function invoke error:', error);
     throw new Error('Kapcsolódási probléma');
   }
 
-  console.log('Analysis response:', data);
+  // console.log('Analysis response:', data);
   return data;
 };

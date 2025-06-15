@@ -1,3 +1,45 @@
+/**
+ * @fileoverview Input OTP UI Component - One-Time Password Input Fields
+ * 
+ * This file provides a complete OTP (One-Time Password) input component system
+ * built on input-otp library, offering accessible multi-digit input fields
+ * for authentication and verification in the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible OTP input with proper ARIA attributes and keyboard navigation
+ * - Visual feedback with active slot highlighting and caret animation
+ * - Flexible grouping and separator support for different OTP formats
+ * - Auto-focus progression between input slots
+ * - Paste support for complete OTP codes
+ * - Disabled state support with visual feedback
+ * - Built on input-otp for robust OTP input behavior
+ * 
+ * Components Exported:
+ * - InputOTP: Root OTP input container with configuration
+ * - InputOTPGroup: Grouping container for related OTP slots
+ * - InputOTPSlot: Individual digit input slot with visual states
+ * - InputOTPSeparator: Visual separator between OTP groups
+ * 
+ * Usage Examples:
+ * - Two-factor authentication (2FA) code entry
+ * - Email verification code input
+ * - SMS verification for legal document access
+ * - Secure login verification for legal professionals
+ * - Account recovery verification codes
+ * - Legal document access PIN entry
+ * 
+ * Integration Points:
+ * - Used in authentication and verification workflows
+ * - Integrates with security and user authentication systems
+ * - Supports Hungarian localization for input labels and instructions
+ * - Consistent with platform's accessibility and design standards
+ * - Works with legal document security and access control systems
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"

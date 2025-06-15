@@ -1,3 +1,53 @@
+/**
+ * @fileoverview Menubar UI Component - Application Menu System
+ * 
+ * This file provides a complete menubar implementation built on Radix UI primitives,
+ * offering accessible application-level menu systems with rich interaction patterns
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible menubar with proper ARIA attributes and keyboard navigation
+ * - Multiple menu triggers in a horizontal bar layout
+ * - Nested submenus with intelligent positioning and collision detection
+ * - Checkbox and radio item support for toggleable and exclusive options
+ * - Keyboard shortcuts display and handling
+ * - Flexible content composition with separators, labels, and grouping
+ * - Portal rendering for proper z-index layering and positioning
+ * - Built on Radix UI for robust cross-browser compatibility
+ * 
+ * Components Exported:
+ * - Menubar: Root menubar container with horizontal layout
+ * - MenubarMenu: Individual menu container within the menubar
+ * - MenubarTrigger: Menu trigger buttons in the menubar
+ * - MenubarContent: Menu content container with positioning
+ * - MenubarItem: Individual menu items with actions
+ * - MenubarCheckboxItem: Toggleable checkbox menu items
+ * - MenubarRadioItem: Radio button menu items for exclusive selection
+ * - MenubarLabel: Section labels and headers
+ * - MenubarSeparator: Visual separators between menu sections
+ * - MenubarShortcut: Keyboard shortcut display
+ * - MenubarSub: Nested submenu containers and triggers
+ * 
+ * Usage Examples:
+ * - Application-level menu bar (File, Edit, View, Tools, Help)
+ * - Legal document management menus (New, Open, Save, Export)
+ * - AI analysis tool menus (Analyze, Review, Compare, Report)
+ * - Legal workflow menus (Draft, Review, Approve, Archive)
+ * - Settings and configuration menus
+ * - Legal domain-specific tool menus
+ * 
+ * Integration Points:
+ * - Used for primary application navigation and actions
+ * - Integrates with legal document management and workflow systems
+ * - Supports Hungarian localization for menu items and shortcuts
+ * - Consistent with platform's accessibility and design standards
+ * - Works with permission systems for role-based menu visibility
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"

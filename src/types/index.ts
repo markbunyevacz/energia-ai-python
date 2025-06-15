@@ -1,3 +1,70 @@
+/**
+ * @fileoverview Main Types Index - Central Type Definitions for Legal AI Platform
+ * @description Comprehensive collection of TypeScript type definitions, interfaces,
+ * and enums used throughout the Legal AI platform. Provides type safety, IntelliSense
+ * support, and consistent data structures across all components and services.
+ * 
+ * TYPE CATEGORIES:
+ * - User Management: Authentication, roles, and profile types
+ * - Document Processing: Legal documents, contracts, and metadata
+ * - AI Services: Agent configurations, responses, and analytics
+ * - Legal Domains: Domain-specific types and classifications
+ * - API Interfaces: Request/response structures and error types
+ * 
+ * USER TYPES:
+ * - User: Core user profile and authentication data
+ * - UserRole: Role-based access control definitions
+ * - UserPreferences: Personalization and settings
+ * - UserActivity: Interaction tracking and analytics
+ * - UserSession: Session management and state
+ * 
+ * DOCUMENT TYPES:
+ * - LegalDocument: Core legal document structure
+ * - Contract: Commercial agreement and contract data
+ * - DocumentMetadata: Rich metadata and classification
+ * - DocumentAnalysis: AI analysis results and insights
+ * - DocumentVersion: Version control and history
+ * 
+ * AI SERVICE TYPES:
+ * - AgentConfig: AI agent configuration and settings
+ * - AgentResponse: Standardized AI response format
+ * - AnalysisResult: Document analysis outcomes
+ * - RecommendationData: Proactive suggestions and insights
+ * - PerformanceMetrics: Agent performance and analytics
+ * 
+ * API TYPES:
+ * - APIResponse: Standardized API response wrapper
+ * - ErrorResponse: Error handling and reporting
+ * - PaginationData: List pagination and navigation
+ * - FilterOptions: Search and filtering parameters
+ * - SortOptions: Data sorting and ordering
+ * 
+ * UTILITY TYPES:
+ * - Generic utility types for common patterns
+ * - Conditional types for flexible APIs
+ * - Mapped types for data transformations
+ * - Union types for controlled vocabularies
+ * - Branded types for type safety
+ * 
+ * TYPE SAFETY FEATURES:
+ * - Strict null checking and undefined handling
+ * - Discriminated unions for polymorphic data
+ * - Generic constraints for type relationships
+ * - Branded types for domain-specific values
+ * - Compile-time validation and error detection
+ * 
+ * INTEGRATION POINTS:
+ * - Database schema compatibility
+ * - API contract enforcement
+ * - Component prop validation
+ * - Service interface definitions
+ * - Configuration type checking
+ * 
+ * @author Legal AI Team
+ * @version 1.5.0
+ * @since 2024
+ */
+
 export interface User {
   id: string;
   name: string;

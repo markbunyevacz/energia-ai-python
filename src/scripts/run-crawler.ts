@@ -30,13 +30,13 @@ function parseProxies(proxyString: string | undefined): CrawlerProxy[] {
 async function main() {
   const crawlerArg = process.argv[2];
   if (!crawlerArg) {
-    console.error('Please specify which crawler to run. Available:', Object.keys(CRAWLERS).join(', '));
+    // console.error('Please specify which crawler to run. Available:', Object.keys(CRAWLERS).join(', '));
     process.exit(1);
   }
 
   const CrawlerClass = CRAWLERS[crawlerArg.toLowerCase()];
   if (!CrawlerClass) {
-    console.error(`Invalid crawler specified: ${crawlerArg}. Available:`, Object.keys(CRAWLERS).join(', '));
+    // console.error(`Invalid crawler specified: ${crawlerArg}. Available:`, Object.keys(CRAWLERS).join(', '));
     process.exit(1);
   }
 
@@ -45,8 +45,8 @@ async function main() {
   const supabaseKey = process.env.SUPABASE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
   
   if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase credentials. Please check your .env file.');
-    console.error('Required: SUPABASE_URL/VITE_SUPABASE_URL and SUPABASE_KEY/VITE_SUPABASE_ANON_KEY');
+    // console.error('Missing Supabase credentials. Please check your .env file.');
+    // console.error('Required: SUPABASE_URL/VITE_SUPABASE_URL and SUPABASE_KEY/VITE_SUPABASE_ANON_KEY');
     process.exit(1);
   }
   
@@ -60,16 +60,16 @@ async function main() {
   const crawler = new CrawlerClass(proxies);
   
   try {
-    console.log(`Starting ${crawlerArg} crawler...`);
+    // console.log(`Starting ${crawlerArg} crawler...`);
     const result = await crawler.crawl();
     
     if (result.success) {
-      console.log(`Crawl completed successfully. Found ${result.documents.length} documents.`);
+      // console.log(`Crawl completed successfully. Found ${result.documents.length} documents.`);
     } else {
-      console.error('Crawl finished with errors:', result.errors.join('\n'));
+      // console.error('Crawl finished with errors:', result.errors.join('\n'));
     }
   } catch (error: any) {
-    console.error('Crawl failed:', error?.message || 'Unknown error');
+    // console.error('Crawl failed:', error?.message || 'Unknown error');
     process.exit(1);
   }
 }

@@ -5,7 +5,7 @@ async function repairMigrations() {
     await executeCommand('supabase migration repair --status reverted 20240320');
     await executeCommand('supabase db pull');
     await executeCommand('supabase migration up');
-    console.log('Migration repair completed successfully');
+    // console.log('Migration repair completed successfully');
   } catch (error) {
     console.error('Migration repair failed:', error);
   }
@@ -13,9 +13,8 @@ async function repairMigrations() {
 
 function executeCommand(cmd) {
   return new Promise((resolve, reject) => {
-    exec(cmd, (error, stdout, stderr) => {
+    exec(cmd, (error) => {
       if (error) reject(error);
-      console.log(stdout);
       resolve();
     });
   });

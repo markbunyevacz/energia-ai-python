@@ -42,12 +42,12 @@ export class DataCollectionAgent {
    */
   public async start(): Promise<void> {
     if (this.isRunning) {
-      console.log('Data collection agent is already running');
+      // console.log('Data collection agent is already running');
       return;
     }
 
     this.isRunning = true;
-    console.log('Starting data collection agent...');
+    // console.log('Starting data collection agent...');
 
     try {
       // Get all active legal sources
@@ -66,7 +66,7 @@ export class DataCollectionAgent {
 
       this.lastRunTime = new Date();
     } catch (error) {
-      console.error('Error in data collection agent:', error);
+      // console.error('Error in data collection agent:', error);
       throw error;
     } finally {
       this.isRunning = false;
@@ -78,18 +78,18 @@ export class DataCollectionAgent {
    */
   private async processSource(source: LegalSourceRow): Promise<void> {
     try {
-      console.log(`Processing source: ${source.name}`);
+      // console.log(`Processing source: ${source.name}`);
 
       // Check if it's time to crawl this source
       if (!this.shouldCrawlSource(source)) {
-        console.log(`Skipping source ${source.name} - not due for crawling yet`);
+        // console.log(`Skipping source ${source.name} - not due for crawling yet`);
         return;
       }
 
       // Create appropriate crawler based on source type
       const crawler = this.createCrawler(source);
       if (!crawler) {
-        console.error(`No crawler available for source type: ${source.type}`);
+        // console.error(`No crawler available for source type: ${source.type}`);
         return;
       }
 
@@ -106,7 +106,7 @@ export class DataCollectionAgent {
         .eq('id', source.id);
 
     } catch (error) {
-      console.error(`Error processing source ${source.name}:`, error);
+      // console.error(`Error processing source ${source.name}:`, error);
       // Log the error but continue with other sources
     }
   }
@@ -159,7 +159,7 @@ export class DataCollectionAgent {
    */
   private async processCrawlResult(source: LegalSourceRow, result: CrawlerResult): Promise<void> {
     if (!result.success || !result.documents) {
-      console.error(`Crawl failed for source ${source.name}:`, result.errors);
+      // console.error(`Crawl failed for source ${source.name}:`, result.errors);
       return;
     }
 
@@ -180,7 +180,7 @@ export class DataCollectionAgent {
         if (existingDoc) {
           // If content has changed, log it and update
           if (existingDoc.content_hash !== contentHash) {
-            console.log(`Change detected for document: ${doc.metadata.original_url}`);
+            // console.log(`Change detected for document: ${doc.metadata.original_url}`);
             
             // 1. Analyze the change to get a summary
             const summary = await this.changeAnalyzer.analyzeChanges(existingDoc.content ?? '', doc.content);
@@ -218,7 +218,7 @@ export class DataCollectionAgent {
           });
         }
       } catch (error) {
-        console.error('Error processing document:', error);
+        // console.error('Error processing document:', error);
         // Continue with next document
       }
     }
@@ -246,7 +246,7 @@ export class DataCollectionAgent {
    */
   public async stop(): Promise<void> {
     this.isRunning = false;
-    console.log('Stopping data collection agent...');
+    // console.log('Stopping data collection agent...');
   }
 
   /**

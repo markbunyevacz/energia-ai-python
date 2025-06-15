@@ -1,3 +1,55 @@
+/**
+ * @fileoverview Authentication Context - Global Authentication State Management
+ * @description React Context provider that manages global authentication state for the
+ * Legal AI platform. Provides centralized user authentication, role management, and
+ * session handling across all components with Supabase integration.
+ * 
+ * AUTHENTICATION FEATURES:
+ * - Global authentication state management
+ * - User session persistence and restoration
+ * - Role-based access control integration
+ * - Automatic token refresh handling
+ * - Secure logout and session cleanup
+ * 
+ * STATE MANAGEMENT:
+ * - Current user information and profile
+ * - Authentication loading states
+ * - User roles and permissions
+ * - Session expiration handling
+ * - Error state management
+ * 
+ * SUPABASE INTEGRATION:
+ * - Real-time authentication state changes
+ * - Secure token management
+ * - User profile synchronization
+ * - Role-based database access
+ * - Session persistence across browser sessions
+ * 
+ * CONTEXT FEATURES:
+ * - Provider pattern for global state access
+ * - Custom hooks for authentication operations
+ * - Type-safe authentication state
+ * - Optimized re-rendering patterns
+ * - Memory leak prevention
+ * 
+ * SECURITY MEASURES:
+ * - Secure token storage and handling
+ * - Automatic session validation
+ * - Role verification and enforcement
+ * - Secure logout with token cleanup
+ * - Protection against XSS and CSRF attacks
+ * 
+ * USAGE PATTERNS:
+ * - Wrap entire application with AuthProvider
+ * - Use useAuth hook in components
+ * - Conditional rendering based on auth state
+ * - Protected route integration
+ * - Role-based feature access
+ * 
+ * @author Legal AI Team
+ * @version 1.2.0
+ * @since 2024
+ */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase, User, UserRole, getUserRole } from './supabase';

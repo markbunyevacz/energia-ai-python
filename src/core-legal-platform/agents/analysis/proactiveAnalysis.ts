@@ -51,7 +51,7 @@ class ProactiveAnalysisService {
 
       return recommendations.slice(0, 6); // Limit to 6 recommendations
     } catch (error) {
-      console.error('Error generating proactive recommendations:', error);
+      // console.error('Error generating proactive recommendations:', error);
       return this.getGeneralRecommendations();
     }
   }
@@ -188,7 +188,7 @@ class ProactiveAnalysisService {
         event_data: { recommendation_id: recommendationId }
       });
     } catch (error) {
-      console.error('Error tracking recommendation click:', error);
+      // console.error('Error tracking recommendation click:', error);
     }
   }
 }

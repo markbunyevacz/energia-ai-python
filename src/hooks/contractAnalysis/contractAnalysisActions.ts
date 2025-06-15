@@ -32,7 +32,7 @@ export const analyzeContract = async (
       // Immediately refresh the analyses list
       await onAnalysisComplete();
     } else {
-      console.error('Analysis failed:', data);
+      // console.error('Analysis failed:', data);
       const errorMessage = data?.error || 'Ismeretlen hiba történt az elemzés során';
       await updateDocumentAnalysisStatus(document.id, 'failed', errorMessage);
       onStatusUpdate(document.id, 'failed', errorMessage);
@@ -40,11 +40,11 @@ export const analyzeContract = async (
       
       // Log additional details for debugging
       if (data?.details) {
-        console.error('Error details:', data.details);
+        // console.error('Error details:', data.details);
       }
     }
   } catch (error) {
-    console.error('Analysis error:', error);
+    // console.error('Analysis error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Kapcsolódási probléma';
     await updateDocumentAnalysisStatus(document.id, 'failed', errorMessage);
     onStatusUpdate(document.id, 'failed', errorMessage);
@@ -85,7 +85,7 @@ export const saveDocumentAndAnalyze = async (
     await onContractsRefresh();
 
   } catch (error) {
-    console.error('Error saving document:', error);
+    // console.error('Error saving document:', error);
     toast.error('Hiba a dokumentum mentésekor');
   }
 };

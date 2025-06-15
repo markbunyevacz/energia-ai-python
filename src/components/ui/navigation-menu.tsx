@@ -1,3 +1,49 @@
+/**
+ * @fileoverview Navigation Menu UI Component - Hierarchical Navigation System
+ * 
+ * This file provides a complete navigation menu implementation built on Radix UI primitives,
+ * offering accessible hierarchical navigation with dropdown content areas
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible navigation with proper ARIA attributes and keyboard navigation
+ * - Hierarchical menu structure with trigger and content areas
+ * - Smooth animations and transitions for content appearance
+ * - Intelligent positioning with viewport management
+ * - Visual indicators for active and open states
+ * - Responsive design with mobile-friendly behavior
+ * - Built on Radix UI for robust cross-browser compatibility
+ * 
+ * Components Exported:
+ * - NavigationMenu: Root navigation container with viewport management
+ * - NavigationMenuList: Horizontal list container for navigation items
+ * - NavigationMenuItem: Individual navigation item wrapper
+ * - NavigationMenuTrigger: Clickable trigger with chevron indicator
+ * - NavigationMenuContent: Dropdown content area with animations
+ * - NavigationMenuLink: Direct navigation links
+ * - NavigationMenuViewport: Content viewport with dynamic sizing
+ * - NavigationMenuIndicator: Visual indicator for active items
+ * 
+ * Usage Examples:
+ * - Primary site navigation with legal domain categories
+ * - Legal document type navigation (Contracts, Policies, Regulations)
+ * - AI tool and service navigation menus
+ * - Legal practice area navigation (Energy, Corporate, Compliance)
+ * - Dashboard section navigation with content previews
+ * - Legal resource and template navigation
+ * 
+ * Integration Points:
+ * - Used for primary site navigation and content organization
+ * - Integrates with legal document categorization systems
+ * - Supports Hungarian localization for navigation labels
+ * - Consistent with platform's accessibility and design standards
+ * - Works with legal domain routing and content management
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"

@@ -1,3 +1,48 @@
+/**
+ * @fileoverview Carousel UI Component - Interactive Content Slider
+ * 
+ * This file provides a complete carousel implementation built on Embla Carousel,
+ * offering accessible and customizable content sliders with navigation controls
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible carousel with keyboard navigation and screen reader support
+ * - Horizontal and vertical orientation support
+ * - Touch/swipe gestures for mobile interaction
+ * - Navigation buttons with disabled states
+ * - Flexible content support with custom slide layouts
+ * - Plugin system for extended functionality
+ * - Auto-play and infinite loop options
+ * - Responsive design with breakpoint-aware behavior
+ * 
+ * Components Exported:
+ * - Carousel: Root carousel container with context provider
+ * - CarouselContent: Scrollable content container
+ * - CarouselItem: Individual slide wrapper
+ * - CarouselPrevious: Previous navigation button
+ * - CarouselNext: Next navigation button
+ * - useCarousel: Hook for accessing carousel context and controls
+ * 
+ * Usage Examples:
+ * - Legal document gallery with thumbnail navigation
+ * - Feature showcases in onboarding flows
+ * - Legal case study presentations
+ * - Dashboard widget carousels for analytics
+ * - Legal template galleries and previews
+ * - Training material content sliders
+ * 
+ * Integration Points:
+ * - Used throughout platform for content presentation
+ * - Integrates with legal document management systems
+ * - Supports Hungarian localization for navigation labels
+ * - Consistent with platform's accessibility and design standards
+ * - Works with image optimization and lazy loading
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,

@@ -15,17 +15,17 @@ import path from 'path';
  * It is configured in `vitest.config.ts` via the `globalSetup` option.
  */
 export default async () => {
-  console.log('--- Loading environment variables for tests from .env file ---');
+  // console.log('--- Loading environment variables for tests from .env file ---');
   const envPath = path.resolve(__dirname, '../../.env');
   const result = config({ path: envPath });
 
   if (result.error) {
-    console.error(
+    // console.error(
       '!!! FAILED TO LOAD .env FILE FOR TESTS. This will cause authentication errors. !!!'
     );
-    console.error('Error details:', result.error);
+    // console.error('Error details:', result.error);
     throw result.error;
   }
 
-  console.log('--- .env file loaded successfully for tests ---');
+  // console.log('--- .env file loaded successfully for tests ---');
 }; 

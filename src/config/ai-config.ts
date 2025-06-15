@@ -149,10 +149,10 @@ export class AIConfigManager {
   }
 
   public printConfiguration(): void {
-    console.log('🤖 AI Configuration Status:');
-    console.log(`  Default Provider: ${this.getDefaultProvider()}`);
-    console.log(`  Default Model: ${this.getDefaultModel()}`);
-    console.log(`  Available Providers: ${this.getAvailableProviders().join(', ')}`);
+    // console.log('🤖 AI Configuration Status:');
+    // console.log(`  Default Provider: ${this.getDefaultProvider()}`);
+    // console.log(`  Default Model: ${this.getDefaultModel()}`);
+    // console.log(`  Available Providers: ${this.getAvailableProviders().join(', ')}`);
     
     Object.entries({
       'OpenAI': this.hasApiKey('openai'),
@@ -160,13 +160,13 @@ export class AIConfigManager {
       'Gemini': this.hasApiKey('gemini'),
       'Deepseek': this.hasApiKey('deepseek')
     }).forEach(([name, hasKey]) => {
-      console.log(`  ${name}: ${hasKey ? '✅ Configured' : '❌ No API Key'}`);
+      // console.log(`  ${name}: ${hasKey ? '✅ Configured' : '❌ No API Key'}`);
     });
 
     const validation = this.validateConfiguration();
     if (!validation.valid) {
-      console.log('⚠️  Configuration Issues:');
-      validation.errors.forEach(error => console.log(`    - ${error}`));
+      // console.log('⚠️  Configuration Issues:');
+      validation.errors.forEach(error => // console.log(`    - ${error}`));
     }
   }
 }

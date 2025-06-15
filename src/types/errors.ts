@@ -1,3 +1,72 @@
+/**
+ * @fileoverview Error Types & Handling - Comprehensive Error Management System
+ * @description Centralized error type definitions, custom error classes, and error
+ * handling utilities for the Legal AI platform. Provides structured error reporting,
+ * user-friendly messages, and debugging support across all application layers.
+ * 
+ * ERROR ARCHITECTURE:
+ * - Custom error classes for different error categories
+ * - Structured error codes for programmatic handling
+ * - User-friendly error messages with localization
+ * - Debug information for development and troubleshooting
+ * - Error context and metadata for analytics
+ * 
+ * ERROR CATEGORIES:
+ * - Authentication: Login, session, and permission errors
+ * - Validation: Input validation and data integrity errors
+ * - Network: API communication and connectivity issues
+ * - AI Service: LLM and AI processing failures
+ * - Document: File processing and analysis errors
+ * - Database: Data persistence and retrieval failures
+ * 
+ * CUSTOM ERROR CLASSES:
+ * - BaseError: Foundation class with common error properties
+ * - ValidationError: Input validation and constraint violations
+ * - AuthenticationError: User authentication and authorization
+ * - NetworkError: API and network communication failures
+ * - AIServiceError: AI model and processing errors
+ * - DocumentProcessingError: File and document handling
+ * 
+ * ERROR CODES:
+ * - Structured error codes for programmatic handling
+ * - Hierarchical organization by category and severity
+ * - Consistent naming conventions across services
+ * - Machine-readable error identification
+ * - Integration with monitoring and alerting systems
+ * 
+ * LOCALIZATION SUPPORT:
+ * - Hungarian error messages for local users
+ * - English fallback for international users
+ * - Context-aware message formatting
+ * - Legal terminology and professional language
+ * - Cultural adaptation for Hungarian legal market
+ * 
+ * ERROR CONTEXT:
+ * - Request context and user information
+ * - Stack traces and debugging information
+ * - Performance metrics and timing data
+ * - Related entity IDs and references
+ * - User action and workflow context
+ * 
+ * INTEGRATION FEATURES:
+ * - Error boundary integration for React components
+ * - API error response standardization
+ * - Logging and monitoring service integration
+ * - User notification and feedback systems
+ * - Analytics and error tracking
+ * 
+ * USAGE PATTERNS:
+ * - Throw custom errors with structured data
+ * - Catch and transform errors at service boundaries
+ * - Display user-friendly error messages
+ * - Log detailed error information for debugging
+ * - Track error patterns for system improvement
+ * 
+ * @author Legal AI Team
+ * @version 1.3.0
+ * @since 2024
+ */
+
 export type ErrorCode = keyof typeof ErrorCodes;
 
 export class ContractAnalysisError extends Error {

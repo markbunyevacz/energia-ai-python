@@ -1,3 +1,39 @@
+/**
+ * @fileoverview Checkbox UI Component - Form Input Controls
+ * 
+ * This file provides a complete checkbox component built on Radix UI primitives,
+ * offering accessible form input controls with consistent styling and behavior
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible checkbox with proper ARIA attributes and keyboard navigation
+ * - Visual check indicator with smooth animations
+ * - Consistent styling with platform design system
+ * - Focus management with visible focus rings
+ * - Disabled state support with appropriate visual feedback
+ * - Built on Radix UI for robust cross-browser compatibility
+ * 
+ * Usage Examples:
+ * - Legal document selection in bulk operations
+ * - Terms and conditions acceptance in legal forms
+ * - Feature toggles in user preferences and settings
+ * - Multi-select filters in legal document searches
+ * - Permission and role assignment interfaces
+ * - Legal compliance checklist items
+ * - Contract clause selection and review workflows
+ * 
+ * Integration Points:
+ * - Used throughout platform for boolean input collection
+ * - Integrates with form validation and submission systems
+ * - Supports Hungarian localization for legal form labels
+ * - Consistent with platform's accessibility and design standards
+ * - Works with legal document management and workflow systems
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { Check } from "lucide-react"

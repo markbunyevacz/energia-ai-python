@@ -131,7 +131,7 @@ export class AIService implements BaseLLM {
         },
       };
     } catch (error) {
-      console.error('OpenAI API Error:', error);
+      // console.error('OpenAI API Error:', error);
       throw new Error(`OpenAI API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -170,7 +170,7 @@ export class AIService implements BaseLLM {
         },
       };
     } catch (error) {
-      console.error('Claude API Error:', error);
+      // console.error('Claude API Error:', error);
       throw new Error(`Claude API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -212,7 +212,7 @@ export class AIService implements BaseLLM {
         },
       };
     } catch (error) {
-      console.error('Gemini API Error:', error);
+      // console.error('Gemini API Error:', error);
       throw new Error(`Gemini API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -256,7 +256,7 @@ export class AIService implements BaseLLM {
         },
       };
     } catch (error) {
-      console.error('Deepseek API Error:', error);
+      // console.error('Deepseek API Error:', error);
       throw new Error(`Deepseek API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -298,7 +298,7 @@ export class AIService implements BaseLLM {
       const result = await this.generate('Hello, this is a connection test. Please respond with "OK".');
       return result.content.toLowerCase().includes('ok');
     } catch (error) {
-      console.error(`Connection test failed for ${this.provider}:`, error);
+      // console.error(`Connection test failed for ${this.provider}:`, error);
       return false;
     }
   }

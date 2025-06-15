@@ -13,7 +13,7 @@ export class ExampleAgent extends BaseAgent {
   public async initialize(): Promise<void> {
     // Initialize any required resources
     this.processingCount = 0;
-    console.log(`Initialized ${this.config.name} agent`);
+    // console.log(`Initialized ${this.config.name} agent`);
   }
 
   protected async performTask(task: AgentTask): Promise<AgentResponse> {
@@ -47,7 +47,7 @@ export class ExampleAgent extends BaseAgent {
   public async cleanup(): Promise<void> {
     // Clean up any resources
     this.processingCount = 0;
-    console.log(`Cleaned up ${this.config.name} agent`);
+    // console.log(`Cleaned up ${this.config.name} agent`);
   }
 
   public getProcessingCount(): number {

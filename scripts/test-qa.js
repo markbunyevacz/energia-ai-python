@@ -20,10 +20,10 @@ async function testQA() {
       console.error('Error signing in:', signInError)
       return
     }
-    console.log('Signed in successfully:', signInData)
+    // console.log('Signed in successfully:', signInData)
 
     // Make the function call with the access token
-    const { data, error } = await supabase.functions.invoke('ai-question-answer', {
+    const { error } = await supabase.functions.invoke('ai-question-answer', {
       body: {
         question: 'What are the key requirements for a valid contract under Hungarian law?',
         userId: signInData.user.id,
@@ -43,7 +43,7 @@ async function testQA() {
       return
     }
 
-    console.log('Response:', JSON.stringify(data, null, 2))
+    // console.log('Response:', JSON.stringify(data, null, 2))
   } catch (error) {
     console.error('Caught error:', error)
     if (error.response) {

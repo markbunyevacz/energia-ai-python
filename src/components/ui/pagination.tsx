@@ -1,3 +1,42 @@
+/**
+ * @fileoverview Pagination UI Component - Navigating Paginated Content
+ * 
+ * This file provides a comprehensive set of components for building accessible
+ * and customizable pagination controls. It's essential for navigating through
+ * large sets of data, such as lists of legal documents, search results, or user logs.
+ * 
+ * Key Features:
+ * - Fully accessible pagination navigation with ARIA labels
+ * - Composite components for flexible layout (Previous, Next, Page Links, Ellipsis)
+ * - Styling consistent with the platform's design system, built on button variants
+ * - `isActive` prop for highlighting the current page
+ * - Includes "Previous" and "Next" buttons with icons and labels
+ * - Ellipsis component for gracefully handling large numbers of pages
+ * 
+ * Components Exported:
+ * - Pagination: The root `nav` container with ARIA roles
+ * - PaginationContent: A `ul` list to contain the pagination items
+ * - PaginationItem: An `li` list item for each pagination element
+ * - PaginationLink: The core link/button element for page numbers
+ * - PaginationPrevious: A styled link for navigating to the previous page
+ * - PaginationNext: A styled link for navigating to the next page
+ * - PaginationEllipsis: A component to indicate truncated page links
+ * 
+ * Usage Examples:
+ * - Navigating through a list of legal documents in the document repository
+ * - Paginating search results from the legal knowledge base
+ * - Moving through pages of user activity logs in the admin dashboard
+ * - Paginating tables with large datasets
+ * 
+ * Integration Points:
+ * - Integrates with data-fetching hooks and state management to handle page changes
+ * - Used on any page that displays a large, filterable list of items
+ * - Supports Hungarian localization for "Previous" and "Next" text
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 

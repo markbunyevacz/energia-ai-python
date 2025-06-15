@@ -54,7 +54,7 @@ export class ChangeAnalyzer {
    * @returns A list of potentially impacted user document IDs and their relevance scores.
    */
   public async findImpactedDocuments(changeContent: string): Promise<{ documentId: string; score: number }[]> {
-    console.log('Finding impacted documents...');
+    // console.log('Finding impacted documents...');
     
     try {
       // 1. Generate an embedding for the content of the legal change.
@@ -73,11 +73,11 @@ export class ChangeAnalyzer {
         score: doc.metadata.similarity || 0,
       }));
 
-      console.log(`Found ${impactedDocuments.length} potentially impacted documents.`);
+      // console.log(`Found ${impactedDocuments.length} potentially impacted documents.`);
       return impactedDocuments;
 
     } catch (error) {
-      console.error('Error finding impacted documents:', error);
+      // console.error('Error finding impacted documents:', error);
       return [];
     }
   }

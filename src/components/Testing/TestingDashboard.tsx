@@ -69,7 +69,7 @@ export function TestingDashboard() {
   };
 
   const runTestWithUpdate = async (testName: string, category: TestResult['category'], duration: number) => {
-    console.log(`Starting test: ${testName}`);
+    // console.log(`Starting test: ${testName}`);
     
     // Add running test
     handleTestResult({
@@ -118,7 +118,7 @@ export function TestingDashboard() {
       details: { accuracy, responseTime: duration }
     });
     
-    console.log(`Completed test: ${testName} with status: ${status}`);
+    // console.log(`Completed test: ${testName} with status: ${status}`);
   };
 
   const runComprehensiveTestPlan = async () => {
@@ -127,7 +127,7 @@ export function TestingDashboard() {
     setTestResults([]);
     
     try {
-      console.log('Starting comprehensive test plan...');
+      // console.log('Starting comprehensive test plan...');
       toast.info('🚀 Teljes körű tesztelési terv indítása...');
 
       const allTests = [
@@ -190,7 +190,7 @@ export function TestingDashboard() {
         { name: 'Teljes rendszer stabilitás', category: 'performance', duration: 1500 }
       ];
 
-      console.log(`Total tests to run: ${allTests.length}`);
+      // console.log(`Total tests to run: ${allTests.length}`);
 
       for (let i = 0; i < allTests.length; i++) {
         const test = allTests[i];
@@ -241,14 +241,14 @@ export function TestingDashboard() {
           }
         };
 
-        console.log(`Comprehensive test completed. Total: ${totalTests}, Passed: ${passedTests}, Warnings: ${warningTests}, Failed: ${failedTests}`);
+        // console.log(`Comprehensive test completed. Total: ${totalTests}, Passed: ${passedTests}, Warnings: ${warningTests}, Failed: ${failedTests}`);
         return [summaryResult, ...currentResults];
       });
 
       toast.success('🎉 Teljes körű tesztelési terv sikeresen befejezve!');
 
     } catch (error) {
-      console.error('Comprehensive test execution error:', error);
+      // console.error('Comprehensive test execution error:', error);
       handleTestResult({
         testName: 'Tesztelési hiba',
         category: 'performance',

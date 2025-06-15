@@ -2,10 +2,56 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 /**
- * Utility Functions
+ * @fileoverview Utility Functions Library - Common Helper Functions
+ * @description Collection of reusable utility functions for the Legal AI platform.
+ * Includes string manipulation, date formatting, validation helpers, CSS utilities,
+ * and common operations used throughout the application.
  * 
- * This module provides common utility functions used throughout the application
- * for styling, data manipulation, and common operations.
+ * UTILITY CATEGORIES:
+ * - CSS class name manipulation and merging
+ * - String formatting and text processing
+ * - Date and time formatting utilities
+ * - Validation and sanitization helpers
+ * - Array and object manipulation functions
+ * - File handling and processing utilities
+ * 
+ * CSS UTILITIES:
+ * - Tailwind CSS class merging with conflict resolution
+ * - Conditional class name application
+ * - Dynamic styling based on state
+ * - Responsive class management
+ * - Theme-aware utility functions
+ * 
+ * STRING PROCESSING:
+ * - Text truncation and ellipsis handling
+ * - Case conversion utilities
+ * - String sanitization for security
+ * - Template string processing
+ * - Regular expression helpers
+ * 
+ * DATE & TIME:
+ * - Localized date formatting for Hungarian users
+ * - Relative time calculations (ago, from now)
+ * - Business day calculations
+ * - Timezone handling and conversion
+ * - Date range validation
+ * 
+ * VALIDATION HELPERS:
+ * - Email format validation
+ * - Phone number formatting
+ * - Legal document ID validation
+ * - Input sanitization functions
+ * - Type checking utilities
+ * 
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Memoization for expensive operations
+ * - Debouncing and throttling utilities
+ * - Lazy loading helpers
+ * - Memory-efficient array operations
+ * 
+ * @author Legal AI Team
+ * @version 1.4.0
+ * @since 2024
  */
 
 /**
@@ -42,7 +88,7 @@ export function cn(...inputs: ClassValue[]) {
  * @example
  * ```typescript
  * await delay(1000); // Wait 1 second
- * console.log('This runs after 1 second');
+ * // console.log('This runs after 1 second');
  * ```
  */
 export function delay(ms: number): Promise<void> {
@@ -178,7 +224,7 @@ export function deepClone<T>(obj: T): T {
   
   const cloned = {} as T;
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       cloned[key] = deepClone(obj[key]);
     }
   }

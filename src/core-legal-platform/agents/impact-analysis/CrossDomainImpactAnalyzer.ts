@@ -70,7 +70,7 @@ export class CrossDomainImpactAnalyzer extends BaseAgent {
         // handleError method was found to create malformed errors that broke tests.
         if (!context.document.content) {
             const error = new Error("Document content is empty");
-            console.error(`[${this.config.name}] Error processing task:`, error);
+            // console.error(`[${this.config.name}] Error processing task:`, error);
             return {
                 success: false,
                 message: `Processing failed: ${error.message}`,
@@ -182,7 +182,7 @@ export class CrossDomainImpactAnalyzer extends BaseAgent {
                     });
                 }
             } catch (error) {
-                console.warn(`Failed to analyze impact for document ${similarDoc.id}:`, error);
+                // console.warn(`Failed to analyze impact for document ${similarDoc.id}:`, error);
                 // Continue processing other documents
             }
         }
@@ -206,7 +206,7 @@ export class CrossDomainImpactAnalyzer extends BaseAgent {
                 .in('id', crossDomainImpacts.map(impact => impact.impactedDocument.id));
 
             if (error) {
-                console.warn('Error fetching contracts:', error);
+                // console.warn('Error fetching contracts:', error);
                 return {
                     totalAffectedContracts: 0,
                     highRiskContracts: 0,
@@ -247,7 +247,7 @@ export class CrossDomainImpactAnalyzer extends BaseAgent {
                 recommendations
             };
         } catch (error) {
-            console.error('Error in contract impact analysis:', error);
+            // console.error('Error in contract impact analysis:', error);
             return {
                 totalAffectedContracts: 0,
                 highRiskContracts: 0,

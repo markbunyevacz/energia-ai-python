@@ -1,3 +1,43 @@
+/**
+ * @fileoverview Alert UI Component - Status and Notification Messages
+ * 
+ * This file provides a flexible alert component system for displaying important messages,
+ * notifications, and status updates throughout the Legal AI platform interface.
+ * 
+ * Key Features:
+ * - Multiple alert variants (default, destructive) for different message types
+ * - Accessible alert role for screen readers and assistive technologies
+ * - Icon support with proper spacing and positioning
+ * - Consistent styling with platform design system
+ * - Responsive design with proper text scaling
+ * 
+ * Components Exported:
+ * - Alert: Main alert container with variant styling
+ * - AlertTitle: Bold title/heading for the alert message
+ * - AlertDescription: Detailed description or body text
+ * 
+ * Alert Variants:
+ * - default: Standard informational alerts
+ * - destructive: Error, warning, or critical status alerts
+ * 
+ * Usage Examples:
+ * - Legal document processing status notifications
+ * - Contract analysis error messages
+ * - System status updates and maintenance notices
+ * - User action confirmations and feedback
+ * - Validation errors in legal forms
+ * 
+ * Integration Points:
+ * - Used across all platform pages for user feedback
+ * - Integrates with error handling and notification systems
+ * - Supports Hungarian localization for legal professionals
+ * - Consistent with platform's accessibility and design standards
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 

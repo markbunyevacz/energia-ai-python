@@ -120,7 +120,7 @@ export function ContractAnalysis() {
       toast.success('Elemzés sikeresen befejeződött');
       
     } catch (error) {
-      console.error('Contract analysis error:', error);
+      // console.error('Contract analysis error:', error);
       toast.error('Hiba történt az elemzés során', {
         description: error instanceof Error ? error.message : 'Ismeretlen hiba történt'
       });

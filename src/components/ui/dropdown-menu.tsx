@@ -1,3 +1,52 @@
+/**
+ * @fileoverview Dropdown Menu UI Component - Accessible Menu Systems
+ * 
+ * This file provides a complete dropdown menu implementation built on Radix UI primitives,
+ * offering accessible dropdown menus with rich interaction patterns and content options
+ * for the Legal AI platform.
+ * 
+ * Key Features:
+ * - Accessible dropdown menus with proper ARIA attributes and keyboard navigation
+ * - Click and hover activation with configurable triggers
+ * - Nested submenus with intelligent positioning and collision detection
+ * - Checkbox and radio item support for toggleable and exclusive options
+ * - Keyboard shortcuts display and handling
+ * - Flexible content composition with separators, labels, and grouping
+ * - Portal rendering for proper z-index layering and positioning
+ * - Built on Radix UI for robust cross-browser compatibility
+ * 
+ * Components Exported:
+ * - DropdownMenu: Root dropdown menu container
+ * - DropdownMenuTrigger: Button or element that opens the dropdown
+ * - DropdownMenuContent: Main menu content container with positioning
+ * - DropdownMenuItem: Individual menu items with actions
+ * - DropdownMenuCheckboxItem: Toggleable checkbox menu items
+ * - DropdownMenuRadioItem: Radio button menu items for exclusive selection
+ * - DropdownMenuLabel: Section labels and headers
+ * - DropdownMenuSeparator: Visual separators between menu sections
+ * - DropdownMenuShortcut: Keyboard shortcut display
+ * - DropdownMenuSub: Nested submenu containers and triggers
+ * 
+ * Usage Examples:
+ * - User profile and account management menus
+ * - Legal document action menus (export, share, analyze)
+ * - Navigation menus with legal domain categories
+ * - Settings and preference selection menus
+ * - AI agent and tool selection dropdowns
+ * - Filter and sorting option menus in legal document lists
+ * 
+ * Integration Points:
+ * - Used throughout platform for menu-based interactions
+ * - Integrates with legal document management and workflow systems
+ * - Supports Hungarian localization for menu items and labels
+ * - Consistent with platform's accessibility and design standards
+ * - Works with permission systems for role-based menu item visibility
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"

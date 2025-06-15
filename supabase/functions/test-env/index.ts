@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 console.log('Function starting up...')
 
 serve(async (req) => {
-  console.log('Request received:', req.method, req.url)
+  // console.log('Request received:', req.method, req.url)
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -18,7 +18,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Checking environment variables...')
+    // console.log('Checking environment variables...')
     
     // Check if environment variables are accessible
     const envVars = {
@@ -27,7 +27,7 @@ serve(async (req) => {
       SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ? 'present' : 'missing'
     }
     
-    console.log('Environment variables status:', envVars)
+    // console.log('Environment variables status:', envVars)
 
     return new Response(
       JSON.stringify({

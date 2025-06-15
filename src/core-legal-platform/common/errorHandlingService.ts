@@ -309,8 +309,7 @@ export class ErrorHandlingService {
           label: 'Szerződés javítása',
           onClick: () => {
             this.logger.log('info', 'Attempting to fix contract validation', error);
-            // Implement contract validation fix logic
-            console.log('Fixing contract validation...');
+            // console.log('Fixing contract validation...');
           }
         };
       case ErrorCodes.AUTHENTICATION_ERROR:
@@ -318,8 +317,7 @@ export class ErrorHandlingService {
           label: 'Újra bejelentkezés',
           onClick: () => {
             this.logger.log('info', 'Attempting re-authentication', error);
-            // Implement re-authentication logic
-            console.log('Re-authenticating...');
+            // console.log('Re-authenticating...');
           }
         };
       case ErrorCodes.API_RATE_LIMIT:
@@ -327,8 +325,7 @@ export class ErrorHandlingService {
           label: 'Várjon 1 percet',
           onClick: () => {
             this.logger.log('info', 'Waiting for API rate limit', error);
-            // Implement API rate limit handling
-            console.log('Waiting for API rate limit...');
+            // console.log('Waiting for API rate limit...');
             setTimeout(() => this.handleRetry(error), 60000);
           }
         };
@@ -337,7 +334,6 @@ export class ErrorHandlingService {
           label: 'Újrapróbálás',
           onClick: () => {
             this.logger.log('info', 'Retrying network operation', error);
-            // Implement network retry with exponential backoff
             this.handleRetry(error);
           }
         };
@@ -362,14 +358,6 @@ export class ErrorHandlingService {
           label: 'Szerződés elemzése újra',
           onClick: () => {
             this.logger.log('info', 'Retrying contract analysis', error);
-            this.handleRetry(error);
-          }
-        };
-      case ErrorCodes.CONTRACT_VALIDATION_ERROR:
-        return {
-          label: 'Szerződés validálása újra',
-          onClick: () => {
-            this.logger.log('info', 'Retrying contract validation', error);
             this.handleRetry(error);
           }
         };

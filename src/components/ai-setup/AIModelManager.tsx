@@ -123,7 +123,7 @@ export const AIModelManager: React.FC = () => {
       const isWorking = await service.testConnection();
       setTestResults(prev => new Map(prev.set(modelId, isWorking)));
     } catch (error) {
-      console.error(`Test failed for model ${modelId}:`, error);
+      // console.error(`Test failed for model ${modelId}:`, error);
       setTestResults(prev => new Map(prev.set(modelId, false)));
     } finally {
       setTestingModel(null);
@@ -133,7 +133,7 @@ export const AIModelManager: React.FC = () => {
   const handleUpdateApiKey = (provider: AIProvider, newKey: string) => {
     // This would typically update environment variables or secure storage
     // For demo purposes, we'll show how it would work
-    console.log(`Would update ${provider} API key to: ${newKey.substring(0, 8)}...`);
+    // console.log(`Would update ${provider} API key to: ${newKey.substring(0, 8)}...`);
     
     // Update local state
     setApiKeys(prev => prev.map(k => 

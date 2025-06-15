@@ -1,3 +1,46 @@
+/**
+ * @fileoverview useAnalyticsTracking Hook - Comprehensive Platform Analytics
+ * 
+ * This custom React hook provides comprehensive analytics tracking functionality
+ * for the Legal AI platform, capturing user behavior, performance metrics, system health,
+ * and cost tracking data for business intelligence and optimization.
+ * 
+ * Key Features:
+ * - Multi-dimensional event tracking (user actions, page views, system events)
+ * - Performance metrics collection and monitoring
+ * - System health status tracking for all services
+ * - Cost tracking for AI services and resource usage
+ * - User session management and identification
+ * - Error handling and fallback tracking mechanisms
+ * - Integration with Supabase analytics infrastructure
+ * 
+ * Tracking Categories:
+ * - User Events: Page views, actions, interactions, conversions
+ * - Performance: Response times, load metrics, system performance
+ * - System Health: Service status, uptime, error rates
+ * - Cost Management: AI service costs, usage metrics, billing data
+ * - Security: Authentication events, access patterns
+ * 
+ * Usage Examples:
+ * - Legal document interaction tracking
+ * - AI agent performance monitoring
+ * - User workflow analysis and optimization
+ * - Cost optimization for AI services
+ * - System reliability monitoring
+ * - Legal professional usage pattern analysis
+ * 
+ * Integration Points:
+ * - Used throughout platform for comprehensive data collection
+ * - Integrates with business intelligence and reporting systems
+ * - Supports Hungarian legal professional workflow tracking
+ * - Works with cost optimization and resource management
+ * - Connects to real-time monitoring and alerting systems
+ * 
+ * @author Legal AI Platform Team
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -30,10 +73,10 @@ export function useAnalyticsTracking() {
         });
 
       if (error) {
-        console.error('Analytics tracking error:', error);
+        // console.error('Analytics tracking error:', error);
       }
     } catch (error) {
-      console.error('Failed to track event:', error);
+      // console.error('Failed to track event:', error);
     }
   };
 
@@ -62,10 +105,10 @@ export function useAnalyticsTracking() {
         });
 
       if (error) {
-        console.error('Performance tracking error:', error);
+        // console.error('Performance tracking error:', error);
       }
     } catch (error) {
-      console.error('Failed to track performance:', error);
+      // console.error('Failed to track performance:', error);
     }
   };
 
@@ -82,10 +125,10 @@ export function useAnalyticsTracking() {
         });
 
       if (error) {
-        console.error('System health tracking error:', error);
+        // console.error('System health tracking error:', error);
       }
     } catch (error) {
-      console.error('Failed to track system health:', error);
+      // console.error('Failed to track system health:', error);
     }
   };
 
@@ -102,10 +145,10 @@ export function useAnalyticsTracking() {
         });
 
       if (error) {
-        console.error('Cost tracking error:', error);
+        // console.error('Cost tracking error:', error);
       }
     } catch (error) {
-      console.error('Failed to track cost:', error);
+      // console.error('Failed to track cost:', error);
     }
   };
 

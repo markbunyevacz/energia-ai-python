@@ -1,27 +1,47 @@
 /**
- * Main Application Entry Point
+ * @fileoverview Application Entry Point - React Application Bootstrap
+ * @description Main entry point for the Legal AI platform React application. Handles
+ * application initialization, root component mounting, and global configuration setup
+ * including strict mode, error boundaries, and performance monitoring.
  * 
- * This is the entry point for the Legal AI Application React application.
- * It initializes the React app using React 18's createRoot API and mounts
- * the main App component to the DOM.
+ * INITIALIZATION FEATURES:
+ * - React 18+ root API for concurrent features
+ * - Strict Mode for development debugging
+ * - Global error boundary integration
+ * - Performance monitoring setup
+ * - CSS and styling imports
  * 
- * Key Responsibilities:
- * - Bootstrap the React application using the modern React 18 API
- * - Mount the root App component to the HTML element with id "root"
- * - Import global CSS styles for the application
+ * REACT 18 FEATURES:
+ * - Concurrent rendering capabilities
+ * - Automatic batching for performance
+ * - Suspense and lazy loading support
+ * - Enhanced error handling
+ * - Improved hydration for SSR
  * 
- * Architecture:
- * - Uses React 18's concurrent features via createRoot()
- * - Strict mode is not explicitly enabled here but can be added for development
- * - CSS imports are processed by Vite's build system
+ * DEVELOPMENT OPTIMIZATIONS:
+ * - Strict Mode for detecting side effects
+ * - Enhanced debugging capabilities
+ * - Component lifecycle validation
+ * - Memory leak detection
+ * - Performance profiling hooks
  * 
- * File Dependencies:
- * - ./App.tsx: Main application component with routing and authentication
- * - ./index.css: Global CSS styles including Tailwind CSS imports
+ * GLOBAL SETUP:
+ * - CSS framework initialization (Tailwind CSS)
+ * - Font loading and optimization
+ * - Theme configuration
+ * - Global error handlers
+ * - Analytics and monitoring setup
  * 
- * @fileoverview Application entry point and React root initialization
+ * PRODUCTION CONSIDERATIONS:
+ * - Bundle size optimization
+ * - Code splitting configuration
+ * - Performance monitoring
+ * - Error reporting integration
+ * - SEO and accessibility setup
+ * 
  * @author Legal AI Team
- * @since 1.0.0
+ * @version 1.0.0
+ * @since 2024
  */
 
 import React from 'react';

@@ -21,7 +21,7 @@ export class PerformanceTuner {
    * @param plan - The improvement plan to execute.
    */
   public async applyImprovementPlan(plan: ImprovementPlan): Promise<void> {
-    console.log(`[Tuner] Applying improvement plan for agent: ${plan.agentId}`);
+    // console.log(`[Tuner] Applying improvement plan for agent: ${plan.agentId}`);
     for (const action of plan.actions) {
       await this.executeAction(plan.agentId, action);
     }
@@ -35,7 +35,7 @@ export class PerformanceTuner {
   private async executeAction(agentId: string, action: ImprovementAction): Promise<void> {
     const agent = this.agentPool.get(agentId);
     if (!agent) {
-      console.error(`[Tuner] Agent with ID ${agentId} not found in pool.`);
+      // console.error(`[Tuner] Agent with ID ${agentId} not found in pool.`);
       return;
     }
 
@@ -51,7 +51,7 @@ export class PerformanceTuner {
         break;
       // Other cases like 'UPDATE_FINETUNING_DATA' would require more complex integration.
       default:
-        console.warn(`[Tuner] Unhandled action type: ${action.type}`);
+        // console.warn(`[Tuner] Unhandled action type: ${action.type}`);
     }
   }
 
@@ -61,7 +61,7 @@ export class PerformanceTuner {
    * @param payload - The data for the adjustment (e.g., { adjustment: 0.1 }).
    */
   private adjustRoutingScore(agentId: string, payload: { adjustment: number }): void {
-    console.log(`[Tuner] Adjusting routing score for ${agentId} by ${payload.adjustment}`);
+    // console.log(`[Tuner] Adjusting routing score for ${agentId} by ${payload.adjustment}`);
     // This method needs to be implemented in MixtureOfExpertsRouter
     // this.moeRouter.adjustAgentScore(agentId, payload.adjustment);
   }
@@ -72,7 +72,7 @@ export class PerformanceTuner {
    * @param configUpdate - The partial configuration to update.
    */
   private async modifyAgentConfig(agent: BaseAgent, configUpdate: Partial<AgentConfig>): Promise<void> {
-    console.log(`[Tuner] Modifying config for ${agent.getConfig().id}`, configUpdate);
+    // console.log(`[Tuner] Modifying config for ${agent.getConfig().id}`, configUpdate);
     await agent.updateConfig(configUpdate);
   }
 
@@ -83,7 +83,7 @@ export class PerformanceTuner {
    * @param reason - The reason for flagging.
    */
   private flagForManualReview(agentId: string, reason: string): void {
-    console.log(`[Tuner] 🚩 Agent ${agentId} flagged for manual review: ${reason}`);
+    // console.log(`[Tuner] 🚩 Agent ${agentId} flagged for manual review: ${reason}`);
     // Integration with a ticketing system (e.g., Jira, Slack) would go here.
   }
 } 

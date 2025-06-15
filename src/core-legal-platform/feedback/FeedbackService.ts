@@ -11,6 +11,73 @@ import {
 } from './types';
 
 /**
+ * @fileoverview Feedback Service - User Feedback & Performance Analytics
+ * @description Comprehensive feedback collection and analytics service that captures
+ * user interactions, performance metrics, and satisfaction ratings to improve
+ * AI agent performance and user experience across the Legal AI platform.
+ * 
+ * FEEDBACK COLLECTION:
+ * - User satisfaction ratings (thumbs up/down, star ratings)
+ * - Detailed feedback comments and suggestions
+ * - Categorized feedback for specific improvements
+ * - Anonymous and authenticated feedback options
+ * - Real-time feedback submission and processing
+ * 
+ * PERFORMANCE METRICS:
+ * - AI agent response times and accuracy
+ * - User interaction patterns and workflows
+ * - Feature usage analytics and adoption
+ * - Error rates and failure analysis
+ * - System performance and reliability metrics
+ * 
+ * ANALYTICS FEATURES:
+ * - Feedback trend analysis and reporting
+ * - Agent performance comparison and ranking
+ * - User satisfaction scoring and tracking
+ * - Feature effectiveness measurement
+ * - Predictive analytics for improvement areas
+ * 
+ * DATA COLLECTION:
+ * - Interaction telemetry and user behavior
+ * - Agent confidence scores and accuracy
+ * - Response time and performance metrics
+ * - Error tracking and failure analysis
+ * - User journey and workflow analytics
+ * 
+ * INTEGRATION POINTS:
+ * - AI agents for performance feedback loops
+ * - User interface for feedback collection
+ * - Analytics dashboard for insights
+ * - Performance tuning and optimization
+ * - Quality assurance and testing
+ * 
+ * PRIVACY & SECURITY:
+ * - GDPR-compliant data collection
+ * - User consent management
+ * - Data anonymization and aggregation
+ * - Secure feedback storage and processing
+ * - Retention policies and data cleanup
+ * 
+ * FEEDBACK CATEGORIES:
+ * - Accuracy: AI response correctness
+ * - Relevance: Content appropriateness
+ * - Usability: Interface and workflow
+ * - Performance: Speed and reliability
+ * - Feature Requests: New functionality
+ * 
+ * USAGE SCENARIOS:
+ * - AI agent performance optimization
+ * - User experience improvement
+ * - Feature prioritization and development
+ * - Quality assurance and testing
+ * - Customer satisfaction monitoring
+ * 
+ * @author Legal AI Team
+ * @version 1.2.0
+ * @since 2024
+ */
+
+/**
  * A service for managing the collection and analysis of user feedback.
  * It interacts with a Supabase backend to store and retrieve feedback data.
  */
@@ -37,7 +104,7 @@ export class FeedbackService {
       .single();
 
     if (error) {
-      console.error('Error collecting feedback:', error);
+      // console.error('Error collecting feedback:', error);
       throw new Error('Failed to collect feedback.');
     }
     return data;
@@ -80,7 +147,7 @@ export class FeedbackService {
       .lte('created_at', timeRange.endDate.toISOString());
 
     if (feedbackError) {
-      console.error('Error fetching feedback data:', feedbackError);
+      // console.error('Error fetching feedback data:', feedbackError);
       throw new Error('Could not analyze feedback.');
     }
     
@@ -92,7 +159,7 @@ export class FeedbackService {
         .lte('created_at', timeRange.endDate.toISOString());
 
     if (metricsError) {
-        console.error('Error fetching metrics data:', metricsError);
+        // console.error('Error fetching metrics data:', metricsError);
         throw new Error('Could not analyze feedback metrics.');
     }
 
@@ -108,7 +175,7 @@ export class FeedbackService {
         'Other': 0,
     };
     feedbackData.forEach(f => {
-        if (f.category && categoryBreakdown.hasOwnProperty(f.category)) {
+        if (f.category && Object.prototype.hasOwnProperty.call(categoryBreakdown, f.category)) {
             categoryBreakdown[f.category as keyof typeof categoryBreakdown]++;
         }
     });
@@ -160,7 +227,7 @@ export class FeedbackService {
         });
     }
     
-    console.log(`Generating improvement plan for agent: ${analysis.agentId} with ${actions.length} action(s).`);
+    // console.log(`Generating improvement plan for agent: ${analysis.agentId} with ${actions.length} action(s).`);
     
     return {
       agentId: analysis.agentId,

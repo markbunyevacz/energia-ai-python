@@ -50,7 +50,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
 
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
+    // console.error('Auth middleware error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -96,7 +96,7 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
       try {
         await supabase.from('audit_log').insert(logData);
       } catch (error) {
-        console.error('Audit log error:', error);
+        // console.error('Audit log error:', error);
       }
     })();
 
