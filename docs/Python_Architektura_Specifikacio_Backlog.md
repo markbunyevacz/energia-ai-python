@@ -164,8 +164,9 @@ A fejlesztés a specifikációban meghatározott 4 fő fázisban történik. Min
 
 #### **Epik: Adatforrások és Adatelőkészítés Réteg (v1)**
 -   [ ] **Adatgyűjtés:**
-    -   [ ] Web crawler fejlesztése a Magyar Közlöny és a Wolters Kluwer forrásaihoz.
-    -   [ ] ETL pipeline v1: letöltött jogszabályok (XML/HTML) feldolgozása és strukturált tárolása.
+    -   [ ] **NJT Integráció (v1):** Adatgyűjtő modul fejlesztése a `njt.hu`-hoz. A modulnak a **European Legislation Identifier (ELI)** szabvány alapján kell programatikusan URL-eket generálnia a jogszabályok közvetlen eléréséhez, elkerülve a komplex, böngészőt szimuláló scrapinget.
+    -   [ ] **Magyar Közlöny Monitorozás:** A `njt.hu`-n publikált Magyar Közlöny lapszámok figyelése az új jogszabályok azonosítására.
+    -   [ ] ETL pipeline v1: letöltött jogszabályok (HTML) feldolgozása és strukturált tárolása.
 -   [ ] **Adattárolás:**
     -   [ ] MongoDB séma tervezése a jogi dokumentumok és metaadataik tárolására.
     -   [ ] PostgreSQL séma a strukturált metaadatoknak (hatály, jogszabálytípus, stb.).
@@ -258,6 +259,284 @@ A fejlesztés a specifikációban meghatározott 4 fő fázisban történik. Min
 #### **Epik: Biztonság és Megfelelőség**
 -   [ ] **Biztonsági Rendszer:** Teljes etikai és GDPR védőkorlátok implementálása, személyes adat maszkolása.
 -   [ ] **Frissítési Rendszer:** Automatikus jogszabálykövető rendszer élesítése, amely riasztásokat küld és frissíti a tudásbázist.
+    -   [ ] **Implementációs megjegyzés:** A rendszernek a `njt.hu` "időállapot" (time state) funkcionalitására kell épülnie a múltbeli, jelenlegi és jövőbeli jogszabályváltozások követéséhez.
 -   [ ] **Integrációs Réteg:** Külső rendszerekkel (SZÜF, iManage) való integráció.
 -   [ ] Nyilvános API réteg és fejlesztői SDK-k létrehozása.
 -   [ ] Részletes jogosultságkezelés (RBAC) és multi-tenant architektúra.
+
+```mermaid
+graph TD
+  A[Adatforrások] -->|Scraping| B(Adatelőkészítés)
+  B -->|Embedding| C1(Vektor memória)
+  B -->|Entitások| C2(Ontológia gráf)
+  C1 & C2 --> D[Ágensközpont]
+  D -->|kérdés| E[MoE Útválasztó]
+  E -->|Civiljog| F1[Specialista Modell]
+  E -->|Büntetőjog| F2[Specialista Modell]
+  F1 & F2 --> G[Emberi Visszacsatolás]
+  G --> H[Biztonsági Rendszer]
+  H --> I[Frissítési Monitor]
+```
+
+# Példa szolgáltatás-indítás
+docker compose up data-ingestion nlp-preprocessor knowledge-graph
+
+project-root/
+├── data-collector/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── app.py
+├── data-preprocessor/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── app.py
+... (similar for each microservice)
+├── docker-compose.yml
+└── .env
+
+---
+
+## **5. Magyar Jogi Adatforrások és Integrációs Stratégia**
+
+### **5.1. Javasolt Magyar Jogi Adatforrások Prioritási Sorrendben**
+
+**1. Prioritás: Hatályos Jogszabályok**
+- **Forrás:** **Nemzeti Jogszabálytár (njt.hu)**
+- **Integráció:**
+  - **Javasolt stratégia:** A **European Legislation Identifier (ELI)** szabványra épülő, programatikusan generált URL-ek használata. Ez a megközelítés robusztus és megbízható adatgyűjtést tesz lehetővé a nyilvános felületről, és hatékonyabb, mint a hagyományos scraping.
+  - **Vizsgálandó:** Hivatalos NJT API/webszolgáltatás elérése, amely teljesebb historikus adathozzáférést vagy garantált szolgáltatási szintet (SLA) biztosíthat.
+- **Miért ez az első?** Minden jogi érvelés alapja a hatályos törvényi szöveg
+- **Jogi domain:** Minden jogterületet lefed
+- **Implementáció:**
+  ```python
+  # data-ingestion mikroszolgáltatás
+  class NJTConnector:
+      def __init__(self, api_key: str = None):
+          self.api_key = api_key
+          self.base_url = "https://njt.hu/api/v1/"
+      
+      async def fetch_legislation(self, query: str) -> List[LegalDocument]:
+          # API vagy scraping logika
+          pass
+  ```
+
+**2. Prioritás: Bírósági Gyakorlat (Precedensek)**
+- **Forrás:** **Bírósági Határozatok Gyűjteménye (birosag.hu)**
+- **Integráció:** Strukturált scraping a nyilvános keresőfelületről
+- **Miért ez a második?** A jogszabályok gyakorlati értelmezését mutatja meg
+- **Jogi domain:** Szűrhetően minden jogterület (polgári, büntető, közigazgatási)
+- **Speciális fókusz:** Kúria eseti döntései (EBH) és kollégiumi vélemények
+
+**3. Prioritás: Jogi Kommentárok és Irodalom**
+- **Forrás:** **Wolters Kluwer (Jogtár)**
+- **Integráció:** Kizárólag kereskedelmi API megállapodás alapján
+- **Miért ez a harmadik?** Szakértői kommentárok mélyebb kontextust adnak
+- **Jogi domain:** Specifikus jogterületekre lebontott elemzések
+
+**4. Prioritás: EU Jog és Nemzetközi Források**
+- **Forrás:** EUR-Lex, HUDOC (Emberi Jogok Európai Bírósága)
+- **Integráció:** Nyilvános API-k használata
+- **Miért fontos?** EU-konform értelmezés biztosítása
+
+### **5.2. Felhőalapú és Konténerizált Architektúra Részletei**
+
+**Fejlesztési Stratégia:**
+```yaml
+# docker-compose.dev.yml - Helyi fejlesztés
+version: '3.8'
+services:
+  data-ingestion:
+    build: ./services/data-ingestion
+    environment:
+      - NJT_API_KEY=${NJT_API_KEY}
+      - MONGODB_URL=mongodb://mongo:27017
+    depends_on:
+      - mongo
+      - redis
+  
+  nlp-preprocessor:
+    build: ./services/nlp-preprocessor
+    environment:
+      - HUGGINGFACE_TOKEN=${HF_TOKEN}
+      - WEAVIATE_URL=http://weaviate:8080
+    volumes:
+      - ./models:/app/models
+    depends_on:
+      - weaviate
+  
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo_data:/data/db
+  
+  weaviate:
+    image: semitechnologies/weaviate:1.22.4
+    environment:
+      - ENABLE_MODULES=text2vec-huggingface
+```
+
+**Javasolt Cloud Stack:**
+- **Orchestráció:** 
+  - **Kubernetes (AWS EKS, Azure AKS, Google GKE)** - maximális rugalmasság
+  - **AWS Fargate / Google Cloud Run** - egyszerűbb üzemeltetés
+- **Adatbázisok:**
+  - **Vektor DB:** AWS OpenSearch / Pinecone / Weaviate Cloud
+  - **Gráf DB:** Neo4j Aura (menedzselt)
+  - **Relációs DB:** AWS RDS PostgreSQL / Azure Database
+- **Aszinkron kommunikáció:** AWS SQS / Azure Service Bus / RabbitMQ
+
+**Terraform példa (AWS):**
+```hcl
+# infrastructure/aws/main.tf
+resource "aws_eks_cluster" "legal_ai" {
+  name     = "legal-ai-cluster"
+  role_arn = aws_iam_role.eks_cluster.arn
+  version  = "1.28"
+
+  vpc_config {
+    subnet_ids = aws_subnet.private[*].id
+  }
+}
+
+resource "aws_rds_instance" "postgres" {
+  identifier = "legal-ai-postgres"
+  engine     = "postgres"
+  engine_version = "15.4"
+  instance_class = "db.t3.medium"
+  allocated_storage = 100
+  storage_encrypted = true
+}
+```
+
+### **5.3. Magyar Nyelvű AI Modellek Részletes Stratégiája**
+
+**Alapmodell Réteg (Embedding és NLP):**
+```python
+# services/nlp-preprocessor/models.py
+from transformers import AutoTokenizer, AutoModel
+import torch
+
+class HungarianLegalNLP:
+    def __init__(self):
+        # Elsődleges: SZTAKI-HLT huBERT
+        self.tokenizer = AutoTokenizer.from_pretrained("SZTAKI-HLT/hubert-base-cc")
+        self.model = AutoModel.from_pretrained("SZTAKI-HLT/hubert-base-cc")
+        
+        # Alternatíva: NYTK BERT
+        # self.tokenizer = AutoTokenizer.from_pretrained("NYTK/text-bert-large-hungarian")
+        # self.model = AutoModel.from_pretrained("NYTK/text-bert-large-hungarian")
+    
+    def create_embeddings(self, legal_text: str) -> torch.Tensor:
+        inputs = self.tokenizer(legal_text, return_tensors="pt", 
+                               max_length=512, truncation=True)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+        return outputs.last_hidden_state.mean(dim=1)
+    
+    def fine_tune_on_legal_corpus(self, legal_documents: List[str]):
+        # Jogi szövegkorpuszon való finomhangolás
+        pass
+```
+
+**Generatív Modellek (Mixture of Experts):**
+```python
+# services/expert-router/moe_system.py
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+class LegalExpertRouter:
+    def __init__(self):
+        self.experts = {
+            "civil_law": self._load_expert("civil"),
+            "criminal_law": self._load_expert("criminal"),
+            "administrative_law": self._load_expert("admin"),
+            "constitutional_law": self._load_expert("constitutional")
+        }
+        self.classifier = self._load_domain_classifier()
+    
+    def _load_expert(self, domain: str):
+        # Kezdetben: Mistral-7B finomhangolt változatok
+        model_name = f"legal-ai-hun/{domain}-expert-v1"
+        return {
+            "tokenizer": AutoTokenizer.from_pretrained(model_name),
+            "model": AutoModelForCausalLM.from_pretrained(model_name)
+        }
+    
+    async def route_and_answer(self, question: str) -> str:
+        domain = await self._classify_domain(question)
+        expert = self.experts[domain]
+        return await self._generate_answer(expert, question)
+```
+
+**Javasolt Modell Hierarchia:**
+1. **Alapréteg:** `SZTAKI-HLT/hubert-base-cc` (embedding, NER)
+2. **Generatív réteg:** `Mistral-7B-Instruct-v0.2` finomhangolva
+3. **Specializált réteg:** Domain-specifikus expert modellek
+4. **Jövőbeli cél:** `PULI-GPT` család integrálása (ha elérhető lesz)
+
+**Finomhangolási Stratégia:**
+```python
+# training/fine_tune_legal.py
+from transformers import Trainer, TrainingArguments
+
+def fine_tune_legal_expert(base_model: str, legal_qa_dataset: Dataset):
+    training_args = TrainingArguments(
+        output_dir=f"./models/{base_model}-legal-hun",
+        num_train_epochs=3,
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=4,
+        warmup_steps=500,
+        weight_decay=0.01,
+        logging_dir='./logs',
+        evaluation_strategy="steps",
+        eval_steps=500,
+        save_steps=1000,
+        load_best_model_at_end=True,
+    )
+    
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=legal_qa_dataset["train"],
+        eval_dataset=legal_qa_dataset["validation"],
+        tokenizer=tokenizer,
+    )
+    
+    trainer.train()
+```
+
+### **5.4. Implementációs Roadmap Frissítés**
+
+**Fázis 1 kiegészítések:**
+- [ ] **NJT API Connector:** Hivatalos API kapcsolat kiépítése vagy scraping implementálása
+- [ ] **huBERT Integráció:** Magyar jogi embedding modell beállítása
+- [ ] **Alapvető MoE Router:** Domain klasszifikáció implementálása
+
+**Fázis 2 kiegészítések:**
+- [ ] **Bírósági Határozatok Crawler:** birosag.hu strukturált feldolgozása
+- [ ] **Jogtár API Integráció:** Kereskedelmi megállapodás és API implementáció
+- [ ] **Finomhangolt Magyar Modellek:** Jogi korpuszon tanított specializált modellek
+
+**Fázis 3-4 kiegészítések:**
+- [ ] **Multi-Expert System:** Teljes jogterületi lefedettség
+- [ ] **RLHF Magyar Kontextus:** Jogász visszajelzések magyar nyelvi sajátosságokkal
+- [ ] **Hibrid Cloud Deployment:** On-premise és cloud közötti rugalmas átjárás
+
+---
+
+## **6. Következő Lépések és Döntési Pontok**
+
+### **Azonnali Teendők:**
+1. **NJT Kapcsolatfelvétel:** API hozzáférés tisztázása
+2. **Jogtár Tárgyalások:** Kereskedelmi feltételek megismerése  
+3. **huBERT Tesztelés:** Magyar jogi szövegeken való teljesítmény mérése
+4. **Cloud Provider Kiválasztása:** AWS/Azure/GCP döntés infrastruktúra alapján
+
+### **Kritikus Döntési Pontok:**
+- **Adatvédelmi megfelelőség:** GDPR compliance minden adatforrásra
+- **Licencelési stratégia:** Nyílt forráskódú vs. kereskedelmi modellek aránya
+- **Skálázhatósági tervezés:** Kezdeti felhasználószám és növekedési projekció
+
+from transformers import AutoTokenizer, AutoModel
+
+tokenizer = AutoTokenizer.from_pretrained("SZTAKI-HLT/hubert-base-cc")
+model = AutoModel.from_pretrained("SZTAKI-HLT/hubert-base-cc")
