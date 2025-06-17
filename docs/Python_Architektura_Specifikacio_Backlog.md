@@ -540,3 +540,15 @@ from transformers import AutoTokenizer, AutoModel
 
 tokenizer = AutoTokenizer.from_pretrained("SZTAKI-HLT/hubert-base-cc")
 model = AutoModel.from_pretrained("SZTAKI-HLT/hubert-base-cc")
+
+# Automatic context detection and switching
+python .cursor/config-manager.py auto
+
+# Manual context switching
+python .cursor/config-manager.py switch --context ai-development
+
+# Check current status
+python .cursor/config-manager.py status
+
+# Initialize complete environment
+python .cursor/startup.py

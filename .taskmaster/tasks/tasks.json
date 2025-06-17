@@ -1,160 +1,1086 @@
 {
-  "format_version": "1.0",
-  "created_date": "2025-06-17",
-  "last_modified": "2025-06-17",
-  "total_tasks": 8,
-  "tasks": [
-    {
-      "id": 1,
-      "title": "Set up Python project structure and FastAPI backend",
-      "description": "Create the basic Python project structure with FastAPI, implement health check endpoints, and set up the foundational architecture for the Hungarian Legal AI system.",
-      "status": "todo",
-      "priority": "high",
-      "complexity": 5,
-      "created_date": "2025-06-17",
-      "tags": ["backend", "setup", "fastapi"],
-      "implementation_plan": "1. Create src/ directory structure\n2. Set up FastAPI application with main.py\n3. Create config/ directory for configuration management\n4. Add health check endpoints\n5. Set up basic logging",
-      "acceptance_criteria": [
-        "FastAPI server starts without errors",
-        "Health check endpoint returns 200 status",
-        "Basic project structure follows Python best practices",
-        "Configuration management is properly set up"
-      ],
-      "dependencies": [],
-      "estimated_hours": 4
-    },
-    {
-      "id": 2,
-      "title": "Implement NJT.hu crawler for legal documents",
-      "description": "Develop a web crawler to collect Hungarian legal documents from njt.hu using ELI (European Legislation Identifier) standards for programmatic URL generation.",
-      "status": "todo",
-      "priority": "high",
-      "complexity": 8,
-      "created_date": "2025-06-17",
-      "tags": ["crawler", "data-collection", "legal"],
-      "implementation_plan": "1. Research njt.hu structure and ELI standards\n2. Create base crawler class\n3. Implement ELI-based URL generation\n4. Add rate limiting and politeness policies\n5. Handle different document types\n6. Add error handling and retry logic",
-      "acceptance_criteria": [
-        "Crawler can successfully fetch legal documents from njt.hu",
-        "ELI standard is properly implemented",
-        "Rate limiting prevents server overload",
-        "Error handling covers common failure scenarios"
-      ],
-      "dependencies": [1],
-      "estimated_hours": 12
-    },
-    {
-      "id": 3,
-      "title": "Set up PostgreSQL and MongoDB databases",
-      "description": "Configure and set up the database infrastructure including PostgreSQL for structured data and MongoDB for document storage.",
-      "status": "todo",
-      "priority": "high",
-      "complexity": 6,
-      "created_date": "2025-06-17",
-      "tags": ["database", "postgresql", "mongodb"],
-      "implementation_plan": "1. Set up PostgreSQL database schema\n2. Configure MongoDB for document storage\n3. Create database connection managers\n4. Implement basic CRUD operations\n5. Add database migrations system",
-      "acceptance_criteria": [
-        "PostgreSQL database is properly configured",
-        "MongoDB connection is established",
-        "Database schemas are created",
-        "Connection managers handle errors gracefully"
-      ],
-      "dependencies": [1],
-      "estimated_hours": 6
-    },
-    {
-      "id": 4,
-      "title": "Implement vector database for semantic search",
-      "description": "Set up Weaviate or Qdrant for vector storage and semantic search capabilities for legal documents.",
-      "status": "todo",
-      "priority": "medium",
-      "complexity": 7,
-      "created_date": "2025-06-17",
-      "tags": ["vector-db", "semantic-search", "embeddings"],
-      "implementation_plan": "1. Choose between Weaviate and Qdrant\n2. Set up vector database instance\n3. Create embedding generation pipeline\n4. Implement vector search functionality\n5. Add semantic similarity scoring",
-      "acceptance_criteria": [
-        "Vector database is operational",
-        "Embeddings can be generated and stored",
-        "Semantic search returns relevant results",
-        "Performance meets requirements"
-      ],
-      "dependencies": [1, 3],
-      "estimated_hours": 10
-    },
-    {
-      "id": 5,
-      "title": "Create legal document chunking and preprocessing",
-      "description": "Implement intelligent chunking algorithms for legal documents that respect legal structure (paragraphs, sections, articles).",
-      "status": "todo",
-      "priority": "medium",
-      "complexity": 6,
-      "created_date": "2025-06-17",
-      "tags": ["nlp", "preprocessing", "chunking"],
-      "implementation_plan": "1. Analyze legal document structure\n2. Implement paragraph-based chunking\n3. Add section and article awareness\n4. Create metadata extraction\n5. Handle different document formats",
-      "acceptance_criteria": [
-        "Legal documents are chunked intelligently",
-        "Legal structure is preserved",
-        "Metadata is properly extracted",
-        "Different document formats are supported"
-      ],
-      "dependencies": [2, 3],
-      "estimated_hours": 8
-    },
-    {
-      "id": 6,
-      "title": "Implement basic search agent",
-      "description": "Create the first agent that can perform basic semantic and lexical searches across the legal document corpus.",
-      "status": "todo",
-      "priority": "medium",
-      "complexity": 5,
-      "created_date": "2025-06-17",
-      "tags": ["agent", "search", "nlp"],
-      "implementation_plan": "1. Create base agent class\n2. Implement semantic search logic\n3. Add lexical search capabilities\n4. Combine and rank results\n5. Add query understanding",
-      "acceptance_criteria": [
-        "Agent can perform semantic searches",
-        "Lexical search functionality works",
-        "Results are properly ranked",
-        "Query understanding is implemented"
-      ],
-      "dependencies": [4, 5],
-      "estimated_hours": 6
-    },
-    {
-      "id": 7,
-      "title": "Set up Claude API integration",
-      "description": "Integrate with Claude API for natural language processing tasks and legal document analysis.",
-      "status": "todo",
-      "priority": "high",
-      "complexity": 4,
-      "created_date": "2025-06-17",
-      "tags": ["api", "claude", "integration"],
-      "implementation_plan": "1. Set up Claude API client\n2. Implement retry logic and error handling\n3. Create prompt templates for legal tasks\n4. Add token usage tracking\n5. Implement rate limiting",
-      "acceptance_criteria": [
-        "Claude API integration works correctly",
-        "Error handling is robust",
-        "Token usage is tracked",
-        "Rate limiting prevents API abuse"
-      ],
-      "dependencies": [1],
-      "estimated_hours": 4
-    },
-    {
-      "id": 8,
-      "title": "Create basic web interface for testing",
-      "description": "Develop a simple web interface to test the legal document search and analysis functionality.",
-      "status": "todo",
-      "priority": "low",
-      "complexity": 5,
-      "created_date": "2025-06-17",
-      "tags": ["frontend", "testing", "ui"],
-      "implementation_plan": "1. Create basic HTML/CSS interface\n2. Add search functionality\n3. Display search results\n4. Add basic document viewer\n5. Implement responsive design",
-      "acceptance_criteria": [
-        "Web interface is functional",
-        "Search works from the UI",
-        "Results are properly displayed",
-        "Interface is responsive"
-      ],
-      "dependencies": [6, 7],
-      "estimated_hours": 6
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Set up Python project structure and FastAPI backend",
+        "description": "Create the basic Python project structure with FastAPI, implement health check endpoints, and set up the foundational architecture for the Hungarian Legal AI system.",
+        "status": "done",
+        "priority": "critical",
+        "complexity": 5,
+        "phase": "Foundation",
+        "epic": "Project Foundations & Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "backend",
+          "setup",
+          "fastapi",
+          "foundation"
+        ],
+        "implementation_plan": "1. Create src/ directory structure with energia_ai package\n2. Set up FastAPI application with main.py\n3. Create config/ directory for configuration management\n4. Add health check endpoints (/health, /ready)\n5. Set up structured logging with structlog\n6. Configure Pydantic settings management\n7. Add CORS middleware and error handlers",
+        "acceptance_criteria": [
+          "FastAPI server starts without errors on port 8000",
+          "Health check endpoint returns 200 status with system info",
+          "Basic project structure follows Python best practices",
+          "Configuration management works with environment variables",
+          "Structured logging outputs JSON in production mode",
+          "API documentation available at /api/docs"
+        ],
+        "dependencies": [],
+        "estimated_hours": 6,
+        "updated": "2025-06-17T20:18:28.171611",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Create Docker and Docker Compose setup",
+        "description": "Set up containerization for the entire application stack including FastAPI, PostgreSQL, MongoDB, Redis, and Elasticsearch for consistent development and deployment.",
+        "status": "done",
+        "priority": "high",
+        "complexity": 6,
+        "phase": "Foundation",
+        "epic": "Project Foundations & Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "devops",
+          "docker",
+          "infrastructure"
+        ],
+        "implementation_plan": "1. Create multi-stage Dockerfile for Python application\n2. Create docker-compose.yml with all required services\n3. Configure service networking and volume mounts\n4. Add health checks for all services\n5. Create development and production compose variants\n6. Add .dockerignore and optimize image size\n7. Document container setup and usage",
+        "acceptance_criteria": [
+          "docker-compose up starts all services successfully",
+          "FastAPI connects to all databases without errors",
+          "Services can communicate with each other",
+          "Data persists after container restarts",
+          "Container images are optimized for size and security",
+          "Development workflow documented"
+        ],
+        "dependencies": [
+          1
+        ],
+        "estimated_hours": 8,
+        "updated": "2025-06-17T20:18:33.314250"
+      },
+      {
+        "id": 3,
+        "title": "Implement CI/CD pipeline with GitHub Actions",
+        "description": "Create automated testing, linting, and deployment pipeline using GitHub Actions for continuous integration and deployment.",
+        "status": "done",
+        "priority": "high",
+        "complexity": 7,
+        "phase": "Foundation",
+        "epic": "Project Foundations & Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "devops",
+          "ci-cd",
+          "github-actions",
+          "testing"
+        ],
+        "implementation_plan": "1. Create .github/workflows/main.yml\n2. Add Python setup and dependency caching\n3. Configure Ruff for linting and formatting\n4. Add MyPy for type checking\n5. Set up pytest with coverage reporting\n6. Add security scanning with bandit\n7. Configure deployment to staging/production\n8. Add pull request automation",
+        "acceptance_criteria": [
+          "Pipeline runs on every push and PR",
+          "All code quality checks pass (ruff, mypy, tests)",
+          "Test coverage reports are generated",
+          "Security vulnerabilities are detected",
+          "Deployment to staging works automatically",
+          "Pipeline fails fast on any quality issues"
+        ],
+        "dependencies": [
+          1
+        ],
+        "estimated_hours": 10,
+        "updated": "2025-06-17T20:25:55.262046"
+      },
+      {
+        "id": 4,
+        "title": "Set up PostgreSQL database and schema",
+        "description": "Configure PostgreSQL database with proper schema design for legal document metadata, user management, and system tracking.",
+        "status": "done",
+        "priority": "high",
+        "complexity": 6,
+        "phase": "Foundation",
+        "epic": "Data Storage Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "database",
+          "postgresql",
+          "schema"
+        ],
+        "implementation_plan": "1. Design database schema for legal documents\n2. Create tables for users, documents, metadata\n3. Set up Alembic for database migrations\n4. Configure SQLAlchemy with async support\n5. Add database connection pooling\n6. Create database initialization scripts\n7. Add backup and recovery procedures",
+        "acceptance_criteria": [
+          "PostgreSQL database is accessible and configured",
+          "All required tables are created with proper relationships",
+          "Database migrations work correctly",
+          "Connection pooling handles concurrent requests",
+          "Database operations are performant",
+          "Backup procedures are documented and tested"
+        ],
+        "dependencies": [
+          2
+        ],
+        "estimated_hours": 8,
+        "updated": "2025-06-17T23:01:10.679799"
+      },
+      {
+        "id": 5,
+        "title": "Set up MongoDB for document storage",
+        "description": "Configure MongoDB for storing raw legal documents, processed content, and document metadata with proper indexing.",
+        "status": "done",
+        "priority": "high",
+        "complexity": 5,
+        "phase": "Foundation",
+        "epic": "Data Storage Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "database",
+          "mongodb",
+          "documents"
+        ],
+        "implementation_plan": "1. Configure MongoDB with proper authentication\n2. Design document schemas for legal content\n3. Set up Motor for async MongoDB operations\n4. Create indexes for efficient querying\n5. Implement document validation rules\n6. Add full-text search capabilities\n7. Configure replica set for high availability",
+        "acceptance_criteria": [
+          "MongoDB is accessible with authentication",
+          "Document schemas are properly validated",
+          "Indexes improve query performance significantly",
+          "Full-text search works for Hungarian content",
+          "Database handles large document storage",
+          "Replica set provides high availability"
+        ],
+        "dependencies": [
+          2
+        ],
+        "estimated_hours": 6,
+        "updated": "2025-06-17T23:01:17.052396"
+      },
+      {
+        "id": 6,
+        "title": "Set up Redis for caching and session management",
+        "description": "Configure Redis for application caching, session storage, and temporary data management.",
+        "status": "done",
+        "priority": "medium",
+        "complexity": 4,
+        "phase": "Foundation",
+        "epic": "Data Storage Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "database",
+          "redis",
+          "caching"
+        ],
+        "implementation_plan": "1. Configure Redis with persistence\n2. Set up Redis connection with aioredis\n3. Implement caching decorators\n4. Configure session management\n5. Add cache invalidation strategies\n6. Set up Redis monitoring\n7. Configure backup and recovery",
+        "acceptance_criteria": [
+          "Redis is accessible and performant",
+          "Caching reduces database load significantly",
+          "Session management works correctly",
+          "Cache invalidation maintains data consistency",
+          "Redis monitoring provides useful metrics",
+          "Backup and recovery procedures work"
+        ],
+        "dependencies": [
+          2
+        ],
+        "estimated_hours": 5,
+        "updated": "2025-06-17T23:01:22.619889"
+      },
+      {
+        "id": 7,
+        "title": "Implement Qdrant vector database for semantic search",
+        "description": "Set up Qdrant vector database for storing and searching document embeddings with Hungarian language optimization.",
+        "status": "done",
+        "priority": "high",
+        "complexity": 8,
+        "phase": "Foundation",
+        "epic": "Data Storage Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "vector-db",
+          "semantic-search",
+          "embeddings",
+          "qdrant"
+        ],
+        "implementation_plan": "1. Set up Qdrant server in Docker\n2. Create collections for document embeddings\n3. Configure vector dimensions and distance metrics\n4. Implement embedding generation pipeline\n5. Add batch insertion for large datasets\n6. Configure Hungarian language preprocessing\n7. Optimize search performance and accuracy",
+        "acceptance_criteria": [
+          "Qdrant server is operational and accessible",
+          "Vector collections handle large document sets",
+          "Embedding generation works for Hungarian text",
+          "Semantic search returns relevant results",
+          "Search performance meets sub-second requirements",
+          "Vector storage is optimized for memory usage"
+        ],
+        "dependencies": [
+          2
+        ],
+        "estimated_hours": 12,
+        "updated": "2025-06-17T23:06:01.918272"
+      },
+      {
+        "id": 8,
+        "title": "Set up Elasticsearch for lexical search",
+        "description": "Configure Elasticsearch for fast lexical search across legal documents with Hungarian language analyzers.",
+        "status": "done",
+        "priority": "high",
+        "complexity": 7,
+        "phase": "Foundation",
+        "epic": "Data Storage Infrastructure",
+        "created_date": "2025-06-17",
+        "tags": [
+          "search",
+          "elasticsearch",
+          "lexical-search"
+        ],
+        "implementation_plan": "1. Set up Elasticsearch cluster in Docker\n2. Configure Hungarian language analyzers\n3. Create indices for different document types\n4. Implement document indexing pipeline\n5. Add search query builders\n6. Configure result highlighting and ranking\n7. Optimize search performance",
+        "acceptance_criteria": [
+          "Elasticsearch cluster is operational",
+          "Hungarian text is properly analyzed and tokenized",
+          "Document indexing handles large volumes",
+          "Search queries return accurate results",
+          "Result highlighting works correctly",
+          "Search performance is under 100ms for simple queries"
+        ],
+        "dependencies": [
+          2
+        ],
+        "estimated_hours": 10,
+        "updated": "2025-06-17T23:06:06.267902"
+      },
+      {
+        "id": 9,
+        "title": "Develop NJT.hu crawler with ELI standards",
+        "description": "Create a web crawler for njt.hu that uses European Legislation Identifier (ELI) standards for programmatic access to Hungarian legal documents.",
+        "status": "done",
+        "priority": "critical",
+        "complexity": 9,
+        "phase": "Foundation",
+        "epic": "Data Collection & Processing",
+        "created_date": "2025-06-17",
+        "tags": [
+          "crawler",
+          "njt.hu",
+          "eli-standards",
+          "legal-documents"
+        ],
+        "implementation_plan": "1. Research njt.hu structure and ELI specifications\n2. Create base crawler class with rate limiting\n3. Implement ELI-based URL generation\n4. Add document type detection and parsing\n5. Handle different document formats (HTML, PDF)\n6. Implement error handling and retry logic\n7. Add progress tracking and logging\n8. Create incremental update mechanism",
+        "acceptance_criteria": [
+          "Crawler respects robots.txt and rate limits",
+          "ELI standards are correctly implemented",
+          "All major document types are supported",
+          "Error handling covers network and parsing issues",
+          "Crawler can resume from interruptions",
+          "Legal documents are accurately extracted",
+          "System tracks crawling progress and statistics"
+        ],
+        "dependencies": [
+          4,
+          5
+        ],
+        "estimated_hours": 16,
+        "updated": "2025-06-17T23:44:13.367102",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Magyar Közlöny monitoring system",
+        "description": "Create a monitoring system for Magyar Közlöny publications to detect new legal documents and changes.",
+        "status": "in-progress",
+        "priority": "high",
+        "complexity": 6,
+        "phase": "Foundation",
+        "epic": "Data Collection & Processing",
+        "created_date": "2025-06-17",
+        "tags": [
+          "monitoring",
+          "magyar-kozlony",
+          "change-detection"
+        ],
+        "implementation_plan": "1. Analyze Magyar Közlöny publication patterns\n2. Create scheduled monitoring jobs\n3. Implement change detection algorithms\n4. Add notification system for new publications\n5. Parse and extract legal document references\n6. Integrate with main crawler system\n7. Add historical data backfill capability",
+        "acceptance_criteria": [
+          "System detects new publications within hours",
+          "Change detection accurately identifies new content",
+          "Notifications are sent for important updates",
+          "Legal document references are extracted correctly",
+          "Integration with crawler works seamlessly",
+          "Historical data can be processed efficiently"
+        ],
+        "dependencies": [
+          9
+        ],
+        "estimated_hours": 8,
+        "updated": "2025-06-18T00:06:32.617867"
+      },
+      {
+        "id": 11,
+        "title": "Create legal document chunking system",
+        "description": "Implement intelligent chunking algorithms that respect legal document structure (paragraphs, sections, articles) for better processing.",
+        "status": "in-progress",
+        "priority": "high",
+        "complexity": 8,
+        "phase": "Foundation",
+        "epic": "Data Collection & Processing",
+        "created_date": "2025-06-17",
+        "tags": [
+          "nlp",
+          "chunking",
+          "document-processing"
+        ],
+        "implementation_plan": "1. Analyze Hungarian legal document structures\n2. Implement paragraph and section detection\n3. Create hierarchy-aware chunking algorithm\n4. Add metadata extraction for each chunk\n5. Handle different document formats consistently\n6. Optimize chunk sizes for embedding models\n7. Add quality validation for chunks",
+        "acceptance_criteria": [
+          "Legal document structure is preserved in chunks",
+          "Chunk sizes are optimized for processing",
+          "Metadata accurately describes chunk content",
+          "Different document formats are handled uniformly",
+          "Chunk quality meets processing requirements",
+          "Performance allows real-time processing"
+        ],
+        "dependencies": [
+          9
+        ],
+        "estimated_hours": 12,
+        "updated": "2025-06-17T23:37:39.494734"
+      },
+      {
+        "id": 12,
+        "title": "Implement embedding generation pipeline",
+        "description": "Create a pipeline for generating high-quality embeddings from legal document chunks using Hungarian-optimized models.",
+        "status": "done",
+        "priority": "high",
+        "complexity": 7,
+        "phase": "Foundation",
+        "epic": "Data Collection & Processing",
+        "created_date": "2025-06-17",
+        "tags": [
+          "embeddings",
+          "nlp",
+          "pipeline"
+        ],
+        "implementation_plan": "1. Research and select Hungarian language models\n2. Set up sentence-transformers pipeline\n3. Implement batch processing for efficiency\n4. Add embedding quality validation\n5. Create embedding storage and indexing\n6. Optimize for legal domain vocabulary\n7. Add embedding similarity testing",
+        "acceptance_criteria": [
+          "Embeddings capture semantic meaning of legal text",
+          "Pipeline processes documents efficiently in batches",
+          "Embedding quality is validated and consistent",
+          "Storage and retrieval are optimized",
+          "Legal domain terminology is well represented",
+          "Similarity searches return relevant results"
+        ],
+        "dependencies": [
+          7,
+          11
+        ],
+        "estimated_hours": 10
+      },
+      {
+        "id": 13,
+        "title": "Create base agent architecture",
+        "description": "Implement the foundational agent architecture with base classes and communication protocols for specialized legal AI agents.",
+        "status": "in-progress",
+        "priority": "high",
+        "complexity": 8,
+        "phase": "Foundation",
+        "epic": "Agent System Foundation",
+        "created_date": "2025-06-17",
+        "tags": [
+          "agent",
+          "architecture",
+          "foundation"
+        ],
+        "implementation_plan": "1. Design base Agent abstract class\n2. Implement agent communication protocols\n3. Create agent lifecycle management\n4. Add logging and monitoring for agents\n5. Implement error handling and recovery\n6. Create agent configuration system\n7. Add agent performance metrics",
+        "acceptance_criteria": [
+          "Base agent class provides consistent interface",
+          "Agents can communicate reliably with each other",
+          "Agent lifecycle is properly managed",
+          "Comprehensive logging tracks agent activities",
+          "Error recovery maintains system stability",
+          "Configuration allows agent customization",
+          "Performance metrics enable optimization"
+        ],
+        "dependencies": [
+          1
+        ],
+        "estimated_hours": 12
+      },
+      {
+        "id": 14,
+        "title": "Implement Task Understanding Agent",
+        "description": "Create the first specialized agent that can understand and parse legal queries and research tasks from users.",
+        "status": "in-progress",
+        "priority": "high",
+        "complexity": 7,
+        "phase": "Foundation",
+        "epic": "Agent System Foundation",
+        "created_date": "2025-06-17",
+        "tags": [
+          "agent",
+          "nlu",
+          "task-understanding"
+        ],
+        "implementation_plan": "1. Design query parsing and intent recognition\n2. Implement Hungarian legal terminology recognition\n3. Create task classification system\n4. Add query expansion and refinement\n5. Implement context preservation\n6. Add confidence scoring for understanding\n7. Create feedback loop for improvement",
+        "acceptance_criteria": [
+          "Agent correctly parses complex legal queries",
+          "Hungarian legal terms are recognized accurately",
+          "Tasks are classified into appropriate categories",
+          "Query context is maintained throughout sessions",
+          "Confidence scores help system decision making",
+          "Agent learns from user feedback"
+        ],
+        "dependencies": [
+          13
+        ],
+        "estimated_hours": 10
+      },
+      {
+        "id": 15,
+        "title": "Implement Search Coordination Agent",
+        "description": "Create an agent that coordinates hybrid search across vector, lexical, and graph databases to find relevant legal information.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 8,
+        "phase": "Foundation",
+        "epic": "Agent System Foundation",
+        "created_date": "2025-06-17",
+        "tags": [
+          "agent",
+          "search",
+          "coordination"
+        ],
+        "implementation_plan": "1. Design search strategy selection logic\n2. Implement query routing to appropriate databases\n3. Create result fusion and ranking algorithms\n4. Add search result validation and filtering\n5. Implement caching for frequent queries\n6. Add search performance optimization\n7. Create search analytics and monitoring",
+        "acceptance_criteria": [
+          "Hybrid search provides more relevant results than single methods",
+          "Query routing optimizes for speed and accuracy",
+          "Result fusion creates coherent ranked lists",
+          "Search results are validated for legal relevance",
+          "Caching improves response times significantly",
+          "Search analytics guide system improvements"
+        ],
+        "dependencies": [
+          7,
+          8,
+          13
+        ],
+        "estimated_hours": 12
+      },
+      {
+        "id": 16,
+        "title": "Integrate Claude API for legal analysis",
+        "description": "Set up Claude API integration for natural language processing, legal document analysis, and content generation tasks.",
+        "status": "done",
+        "priority": "critical",
+        "complexity": 6,
+        "phase": "Foundation",
+        "epic": "AI Integration",
+        "created_date": "2025-06-17",
+        "tags": [
+          "api",
+          "claude",
+          "integration",
+          "llm"
+        ],
+        "implementation_plan": "1. Set up Anthropic API client with authentication\n2. Implement retry logic and error handling\n3. Create legal-specific prompt templates\n4. Add token usage tracking and optimization\n5. Implement rate limiting and cost control\n6. Create response validation and quality checks\n7. Add monitoring and logging for API usage",
+        "acceptance_criteria": [
+          "Claude API integration is stable and reliable",
+          "Legal prompts generate high-quality responses",
+          "Token usage is tracked and optimized",
+          "Rate limits prevent API abuse and overuse",
+          "Response quality is consistently validated",
+          "API usage monitoring provides insights",
+          "Error handling maintains system availability"
+        ],
+        "dependencies": [
+          1
+        ],
+        "estimated_hours": 8,
+        "updated": "2025-06-17T20:28:53.346708"
+      },
+      {
+        "id": 17,
+        "title": "Create Document Generation Agent",
+        "description": "Implement an agent that can generate legal document summaries, abstracts, and basic legal content using Claude API.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 7,
+        "phase": "Foundation",
+        "epic": "AI Integration",
+        "created_date": "2025-06-17",
+        "tags": [
+          "agent",
+          "document-generation",
+          "summarization"
+        ],
+        "implementation_plan": "1. Design document generation workflows\n2. Create templates for different document types\n3. Implement summary generation algorithms\n4. Add quality validation for generated content\n5. Create citation and reference tracking\n6. Add user feedback and improvement mechanisms\n7. Implement batch processing capabilities",
+        "acceptance_criteria": [
+          "Generated summaries are accurate and comprehensive",
+          "Different document types are handled appropriately",
+          "Generated content maintains legal accuracy",
+          "Citations and references are properly tracked",
+          "User feedback improves generation quality",
+          "Batch processing handles large document sets",
+          "Generated content follows legal writing standards"
+        ],
+        "dependencies": [
+          13,
+          16
+        ],
+        "estimated_hours": 10
+      },
+      {
+        "id": 18,
+        "title": "Build React frontend for testing and demo",
+        "description": "Create a modern React-based frontend for testing the legal AI system and demonstrating its capabilities.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 6,
+        "phase": "Foundation",
+        "epic": "User Interface",
+        "created_date": "2025-06-17",
+        "tags": [
+          "frontend",
+          "react",
+          "ui",
+          "testing"
+        ],
+        "implementation_plan": "1. Set up React project with TypeScript\n2. Create component library and design system\n3. Implement search interface and results display\n4. Add document viewer and annotation tools\n5. Create admin interface for system monitoring\n6. Add internationalization for Hungarian/English\n7. Implement responsive design for mobile devices",
+        "acceptance_criteria": [
+          "Frontend provides intuitive search experience",
+          "Document viewing is smooth and feature-rich",
+          "Admin interface enables system monitoring",
+          "Interface works well in Hungarian and English",
+          "Responsive design works on all device sizes",
+          "Component library enables rapid development",
+          "Frontend integrates seamlessly with API"
+        ],
+        "dependencies": [
+          1,
+          15
+        ],
+        "estimated_hours": 12
+      },
+      {
+        "id": 19,
+        "title": "Implement court decision crawler",
+        "description": "Create a specialized crawler for collecting Hungarian court decisions from official repositories.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 8,
+        "phase": "Enhancement",
+        "epic": "Expanded Data Sources",
+        "created_date": "2025-06-17",
+        "tags": [
+          "crawler",
+          "court-decisions",
+          "legal-data"
+        ],
+        "implementation_plan": "1. Research court decision publication systems\n2. Create specialized parsing for court documents\n3. Implement case law categorization\n4. Add legal citation extraction\n5. Create case relationship mapping\n6. Implement incremental updates\n7. Add data quality validation",
+        "acceptance_criteria": [
+          "Court decisions are accurately extracted",
+          "Legal citations are properly identified",
+          "Case relationships are mapped correctly",
+          "Data quality meets legal research standards",
+          "Incremental updates work reliably",
+          "System handles various court document formats"
+        ],
+        "dependencies": [
+          9,
+          11
+        ],
+        "estimated_hours": 14
+      },
+      {
+        "id": 20,
+        "title": "Set up Neo4j for legal ontology graph",
+        "description": "Implement Neo4j graph database for storing and querying relationships between legal concepts, citations, and precedents.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 9,
+        "phase": "Enhancement",
+        "epic": "Knowledge Graph",
+        "created_date": "2025-06-17",
+        "tags": [
+          "graph-db",
+          "neo4j",
+          "ontology",
+          "legal-relationships"
+        ],
+        "implementation_plan": "1. Set up Neo4j database and configure security\n2. Design legal ontology schema\n3. Create entity extraction pipeline\n4. Implement relationship detection algorithms\n5. Build graph query interface\n6. Add graph visualization capabilities\n7. Optimize graph performance for large datasets",
+        "acceptance_criteria": [
+          "Neo4j database is secure and performant",
+          "Legal ontology accurately represents domain knowledge",
+          "Entity extraction identifies legal concepts correctly",
+          "Relationship detection finds meaningful connections",
+          "Graph queries return relevant legal insights",
+          "Visualization helps users understand relationships"
+        ],
+        "dependencies": [
+          2,
+          19
+        ],
+        "estimated_hours": 16
+      },
+      {
+        "id": 21,
+        "title": "Implement contextual RAG system",
+        "description": "Create a sophisticated Retrieval-Augmented Generation system that uses context-aware search across multiple data sources.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 9,
+        "phase": "Enhancement",
+        "epic": "Advanced Search & RAG",
+        "created_date": "2025-06-17",
+        "tags": [
+          "rag",
+          "context-aware",
+          "retrieval",
+          "generation"
+        ],
+        "implementation_plan": "1. Design multi-modal retrieval strategies\n2. Implement context preservation mechanisms\n3. Create result re-ranking algorithms\n4. Add source credibility scoring\n5. Implement iterative refinement\n6. Add explanation generation\n7. Optimize for legal domain accuracy",
+        "acceptance_criteria": [
+          "RAG system provides accurate, contextual responses",
+          "Multiple data sources are effectively utilized",
+          "Source credibility is properly evaluated",
+          "Responses include clear explanations and citations",
+          "Iterative refinement improves answer quality",
+          "Legal domain accuracy is maintained"
+        ],
+        "dependencies": [
+          15,
+          16,
+          20
+        ],
+        "estimated_hours": 18
+      },
+      {
+        "id": 22,
+        "title": "Create Planning Agent for complex tasks",
+        "description": "Implement an agent that can break down complex legal research tasks into multi-step execution plans.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 8,
+        "phase": "Enhancement",
+        "epic": "Advanced Agent System",
+        "created_date": "2025-06-17",
+        "tags": [
+          "agent",
+          "planning",
+          "task-decomposition"
+        ],
+        "implementation_plan": "1. Design task decomposition algorithms\n2. Create plan validation and optimization\n3. Implement dynamic plan adjustment\n4. Add resource estimation and scheduling\n5. Create plan execution monitoring\n6. Add learning from execution feedback\n7. Implement plan sharing and collaboration",
+        "acceptance_criteria": [
+          "Complex tasks are broken down effectively",
+          "Plans are validated for feasibility and accuracy",
+          "Dynamic adjustment handles changing requirements",
+          "Resource estimation guides execution",
+          "Execution monitoring provides real-time feedback",
+          "System learns from plan outcomes"
+        ],
+        "dependencies": [
+          14,
+          21
+        ],
+        "estimated_hours": 14
+      },
+      {
+        "id": 23,
+        "title": "Implement Hungarian legal NLP fine-tuning",
+        "description": "Fine-tune language models specifically for Hungarian legal language and terminology.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 10,
+        "phase": "Enhancement",
+        "epic": "Legal Language Processing",
+        "created_date": "2025-06-17",
+        "tags": [
+          "nlp",
+          "fine-tuning",
+          "hungarian",
+          "legal-language"
+        ],
+        "implementation_plan": "1. Collect and prepare Hungarian legal training data\n2. Research optimal model architectures\n3. Implement fine-tuning pipeline\n4. Add legal entity recognition training\n5. Create evaluation benchmarks\n6. Optimize model performance\n7. Deploy fine-tuned models",
+        "acceptance_criteria": [
+          "Fine-tuned models outperform base models on legal tasks",
+          "Hungarian legal terminology is accurately processed",
+          "Entity recognition identifies legal concepts precisely",
+          "Model performance meets real-world requirements",
+          "Evaluation benchmarks validate improvements",
+          "Models are deployed and accessible"
+        ],
+        "dependencies": [
+          11,
+          19
+        ],
+        "estimated_hours": 20
+      },
+      {
+        "id": 24,
+        "title": "Create Reasoning Agent for legal analysis",
+        "description": "Implement an agent capable of legal reasoning, case law application, and precedent analysis.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 10,
+        "phase": "Advanced",
+        "epic": "Legal Reasoning System",
+        "created_date": "2025-06-17",
+        "tags": [
+          "agent",
+          "reasoning",
+          "legal-analysis",
+          "precedent"
+        ],
+        "implementation_plan": "1. Design legal reasoning frameworks\n2. Implement case law application logic\n3. Create precedent analysis algorithms\n4. Add argumentation structure recognition\n5. Implement consistency checking\n6. Create reasoning explanation generation\n7. Add legal validity verification",
+        "acceptance_criteria": [
+          "Agent applies legal principles correctly",
+          "Case law analysis identifies relevant precedents",
+          "Reasoning is logically consistent and sound",
+          "Explanations are clear and legally grounded",
+          "Legal validity is properly assessed",
+          "Reasoning matches expert legal analysis"
+        ],
+        "dependencies": [
+          20,
+          22,
+          23
+        ],
+        "estimated_hours": 22
+      },
+      {
+        "id": 25,
+        "title": "Implement Self-Reflection Agent",
+        "description": "Create an agent that can review and validate its own outputs for consistency, accuracy, and legal soundness.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 9,
+        "phase": "Advanced",
+        "epic": "Quality Assurance System",
+        "created_date": "2025-06-17",
+        "tags": [
+          "agent",
+          "self-reflection",
+          "validation",
+          "quality"
+        ],
+        "implementation_plan": "1. Design self-validation frameworks\n2. Implement consistency checking algorithms\n3. Create accuracy verification methods\n4. Add bias detection and mitigation\n5. Implement confidence scoring\n6. Create improvement recommendation system\n7. Add learning from validation feedback",
+        "acceptance_criteria": [
+          "Self-validation catches errors and inconsistencies",
+          "Accuracy verification maintains high quality",
+          "Bias detection prevents unfair outcomes",
+          "Confidence scores guide system decisions",
+          "Recommendations improve system performance",
+          "Validation feedback enables continuous learning"
+        ],
+        "dependencies": [
+          24
+        ],
+        "estimated_hours": 16
+      },
+      {
+        "id": 26,
+        "title": "Create Mixture of Experts (MoE) system",
+        "description": "Implement a system that routes queries to specialized expert models based on legal domain and complexity.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 11,
+        "phase": "Advanced",
+        "epic": "Expert System Architecture",
+        "created_date": "2025-06-17",
+        "tags": [
+          "moe",
+          "expert-models",
+          "routing",
+          "specialization"
+        ],
+        "implementation_plan": "1. Design expert model architecture\n2. Create domain classification system\n3. Implement expert routing algorithms\n4. Add expert model training pipeline\n5. Create performance monitoring\n6. Implement load balancing\n7. Add new expert integration capability",
+        "acceptance_criteria": [
+          "Expert routing selects appropriate specialists",
+          "Domain classification is highly accurate",
+          "Expert models outperform general models",
+          "System handles varying loads efficiently",
+          "Performance monitoring guides optimization",
+          "New experts can be easily integrated"
+        ],
+        "dependencies": [
+          23,
+          24
+        ],
+        "estimated_hours": 24
+      },
+      {
+        "id": 27,
+        "title": "Implement Human Feedback System (RLHF)",
+        "description": "Create a comprehensive system for collecting, processing, and incorporating human expert feedback for model improvement.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 9,
+        "phase": "Advanced",
+        "epic": "Human-AI Collaboration",
+        "created_date": "2025-06-17",
+        "tags": [
+          "rlhf",
+          "human-feedback",
+          "model-improvement"
+        ],
+        "implementation_plan": "1. Design feedback collection interfaces\n2. Create legal expert annotation tools\n3. Implement feedback processing pipeline\n4. Add quality control for feedback\n5. Create model update mechanisms\n6. Implement feedback analytics\n7. Add continuous learning capabilities",
+        "acceptance_criteria": [
+          "Legal experts can provide feedback efficiently",
+          "Feedback quality is validated and consistent",
+          "Model updates improve performance measurably",
+          "Feedback analytics guide system development",
+          "Continuous learning maintains model accuracy",
+          "Expert workload is manageable and productive"
+        ],
+        "dependencies": [
+          18,
+          25
+        ],
+        "estimated_hours": 18
+      },
+      {
+        "id": 28,
+        "title": "Implement security and privacy framework",
+        "description": "Create comprehensive security measures and privacy protection for legal document processing and user data.",
+        "status": "in-progress",
+        "priority": "critical",
+        "complexity": 8,
+        "phase": "Advanced",
+        "epic": "Security & Compliance",
+        "created_date": "2025-06-17",
+        "tags": [
+          "security",
+          "privacy",
+          "gdpr",
+          "compliance"
+        ],
+        "implementation_plan": "1. Implement authentication and authorization\n2. Add data encryption at rest and in transit\n3. Create audit logging and monitoring\n4. Implement GDPR compliance measures\n5. Add data anonymization capabilities\n6. Create security incident response\n7. Add penetration testing and vulnerability scanning",
+        "acceptance_criteria": [
+          "Authentication and authorization are robust",
+          "All sensitive data is properly encrypted",
+          "Audit logs provide complete activity tracking",
+          "GDPR compliance is fully implemented",
+          "Data anonymization protects user privacy",
+          "Security monitoring detects threats",
+          "Vulnerability management maintains security"
+        ],
+        "dependencies": [
+          1,
+          4,
+          5
+        ],
+        "estimated_hours": 16,
+        "updated": "2025-06-18T00:06:06.545405"
+      },
+      {
+        "id": 29,
+        "title": "Create legal change monitoring system",
+        "description": "Implement automated monitoring for legal changes and their impact analysis on existing legal relationships.",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 10,
+        "phase": "Advanced",
+        "epic": "Change Detection & Impact Analysis",
+        "created_date": "2025-06-17",
+        "tags": [
+          "monitoring",
+          "change-detection",
+          "impact-analysis"
+        ],
+        "implementation_plan": "1. Design change detection algorithms\n2. Create impact analysis framework\n3. Implement notification systems\n4. Add priority assessment mechanisms\n5. Create change visualization tools\n6. Implement automated update workflows\n7. Add historical change tracking",
+        "acceptance_criteria": [
+          "Legal changes are detected automatically",
+          "Impact analysis identifies affected areas",
+          "Notifications are timely and relevant",
+          "Priority assessment guides response",
+          "Visualizations help understand changes",
+          "Update workflows maintain system currency"
+        ],
+        "dependencies": [
+          10,
+          20,
+          24
+        ],
+        "estimated_hours": 20
+      },
+      {
+        "id": 30,
+        "title": "Implement performance optimization system",
+        "description": "Create comprehensive performance monitoring and optimization for all system components.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 7,
+        "phase": "Optimization",
+        "epic": "System Performance",
+        "created_date": "2025-06-17",
+        "tags": [
+          "performance",
+          "optimization",
+          "monitoring"
+        ],
+        "implementation_plan": "1. Set up comprehensive monitoring\n2. Implement performance profiling\n3. Create optimization recommendations\n4. Add automatic scaling capabilities\n5. Implement caching optimizations\n6. Create performance benchmarking\n7. Add resource usage optimization",
+        "acceptance_criteria": [
+          "All system components are monitored",
+          "Performance bottlenecks are identified quickly",
+          "Optimization recommendations are actionable",
+          "Automatic scaling maintains performance",
+          "Caching reduces response times significantly",
+          "Benchmarks track performance improvements"
+        ],
+        "dependencies": [
+          26,
+          27,
+          28
+        ],
+        "estimated_hours": 14
+      },
+      {
+        "id": 31,
+        "title": "Create advanced analytics and reporting",
+        "description": "Implement comprehensive analytics and reporting for system usage, performance, and legal insights.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 6,
+        "phase": "Optimization",
+        "epic": "Analytics & Business Intelligence",
+        "created_date": "2025-06-17",
+        "tags": [
+          "analytics",
+          "reporting",
+          "business-intelligence"
+        ],
+        "implementation_plan": "1. Design analytics data model\n2. Create usage tracking systems\n3. Implement custom reporting tools\n4. Add legal insight analytics\n5. Create performance dashboards\n6. Implement trend analysis\n7. Add predictive analytics",
+        "acceptance_criteria": [
+          "Analytics provide actionable insights",
+          "Usage tracking covers all system aspects",
+          "Custom reports meet user needs",
+          "Legal insights guide business decisions",
+          "Dashboards are intuitive and informative",
+          "Predictive analytics identify trends"
+        ],
+        "dependencies": [
+          18,
+          30
+        ],
+        "estimated_hours": 12
+      },
+      {
+        "id": 32,
+        "title": "Implement multi-domain support",
+        "description": "Extend the system to support multiple legal domains beyond energy law (tax, labor, constitutional law, etc.).",
+        "status": "todo",
+        "priority": "high",
+        "complexity": 12,
+        "phase": "Optimization",
+        "epic": "Domain Expansion",
+        "created_date": "2025-06-17",
+        "tags": [
+          "multi-domain",
+          "scalability",
+          "legal-domains"
+        ],
+        "implementation_plan": "1. Design domain-agnostic architecture\n2. Create domain configuration system\n3. Implement domain-specific models\n4. Add cross-domain relationship detection\n5. Create domain switching capabilities\n6. Implement domain-specific UI components\n7. Add domain performance optimization",
+        "acceptance_criteria": [
+          "Architecture supports multiple legal domains",
+          "Domain configuration is flexible and maintainable",
+          "Domain-specific models provide specialized insights",
+          "Cross-domain relationships are identified",
+          "Users can easily switch between domains",
+          "Performance remains optimal across domains"
+        ],
+        "dependencies": [
+          26,
+          29
+        ],
+        "estimated_hours": 26
+      },
+      {
+        "id": 33,
+        "title": "Create API marketplace and integration platform",
+        "description": "Develop an API marketplace for third-party integrations and external legal service providers.",
+        "status": "todo",
+        "priority": "low",
+        "complexity": 8,
+        "phase": "Optimization",
+        "epic": "Platform Extension",
+        "created_date": "2025-06-17",
+        "tags": [
+          "api-marketplace",
+          "integrations",
+          "platform"
+        ],
+        "implementation_plan": "1. Design API marketplace architecture\n2. Create developer portal and documentation\n3. Implement API versioning and management\n4. Add usage tracking and billing\n5. Create integration testing framework\n6. Implement partner onboarding\n7. Add marketplace governance",
+        "acceptance_criteria": [
+          "API marketplace is functional and well-documented",
+          "Third-party developers can integrate easily",
+          "API versioning maintains compatibility",
+          "Usage tracking enables fair billing",
+          "Integration testing ensures quality",
+          "Partner onboarding is streamlined"
+        ],
+        "dependencies": [
+          31,
+          32
+        ],
+        "estimated_hours": 16
+      },
+      {
+        "id": 34,
+        "title": "Implement mobile applications",
+        "description": "Create mobile applications for iOS and Android to provide legal AI capabilities on mobile devices.",
+        "status": "todo",
+        "priority": "low",
+        "complexity": 9,
+        "phase": "Optimization",
+        "epic": "Mobile Platform",
+        "created_date": "2025-06-17",
+        "tags": [
+          "mobile",
+          "ios",
+          "android",
+          "cross-platform"
+        ],
+        "implementation_plan": "1. Choose mobile development framework\n2. Design mobile-optimized UI/UX\n3. Implement core legal search features\n4. Add offline capabilities\n5. Implement push notifications\n6. Add mobile-specific security measures\n7. Create app store deployment pipeline",
+        "acceptance_criteria": [
+          "Mobile apps provide core functionality",
+          "UI/UX is optimized for mobile usage",
+          "Offline mode works for basic features",
+          "Push notifications provide timely updates",
+          "Security measures protect mobile data",
+          "App deployment is automated"
+        ],
+        "dependencies": [
+          32,
+          33
+        ],
+        "estimated_hours": 18
+      },
+      {
+        "id": 35,
+        "title": "Create system maintenance and support framework",
+        "description": "Implement comprehensive maintenance, support, and operational procedures for long-term system stability.",
+        "status": "todo",
+        "priority": "medium",
+        "complexity": 6,
+        "phase": "Optimization",
+        "epic": "Operations & Maintenance",
+        "created_date": "2025-06-17",
+        "tags": [
+          "maintenance",
+          "support",
+          "operations"
+        ],
+        "implementation_plan": "1. Create maintenance procedures and schedules\n2. Implement automated health checks\n3. Create incident response procedures\n4. Add backup and disaster recovery\n5. Implement user support systems\n6. Create system documentation\n7. Add knowledge management systems",
+        "acceptance_criteria": [
+          "Maintenance procedures ensure system stability",
+          "Health checks detect issues proactively",
+          "Incident response minimizes downtime",
+          "Backup and recovery protect against data loss",
+          "User support resolves issues efficiently",
+          "Documentation is comprehensive and current"
+        ],
+        "dependencies": [
+          30,
+          31
+        ],
+        "estimated_hours": 10
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-17T17:01:50.666Z",
+      "updated": "2025-06-17T22:36:39.337Z",
+      "description": "Tasks for master context"
     }
-  ]
-} 
+  }
+}

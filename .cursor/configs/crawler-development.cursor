@@ -1,0 +1,50 @@
+{
+  "context": "crawler-development",
+  "rules": [
+    "Focus on legal data crawling and anti-detection mechanisms",
+    "Implement robust error handling for network failures",
+    "Respect robots.txt and rate limiting for legal compliance",
+    "Ensure data integrity and validation for Hungarian legal sources",
+    "Implement comprehensive logging for debugging crawler issues",
+    "Follow ethical web scraping practices"
+  ],
+  "mcp": {
+    "task-master-ai": {
+      "priority": "high",
+      "context": "crawler-tasks"
+    }
+  },
+  "ai_instructions": {
+    "scraping_ethics": "Always respect website terms of service and rate limits",
+    "data_validation": "Validate extracted legal data for completeness and accuracy",
+    "error_handling": "Implement robust retry mechanisms and error recovery",
+    "monitoring": "Add comprehensive monitoring and alerting"
+  },
+  "file_associations": {
+    "*/crawlers/*.py": {
+      "frameworks": ["scrapy", "selenium", "requests"],
+      "testing": "pytest + mock responses",
+      "validation": "legal_data_validator"
+    },
+    "*/anti_detection/*.py": {
+      "focus": "Stealth crawling techniques",
+      "testing": "detection_avoidance_tests"
+    }
+  },
+  "shortcuts": {
+    "test_jogtar": "python -m pytest app/crawlers/tests/test_jogtar_crawler.py",
+    "test_kozlony": "python -m pytest app/crawlers/tests/test_magyar_kozlony_crawler.py",
+    "validate_extraction": "python scripts/validate_crawler_data.py",
+    "check_rate_limits": "python scripts/check_rate_compliance.py"
+  },
+  "monitoring": {
+    "success_rate": "Track successful crawl completion rates",
+    "data_quality": "Monitor extracted data quality metrics",
+    "compliance": "Ensure rate limiting and ethical compliance"
+  },
+  "legal_sources": {
+    "primary": ["njt.hu", "kozlonyok.hu"],
+    "secondary": ["birosag.hu", "kuria.hu"],
+    "compliance_notes": "Follow ELI standards for legal document identification"
+  }
+} 

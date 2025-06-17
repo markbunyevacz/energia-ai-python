@@ -1,0 +1,40 @@
+{
+  "context": "backend-development", 
+  "rules": [
+    "Focus on Python backend development for legal AI system",
+    "Prioritize FastAPI best practices and async patterns",
+    "Ensure Hungarian legal compliance in all implementations",
+    "Follow microservice architecture principles",
+    "Implement proper error handling and logging",
+    "Validate data integrity for legal documents"
+  ],
+  "mcp": {
+    "task-master-ai": {
+      "priority": "high",
+      "context": "backend-tasks"
+    }
+  },
+  "ai_instructions": {
+    "code_style": "Follow PEP 8, use type hints, prefer async/await",
+    "testing": "Write comprehensive tests for legal data processing",
+    "security": "Implement GDPR-compliant data handling",
+    "documentation": "Document all legal AI components thoroughly"
+  },
+  "file_associations": {
+    "*.py": {
+      "linting": ["ruff", "mypy", "bandit"],
+      "testing": "pytest",
+      "docs": "sphinx"
+    },
+    "*.sql": {
+      "validation": "supabase-lint",
+      "security_check": "rls-validator"
+    }
+  },
+  "shortcuts": {
+    "test_crawlers": "python -m pytest app/crawlers/tests/",
+    "validate_migrations": "supabase db lint",
+    "run_dev": "uvicorn main:app --reload",
+    "check_legal_compliance": "python scripts/validate_legal_standards.py"
+  }
+} 

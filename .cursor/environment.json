@@ -1,0 +1,13 @@
+{
+  "agentCanUpdateSnapshot": true,
+  "currentContext": "ai-ml-development",
+  "contextRules": [
+    "Focus on AI/ML components for Hungarian legal text processing",
+    "Prioritize accuracy and Hungarian language understanding",
+    "Implement robust RAG pipelines with legal document chunking",
+    "Ensure hallucination prevention in legal AI responses",
+    "Validate embedding quality for Hungarian legal terminology",
+    "Test AI agents with real legal scenarios"
+  ],
+  "lastUpdated": "2025-06-17T19:30:52.033509"
+}

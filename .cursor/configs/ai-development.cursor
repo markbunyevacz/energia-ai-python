@@ -1,0 +1,46 @@
+{
+  "context": "ai-ml-development",
+  "rules": [
+    "Focus on AI/ML components for Hungarian legal text processing",
+    "Prioritize accuracy and Hungarian language understanding",
+    "Implement robust RAG pipelines with legal document chunking",
+    "Ensure hallucination prevention in legal AI responses",
+    "Validate embedding quality for Hungarian legal terminology",
+    "Test AI agents with real legal scenarios"
+  ],
+  "mcp": {
+    "task-master-ai": {
+      "priority": "high", 
+      "context": "ai-tasks",
+      "research": true
+    }
+  },
+  "ai_instructions": {
+    "model_selection": "Choose models suitable for Hungarian language processing",
+    "prompt_engineering": "Craft prompts for legal accuracy and Hungarian context",
+    "evaluation": "Implement comprehensive AI evaluation metrics",
+    "fine_tuning": "Consider fine-tuning for Hungarian legal terminology"
+  },
+  "file_associations": {
+    "*.py": {
+      "ai_frameworks": ["transformers", "langchain", "torch"],
+      "testing": "pytest + custom AI evaluation",
+      "validation": "hungarian_legal_validator"
+    },
+    "*.ipynb": {
+      "kernel": "python3",
+      "extensions": ["jupyterlab-ai", "hungarian-nlp"]
+    }
+  },
+  "shortcuts": {
+    "test_embeddings": "python scripts/test_embeddings.py",
+    "evaluate_qa": "python scripts/test-qa.py",
+    "validate_rag": "python scripts/validate_rag_pipeline.py",
+    "benchmark_hungarian": "python scripts/benchmark_hungarian_nlp.py"
+  },
+  "research_tools": {
+    "legal_databases": ["njt.hu", "kozlonyok.hu", "birosag.hu"],
+    "nlp_resources": ["MSZNY corpus", "Hungarian Gigaword", "Legal Hungarian datasets"],
+    "evaluation_metrics": ["BLEU", "ROUGE", "Hungarian legal accuracy"]
+  }
+} 

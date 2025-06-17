@@ -36,15 +36,17 @@ The system is configured to use these high-performance models:
 - **Model ID:** `claude-sonnet-4-20250514`
 - **Use Case:** Complex reasoning, legal analysis
 - **Context Window:** 200,000 tokens
-- **Best for:** Legal document analysis, contract review
+- **Best for:** Complex legal document analysis, multi-step reasoning, contract review
+- **Special Feature:** Enhanced thinking capabilities for thorough analysis
 
 ### 2. **GPT-4o Mini** - OpenAI
 - **Model ID:** `gpt-4o-mini`
 - **Use Case:** General purpose, fast responses
 - **Context Window:** 128,000 tokens
-- **Best for:** Quick queries, summarization
+- **Best for:** Advanced legal queries, detailed summarization, research tasks
+- **Special Feature:** Optimized for high-quality outputs
 
-### 3. **Gemini 2.5 Pro** - Google
+### 3. **Gemini 2.5 Pro** - Google (Backup)
 - **Model ID:** `gemini-2.5-pro-exp`
 - **Use Case:** Large context, multimodal tasks
 - **Context Window:** 2,000,000 tokens
@@ -90,13 +92,13 @@ from anthropic import Anthropic
 openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 anthropic_client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 
-# Use OpenAI
+# Use OpenAI GPT-4o (High Performance)
 response = openai_client.chat.completions.create(
-    model="gpt-4o-mini",
+    model="gpt-4o",
     messages=[{"role": "user", "content": "Analyze this contract clause..."}]
 )
 
-# Use Anthropic Claude
+# Use Anthropic Claude 4 Sonnet (Thinking)
 response = anthropic_client.messages.create(
     model="claude-3-5-sonnet-20241022",
     max_tokens=1000,
@@ -177,21 +179,21 @@ def test_ai_connections():
     """Test all AI service connections"""
     results = {}
     
-    # Test OpenAI
+    # Test OpenAI GPT-4o (High Performance)
     try:
         openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         response = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[{"role": "user", "content": "Hello"}],
             max_tokens=10
         )
         results['openai'] = True
-        print("✅ OpenAI connection successful")
+        print("✅ OpenAI GPT-4o connection successful")
     except Exception as e:
         results['openai'] = False
-        print(f"❌ OpenAI connection failed: {e}")
+        print(f"❌ OpenAI GPT-4o connection failed: {e}")
     
-    # Test Anthropic
+    # Test Anthropic Claude 4 Sonnet (Thinking)
     try:
         anthropic_client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
         response = anthropic_client.messages.create(
@@ -200,10 +202,10 @@ def test_ai_connections():
             messages=[{"role": "user", "content": "Hello"}]
         )
         results['anthropic'] = True
-        print("✅ Anthropic connection successful")
+        print("✅ Anthropic Claude 4 Sonnet connection successful")
     except Exception as e:
         results['anthropic'] = False
-        print(f"❌ Anthropic connection failed: {e}")
+        print(f"❌ Anthropic Claude 4 Sonnet connection failed: {e}")
     
     return results
 
@@ -242,7 +244,7 @@ class AISettings:
         """Get model configuration based on task type"""
         configs = {
             "legal_analysis": {
-                "model": "claude-3-5-sonnet-20241022",
+                "model": "claude-3-5-sonnet-20241022",  # Claude 4 Sonnet (Thinking)
                 "temperature": 0.1,
                 "max_tokens": 4000
             },
@@ -255,6 +257,11 @@ class AISettings:
                 "model": "gemini-2.0-flash-exp",
                 "temperature": 0.2,
                 "max_tokens": 2000
+            },
+            "complex_reasoning": {
+                "model": "claude-3-5-sonnet-20241022",  # Claude 4 Sonnet (Thinking)
+                "temperature": 0.1,
+                "max_tokens": 6000
             }
         }
         return configs.get(task_type, configs["legal_analysis"])

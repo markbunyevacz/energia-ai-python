@@ -4,16 +4,21 @@ Project ID: mlgwqkedrmezbbdzpqey
 """
 
 import os
+import sys
 from supabase import create_client, Client
 from dotenv import load_dotenv
+import anthropic
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Supabase Configuration
-SUPABASE_URL = "https://mlgwqkedrmezbbdzpqey.supabase.co"
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "your_anon_key_here")
-SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "your_service_role_key_here")
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
+
+# Anthropic Configuration
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
 # Application Configuration
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
@@ -28,7 +33,12 @@ def get_supabase_client() -> Client:
     Returns:
         Client: Configured Supabase client
     """
-    return create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    try:
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+        return supabase
+    except Exception as e:
+        print(f"Error creating Supabase client: {e}")
+        sys.exit(1)
 
 def get_supabase_admin_client() -> Client:
     """
@@ -39,8 +49,31 @@ def get_supabase_admin_client() -> Client:
     """
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
+def get_anthropic_client() -> anthropic.Anthropic:
+    """
+    Returns an Anthropic client instance.
+    
+    This function initializes the Anthropic client using the API key.
+    It's crucial that ANTHROPIC_API_KEY is set in your .env file.
+    
+    Returns:
+        anthropic.Anthropic: An initialized Anthropic client instance.
+    
+    Raises:
+        ValueError: If Anthropic API key is not configured.
+        ConnectionError: If the client fails to initialize.
+    """
+    if not ANTHROPIC_API_KEY:
+        raise ValueError("Anthropic API Key must be set in the environment.")
+    
+    try:
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        return client
+    except Exception as e:
+        raise ConnectionError(f"Failed to create Anthropic client: {e}") from e
+
 # Test connection function
-def test_connection():
+def test_connection() -> bool:
     """Test the Supabase connection."""
     try:
         supabase = get_supabase_client()

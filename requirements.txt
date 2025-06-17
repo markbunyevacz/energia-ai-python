@@ -1,15 +1,48 @@
-# Core application dependencies
-python-dotenv==1.0.1
-supabase==1.0.3
+# FastAPI and server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
 
-# AI & LLM Libraries
-langgraph==0.4.8
-anthropic==0.29.0 # For Claude AI
+# Structured logging
+structlog==23.2.0
 
-# Dependency Resolutions
-# Pin httpx to a version compatible with both supabase and langsmith/langchain
-httpx==0.23.3
+# HTTP client
+httpx==0.25.2
 
-# Added from the code block
-fastapi
-uvicorn 
+# Environment management
+python-dotenv==1.0.0
+
+# Development tools
+ruff==0.1.6
+mypy==1.7.1
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Database drivers (will be used in later tasks)
+asyncpg==0.29.0
+motor==3.3.2
+aioredis==2.0.1
+
+# AI/ML libraries
+anthropic==0.7.7
+sentence-transformers==2.2.2
+numpy==1.24.3
+
+# Web scraping
+beautifulsoup4==4.12.2
+aiohttp==3.9.1
+selenium==4.15.2
+playwright==1.40.0
+
+# Document processing
+pypdf2==3.0.1
+python-docx==1.1.0
+
+# Qdrant vector database for semantic search
+qdrant-client==1.7.0
+sentence-transformers==2.2.2
+numpy==1.24.3
+
+# Elasticsearch for lexical search
+elasticsearch[async]==8.11.0

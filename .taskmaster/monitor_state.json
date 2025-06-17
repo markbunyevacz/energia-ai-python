@@ -1,0 +1,404 @@
+{
+  "task_states": {
+    "1": {
+      "status": "done",
+      "title": "Set up Python project structure and FastAPI backend",
+      "tags": [
+        "backend",
+        "setup",
+        "fastapi",
+        "foundation"
+      ],
+      "implementation_plan": "1. Create src/ directory structure with energia_ai package\n2. Set up FastAPI application with main.py\n3. Create config/ directory for configuration management\n4. Add health check endpoints (/health, /ready)\n5. Set up structured logging with structlog\n6. Configure Pydantic settings management\n7. Add CORS middleware and error handlers",
+      "description": "Create the basic Python project structure with FastAPI, implement health check endpoints, and set up the foundational architecture for the Hungarian Legal AI system."
+    },
+    "2": {
+      "status": "done",
+      "title": "Create Docker and Docker Compose setup",
+      "tags": [
+        "devops",
+        "docker",
+        "infrastructure"
+      ],
+      "implementation_plan": "1. Create multi-stage Dockerfile for Python application\n2. Create docker-compose.yml with all required services\n3. Configure service networking and volume mounts\n4. Add health checks for all services\n5. Create development and production compose variants\n6. Add .dockerignore and optimize image size\n7. Document container setup and usage",
+      "description": "Set up containerization for the entire application stack including FastAPI, PostgreSQL, MongoDB, Redis, and Elasticsearch for consistent development and deployment."
+    },
+    "3": {
+      "status": "done",
+      "title": "Implement CI/CD pipeline with GitHub Actions",
+      "tags": [
+        "devops",
+        "ci-cd",
+        "github-actions",
+        "testing"
+      ],
+      "implementation_plan": "1. Create .github/workflows/main.yml\n2. Add Python setup and dependency caching\n3. Configure Ruff for linting and formatting\n4. Add MyPy for type checking\n5. Set up pytest with coverage reporting\n6. Add security scanning with bandit\n7. Configure deployment to staging/production\n8. Add pull request automation",
+      "description": "Create automated testing, linting, and deployment pipeline using GitHub Actions for continuous integration and deployment."
+    },
+    "4": {
+      "status": "done",
+      "title": "Set up PostgreSQL database and schema",
+      "tags": [
+        "database",
+        "postgresql",
+        "schema"
+      ],
+      "implementation_plan": "1. Design database schema for legal documents\n2. Create tables for users, documents, metadata\n3. Set up Alembic for database migrations\n4. Configure SQLAlchemy with async support\n5. Add database connection pooling\n6. Create database initialization scripts\n7. Add backup and recovery procedures",
+      "description": "Configure PostgreSQL database with proper schema design for legal document metadata, user management, and system tracking."
+    },
+    "5": {
+      "status": "done",
+      "title": "Set up MongoDB for document storage",
+      "tags": [
+        "database",
+        "mongodb",
+        "documents"
+      ],
+      "implementation_plan": "1. Configure MongoDB with proper authentication\n2. Design document schemas for legal content\n3. Set up Motor for async MongoDB operations\n4. Create indexes for efficient querying\n5. Implement document validation rules\n6. Add full-text search capabilities\n7. Configure replica set for high availability",
+      "description": "Configure MongoDB for storing raw legal documents, processed content, and document metadata with proper indexing."
+    },
+    "6": {
+      "status": "done",
+      "title": "Set up Redis for caching and session management",
+      "tags": [
+        "database",
+        "redis",
+        "caching"
+      ],
+      "implementation_plan": "1. Configure Redis with persistence\n2. Set up Redis connection with aioredis\n3. Implement caching decorators\n4. Configure session management\n5. Add cache invalidation strategies\n6. Set up Redis monitoring\n7. Configure backup and recovery",
+      "description": "Configure Redis for application caching, session storage, and temporary data management."
+    },
+    "7": {
+      "status": "done",
+      "title": "Implement Qdrant vector database for semantic search",
+      "tags": [
+        "vector-db",
+        "semantic-search",
+        "embeddings",
+        "qdrant"
+      ],
+      "implementation_plan": "1. Set up Qdrant server in Docker\n2. Create collections for document embeddings\n3. Configure vector dimensions and distance metrics\n4. Implement embedding generation pipeline\n5. Add batch insertion for large datasets\n6. Configure Hungarian language preprocessing\n7. Optimize search performance and accuracy",
+      "description": "Set up Qdrant vector database for storing and searching document embeddings with Hungarian language optimization."
+    },
+    "8": {
+      "status": "done",
+      "title": "Set up Elasticsearch for lexical search",
+      "tags": [
+        "search",
+        "elasticsearch",
+        "lexical-search"
+      ],
+      "implementation_plan": "1. Set up Elasticsearch cluster in Docker\n2. Configure Hungarian language analyzers\n3. Create indices for different document types\n4. Implement document indexing pipeline\n5. Add search query builders\n6. Configure result highlighting and ranking\n7. Optimize search performance",
+      "description": "Configure Elasticsearch for fast lexical search across legal documents with Hungarian language analyzers."
+    },
+    "9": {
+      "status": "done",
+      "title": "Develop NJT.hu crawler with ELI standards",
+      "tags": [
+        "crawler",
+        "njt.hu",
+        "eli-standards",
+        "legal-documents"
+      ],
+      "implementation_plan": "1. Research njt.hu structure and ELI specifications\n2. Create base crawler class with rate limiting\n3. Implement ELI-based URL generation\n4. Add document type detection and parsing\n5. Handle different document formats (HTML, PDF)\n6. Implement error handling and retry logic\n7. Add progress tracking and logging\n8. Create incremental update mechanism",
+      "description": "Create a web crawler for njt.hu that uses European Legislation Identifier (ELI) standards for programmatic access to Hungarian legal documents."
+    },
+    "10": {
+      "status": "todo",
+      "title": "Implement Magyar K\u00f6zl\u00f6ny monitoring system",
+      "tags": [
+        "monitoring",
+        "magyar-kozlony",
+        "change-detection"
+      ],
+      "implementation_plan": "1. Analyze Magyar K\u00f6zl\u00f6ny publication patterns\n2. Create scheduled monitoring jobs\n3. Implement change detection algorithms\n4. Add notification system for new publications\n5. Parse and extract legal document references\n6. Integrate with main crawler system\n7. Add historical data backfill capability",
+      "description": "Create a monitoring system for Magyar K\u00f6zl\u00f6ny publications to detect new legal documents and changes."
+    },
+    "11": {
+      "status": "in-progress",
+      "title": "Create legal document chunking system",
+      "tags": [
+        "nlp",
+        "chunking",
+        "document-processing"
+      ],
+      "implementation_plan": "1. Analyze Hungarian legal document structures\n2. Implement paragraph and section detection\n3. Create hierarchy-aware chunking algorithm\n4. Add metadata extraction for each chunk\n5. Handle different document formats consistently\n6. Optimize chunk sizes for embedding models\n7. Add quality validation for chunks",
+      "description": "Implement intelligent chunking algorithms that respect legal document structure (paragraphs, sections, articles) for better processing."
+    },
+    "12": {
+      "status": "in-progress",
+      "title": "Implement embedding generation pipeline",
+      "tags": [
+        "embeddings",
+        "nlp",
+        "pipeline"
+      ],
+      "implementation_plan": "1. Research and select Hungarian language models\n2. Set up sentence-transformers pipeline\n3. Implement batch processing for efficiency\n4. Add embedding quality validation\n5. Create embedding storage and indexing\n6. Optimize for legal domain vocabulary\n7. Add embedding similarity testing",
+      "description": "Create a pipeline for generating high-quality embeddings from legal document chunks using Hungarian-optimized models."
+    },
+    "13": {
+      "status": "in-progress",
+      "title": "Create base agent architecture",
+      "tags": [
+        "agent",
+        "architecture",
+        "foundation"
+      ],
+      "implementation_plan": "1. Design base Agent abstract class\n2. Implement agent communication protocols\n3. Create agent lifecycle management\n4. Add logging and monitoring for agents\n5. Implement error handling and recovery\n6. Create agent configuration system\n7. Add agent performance metrics",
+      "description": "Implement the foundational agent architecture with base classes and communication protocols for specialized legal AI agents."
+    },
+    "14": {
+      "status": "todo",
+      "title": "Implement Task Understanding Agent",
+      "tags": [
+        "agent",
+        "nlu",
+        "task-understanding"
+      ],
+      "implementation_plan": "1. Design query parsing and intent recognition\n2. Implement Hungarian legal terminology recognition\n3. Create task classification system\n4. Add query expansion and refinement\n5. Implement context preservation\n6. Add confidence scoring for understanding\n7. Create feedback loop for improvement",
+      "description": "Create the first specialized agent that can understand and parse legal queries and research tasks from users."
+    },
+    "15": {
+      "status": "todo",
+      "title": "Implement Search Coordination Agent",
+      "tags": [
+        "agent",
+        "search",
+        "coordination"
+      ],
+      "implementation_plan": "1. Design search strategy selection logic\n2. Implement query routing to appropriate databases\n3. Create result fusion and ranking algorithms\n4. Add search result validation and filtering\n5. Implement caching for frequent queries\n6. Add search performance optimization\n7. Create search analytics and monitoring",
+      "description": "Create an agent that coordinates hybrid search across vector, lexical, and graph databases to find relevant legal information."
+    },
+    "16": {
+      "status": "done",
+      "title": "Integrate Claude API for legal analysis",
+      "tags": [
+        "api",
+        "claude",
+        "integration",
+        "llm"
+      ],
+      "implementation_plan": "1. Set up Anthropic API client with authentication\n2. Implement retry logic and error handling\n3. Create legal-specific prompt templates\n4. Add token usage tracking and optimization\n5. Implement rate limiting and cost control\n6. Create response validation and quality checks\n7. Add monitoring and logging for API usage",
+      "description": "Set up Claude API integration for natural language processing, legal document analysis, and content generation tasks."
+    },
+    "17": {
+      "status": "todo",
+      "title": "Create Document Generation Agent",
+      "tags": [
+        "agent",
+        "document-generation",
+        "summarization"
+      ],
+      "implementation_plan": "1. Design document generation workflows\n2. Create templates for different document types\n3. Implement summary generation algorithms\n4. Add quality validation for generated content\n5. Create citation and reference tracking\n6. Add user feedback and improvement mechanisms\n7. Implement batch processing capabilities",
+      "description": "Implement an agent that can generate legal document summaries, abstracts, and basic legal content using Claude API."
+    },
+    "18": {
+      "status": "todo",
+      "title": "Build React frontend for testing and demo",
+      "tags": [
+        "frontend",
+        "react",
+        "ui",
+        "testing"
+      ],
+      "implementation_plan": "1. Set up React project with TypeScript\n2. Create component library and design system\n3. Implement search interface and results display\n4. Add document viewer and annotation tools\n5. Create admin interface for system monitoring\n6. Add internationalization for Hungarian/English\n7. Implement responsive design for mobile devices",
+      "description": "Create a modern React-based frontend for testing the legal AI system and demonstrating its capabilities."
+    },
+    "19": {
+      "status": "todo",
+      "title": "Implement court decision crawler",
+      "tags": [
+        "crawler",
+        "court-decisions",
+        "legal-data"
+      ],
+      "implementation_plan": "1. Research court decision publication systems\n2. Create specialized parsing for court documents\n3. Implement case law categorization\n4. Add legal citation extraction\n5. Create case relationship mapping\n6. Implement incremental updates\n7. Add data quality validation",
+      "description": "Create a specialized crawler for collecting Hungarian court decisions from official repositories."
+    },
+    "20": {
+      "status": "todo",
+      "title": "Set up Neo4j for legal ontology graph",
+      "tags": [
+        "graph-db",
+        "neo4j",
+        "ontology",
+        "legal-relationships"
+      ],
+      "implementation_plan": "1. Set up Neo4j database and configure security\n2. Design legal ontology schema\n3. Create entity extraction pipeline\n4. Implement relationship detection algorithms\n5. Build graph query interface\n6. Add graph visualization capabilities\n7. Optimize graph performance for large datasets",
+      "description": "Implement Neo4j graph database for storing and querying relationships between legal concepts, citations, and precedents."
+    },
+    "21": {
+      "status": "todo",
+      "title": "Implement contextual RAG system",
+      "tags": [
+        "rag",
+        "context-aware",
+        "retrieval",
+        "generation"
+      ],
+      "implementation_plan": "1. Design multi-modal retrieval strategies\n2. Implement context preservation mechanisms\n3. Create result re-ranking algorithms\n4. Add source credibility scoring\n5. Implement iterative refinement\n6. Add explanation generation\n7. Optimize for legal domain accuracy",
+      "description": "Create a sophisticated Retrieval-Augmented Generation system that uses context-aware search across multiple data sources."
+    },
+    "22": {
+      "status": "todo",
+      "title": "Create Planning Agent for complex tasks",
+      "tags": [
+        "agent",
+        "planning",
+        "task-decomposition"
+      ],
+      "implementation_plan": "1. Design task decomposition algorithms\n2. Create plan validation and optimization\n3. Implement dynamic plan adjustment\n4. Add resource estimation and scheduling\n5. Create plan execution monitoring\n6. Add learning from execution feedback\n7. Implement plan sharing and collaboration",
+      "description": "Implement an agent that can break down complex legal research tasks into multi-step execution plans."
+    },
+    "23": {
+      "status": "todo",
+      "title": "Implement Hungarian legal NLP fine-tuning",
+      "tags": [
+        "nlp",
+        "fine-tuning",
+        "hungarian",
+        "legal-language"
+      ],
+      "implementation_plan": "1. Collect and prepare Hungarian legal training data\n2. Research optimal model architectures\n3. Implement fine-tuning pipeline\n4. Add legal entity recognition training\n5. Create evaluation benchmarks\n6. Optimize model performance\n7. Deploy fine-tuned models",
+      "description": "Fine-tune language models specifically for Hungarian legal language and terminology."
+    },
+    "24": {
+      "status": "todo",
+      "title": "Create Reasoning Agent for legal analysis",
+      "tags": [
+        "agent",
+        "reasoning",
+        "legal-analysis",
+        "precedent"
+      ],
+      "implementation_plan": "1. Design legal reasoning frameworks\n2. Implement case law application logic\n3. Create precedent analysis algorithms\n4. Add argumentation structure recognition\n5. Implement consistency checking\n6. Create reasoning explanation generation\n7. Add legal validity verification",
+      "description": "Implement an agent capable of legal reasoning, case law application, and precedent analysis."
+    },
+    "25": {
+      "status": "todo",
+      "title": "Implement Self-Reflection Agent",
+      "tags": [
+        "agent",
+        "self-reflection",
+        "validation",
+        "quality"
+      ],
+      "implementation_plan": "1. Design self-validation frameworks\n2. Implement consistency checking algorithms\n3. Create accuracy verification methods\n4. Add bias detection and mitigation\n5. Implement confidence scoring\n6. Create improvement recommendation system\n7. Add learning from validation feedback",
+      "description": "Create an agent that can review and validate its own outputs for consistency, accuracy, and legal soundness."
+    },
+    "26": {
+      "status": "todo",
+      "title": "Create Mixture of Experts (MoE) system",
+      "tags": [
+        "moe",
+        "expert-models",
+        "routing",
+        "specialization"
+      ],
+      "implementation_plan": "1. Design expert model architecture\n2. Create domain classification system\n3. Implement expert routing algorithms\n4. Add expert model training pipeline\n5. Create performance monitoring\n6. Implement load balancing\n7. Add new expert integration capability",
+      "description": "Implement a system that routes queries to specialized expert models based on legal domain and complexity."
+    },
+    "27": {
+      "status": "todo",
+      "title": "Implement Human Feedback System (RLHF)",
+      "tags": [
+        "rlhf",
+        "human-feedback",
+        "model-improvement"
+      ],
+      "implementation_plan": "1. Design feedback collection interfaces\n2. Create legal expert annotation tools\n3. Implement feedback processing pipeline\n4. Add quality control for feedback\n5. Create model update mechanisms\n6. Implement feedback analytics\n7. Add continuous learning capabilities",
+      "description": "Create a comprehensive system for collecting, processing, and incorporating human expert feedback for model improvement."
+    },
+    "28": {
+      "status": "todo",
+      "title": "Implement security and privacy framework",
+      "tags": [
+        "security",
+        "privacy",
+        "gdpr",
+        "compliance"
+      ],
+      "implementation_plan": "1. Implement authentication and authorization\n2. Add data encryption at rest and in transit\n3. Create audit logging and monitoring\n4. Implement GDPR compliance measures\n5. Add data anonymization capabilities\n6. Create security incident response\n7. Add penetration testing and vulnerability scanning",
+      "description": "Create comprehensive security measures and privacy protection for legal document processing and user data."
+    },
+    "29": {
+      "status": "todo",
+      "title": "Create legal change monitoring system",
+      "tags": [
+        "monitoring",
+        "change-detection",
+        "impact-analysis"
+      ],
+      "implementation_plan": "1. Design change detection algorithms\n2. Create impact analysis framework\n3. Implement notification systems\n4. Add priority assessment mechanisms\n5. Create change visualization tools\n6. Implement automated update workflows\n7. Add historical change tracking",
+      "description": "Implement automated monitoring for legal changes and their impact analysis on existing legal relationships."
+    },
+    "30": {
+      "status": "todo",
+      "title": "Implement performance optimization system",
+      "tags": [
+        "performance",
+        "optimization",
+        "monitoring"
+      ],
+      "implementation_plan": "1. Set up comprehensive monitoring\n2. Implement performance profiling\n3. Create optimization recommendations\n4. Add automatic scaling capabilities\n5. Implement caching optimizations\n6. Create performance benchmarking\n7. Add resource usage optimization",
+      "description": "Create comprehensive performance monitoring and optimization for all system components."
+    },
+    "31": {
+      "status": "todo",
+      "title": "Create advanced analytics and reporting",
+      "tags": [
+        "analytics",
+        "reporting",
+        "business-intelligence"
+      ],
+      "implementation_plan": "1. Design analytics data model\n2. Create usage tracking systems\n3. Implement custom reporting tools\n4. Add legal insight analytics\n5. Create performance dashboards\n6. Implement trend analysis\n7. Add predictive analytics",
+      "description": "Implement comprehensive analytics and reporting for system usage, performance, and legal insights."
+    },
+    "32": {
+      "status": "todo",
+      "title": "Implement multi-domain support",
+      "tags": [
+        "multi-domain",
+        "scalability",
+        "legal-domains"
+      ],
+      "implementation_plan": "1. Design domain-agnostic architecture\n2. Create domain configuration system\n3. Implement domain-specific models\n4. Add cross-domain relationship detection\n5. Create domain switching capabilities\n6. Implement domain-specific UI components\n7. Add domain performance optimization",
+      "description": "Extend the system to support multiple legal domains beyond energy law (tax, labor, constitutional law, etc.)."
+    },
+    "33": {
+      "status": "todo",
+      "title": "Create API marketplace and integration platform",
+      "tags": [
+        "api-marketplace",
+        "integrations",
+        "platform"
+      ],
+      "implementation_plan": "1. Design API marketplace architecture\n2. Create developer portal and documentation\n3. Implement API versioning and management\n4. Add usage tracking and billing\n5. Create integration testing framework\n6. Implement partner onboarding\n7. Add marketplace governance",
+      "description": "Develop an API marketplace for third-party integrations and external legal service providers."
+    },
+    "34": {
+      "status": "todo",
+      "title": "Implement mobile applications",
+      "tags": [
+        "mobile",
+        "ios",
+        "android",
+        "cross-platform"
+      ],
+      "implementation_plan": "1. Choose mobile development framework\n2. Design mobile-optimized UI/UX\n3. Implement core legal search features\n4. Add offline capabilities\n5. Implement push notifications\n6. Add mobile-specific security measures\n7. Create app store deployment pipeline",
+      "description": "Create mobile applications for iOS and Android to provide legal AI capabilities on mobile devices."
+    },
+    "35": {
+      "status": "todo",
+      "title": "Create system maintenance and support framework",
+      "tags": [
+        "maintenance",
+        "support",
+        "operations"
+      ],
+      "implementation_plan": "1. Create maintenance procedures and schedules\n2. Implement automated health checks\n3. Create incident response procedures\n4. Add backup and disaster recovery\n5. Implement user support systems\n6. Create system documentation\n7. Add knowledge management systems",
+      "description": "Implement comprehensive maintenance, support, and operational procedures for long-term system stability."
+    }
+  },
+  "last_update": "2025-06-18T00:19:55.143996"
+}

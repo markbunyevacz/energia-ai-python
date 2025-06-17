@@ -1,0 +1,107 @@
+{
+  "project": {
+    "name": "Energia AI - Hungarian Legal AI System",
+    "type": "legal-ai-backend",
+    "language": "python",
+    "framework": "fastapi",
+    "domain": "legal-tech"
+  },
+  "automation": {
+    "task_triggers": {
+      "on_file_change": {
+        "patterns": [
+          {
+            "pattern": "app/crawlers/**/*.py",
+            "actions": ["validate_crawler", "run_tests", "update_crawler_docs"]
+          },
+          {
+            "pattern": "supabase/migrations/*.sql",
+            "actions": ["validate_migration", "update_schema_docs", "check_rls_policies"]
+          },
+          {
+            "pattern": "app/core/**/*.py",
+            "actions": ["run_core_tests", "validate_ai_config", "check_dependencies"]
+          }
+        ]
+      },
+      "on_git_event": {
+        "pre_commit": ["run_linting", "validate_legal_compliance", "check_hungarian_nlp"],
+        "pre_push": ["run_full_tests", "validate_architecture", "check_security"]
+      },
+      "on_task_status_change": {
+        "trigger_conditions": [
+          {
+            "from_status": "pending",
+            "to_status": "in-progress",
+            "actions": ["auto_implement_task", "switch_context", "execute_task_command"]
+          },
+          {
+            "from_status": "in-progress", 
+            "to_status": "done",
+            "actions": ["run_task_tests", "update_documentation", "validate_completion"]
+          }
+        ],
+        "monitor_script": "scripts/automation/task-status-monitor.py",
+        "auto_implementation": true
+      }
+    },
+    "context_aware_suggestions": {
+      "legal_domain": {
+        "when": "working_on_legal_logic",
+        "suggest": [
+          "Validate Hungarian legal citations",
+          "Check Magyar Közlöny compliance",
+          "Review ELI standard implementation",
+          "Verify GDPR compliance for legal data"
+        ]
+      },
+      "ai_components": {
+        "when": "working_on_ai_features",
+        "suggest": [
+          "Test Hungarian language processing",
+          "Validate embedding generation",
+          "Check RAG pipeline accuracy",
+          "Review hallucination prevention"
+        ]
+      },
+      "crawler_development": {
+        "when": "working_on_crawlers",
+        "suggest": [
+          "Test anti-detection mechanisms",
+          "Validate legal source integrity",
+          "Check rate limiting compliance",
+          "Review data extraction accuracy"
+        ]
+      }
+    }
+  },
+  "extensions": {
+    "legal_ai_toolkit": {
+      "commands": [
+        {
+          "name": "validate_hungarian_legal_text",
+          "description": "Validate Hungarian legal text formatting and citation standards",
+          "trigger": "when_editing_legal_content"
+        },
+        {
+          "name": "generate_migration_from_schema_change",
+          "description": "Auto-generate Supabase migration when schema changes detected",
+          "trigger": "when_schema_modified"
+        },
+        {
+          "name": "test_crawler_compliance",
+          "description": "Test crawler against real legal sources with compliance checks",
+          "trigger": "when_crawler_modified"
+        }
+      ]
+    },
+    "architecture_compliance": {
+      "validators": [
+        "microservice_boundaries",
+        "data_flow_consistency", 
+        "security_model_adherence",
+        "hungarian_legal_standards"
+      ]
+    }
+  }
+} 
