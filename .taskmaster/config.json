@@ -1,0 +1,22 @@
+{
+  "project_name": "Hungarian Legal AI System",
+  "project_description": "Magyar Jogi AI Rendszer - Python implementation with FastAPI backend, legal document processing, and AI agents",
+  "version": "1.0.0",
+  "main_model": "claude-3-5-sonnet-20241022",
+  "research_model": "perplexity-latest",
+  "fallback_model": "gpt-4o-mini",
+  "auto_expand_complex_tasks": true,
+  "default_priority": "medium",
+  "estimated_hours_per_complexity_point": 1.5,
+  "tags": {
+    "backend": "Backend development tasks",
+    "frontend": "Frontend/UI development tasks", 
+    "database": "Database setup and management",
+    "crawler": "Web crawling and data collection",
+    "nlp": "Natural language processing",
+    "agent": "AI agent development",
+    "api": "API integration tasks",
+    "setup": "Project setup and configuration",
+    "testing": "Testing and quality assurance"
+  }
+} 

@@ -1,43 +1,259 @@
-# Architecture Guardrails
+# Development Guardrails - Python Backend
 
-This document outlines the key architectural principles and guardrails for the Jogi AI project. Its purpose is to ensure the codebase remains maintainable, scalable, and consistent as new features are added. All new development should adhere to these principles.
+This document establishes the development guidelines, constraints, and best practices for the Energia Legal AI Python backend system to ensure code quality, maintainability, and consistency.
 
-## 1. Core Principles
+## 🏗️ Code Organization Principles
 
-- **Separation of Concerns (SoC)**: Logic should be separated based on its responsibility.
-  - **UI Components (`/src/components`)**: Should contain presentation logic only. They receive data and emit user events. They should not contain complex business logic.
-  - **Core Services (`/src/core-legal-platform`)**: Contain the primary business logic. Services should be self-contained and focus on a specific domain (e.g., `FeedbackService`, `PerformanceTuner`).
-  - **State Management**: Complex state should be managed via React Contexts (`/src/contexts`) or dedicated state management libraries, not within individual components.
+### 1. **Project Structure Standards**
 
-- **Unidirectional Data Flow**: Data should flow in a single, predictable direction. For the feedback loop, the flow is:
-  `UI -> FeedbackService -> Database -> Analytics -> Tuner -> Router`
-  Avoid creating circular dependencies or having services directly call UI components.
+#### **Directory Organization**
+```
+app/
+├── core/                    # Core configuration and utilities
+│   ├── config.py           # Application configuration
+│   ├── database.py         # Database connections
+│   ├── security.py         # Security utilities
+│   ├── logging.py          # Logging configuration
+│   └── exceptions.py       # Custom exceptions
+├── api/                     # API layer (FastAPI)
+│   ├── routers/            # API route handlers
+│   │   ├── auth.py         # Authentication routes
+│   │   ├── documents.py    # Document management
+│   │   ├── analysis.py     # Analysis endpoints
+│   │   └── admin.py        # Admin operations
+│   ├── dependencies.py     # Dependency injection
+│   ├── middleware.py       # Custom middleware
+│   └── models/             # Request/Response models
+├── services/               # Business logic layer
+│   ├── ai_service.py       # AI model integration
+│   ├── document_service.py # Document processing
+│   ├── crawler_service.py  # Web crawling
+│   ├── notification_service.py # Notifications
+│   └── analysis_service.py # Legal analysis
+├── models/                 # Data models
+│   ├── database/           # Database models
+│   │   ├── base.py         # Base model class
+│   │   ├── user.py         # User models
+│   │   ├── document.py     # Document models
+│   │   └── analysis.py     # Analysis models
+│   └── api/                # API models (Pydantic)
+├── crawlers/               # Web crawling modules
+│   ├── base_crawler.py     # Base crawler class
+│   ├── jogtar_crawler.py   # Jogtár crawler
+│   └── magyar_kozlony_crawler.py # Magyar Közlöny
+├── utils/                  # Utility functions
+│   ├── text_processing.py  # Text utilities
+│   ├── file_handlers.py    # File operations
+│   └── validators.py       # Input validation
+└── tests/                  # Test modules
+    ├── unit/               # Unit tests
+    ├── integration/        # Integration tests
+    └── fixtures/           # Test fixtures
+```
 
-- **Modularity and Reusability**:
-  - Build small, reusable components. The `DetailedFeedbackModal` is a good example.
-  - Services should be designed to be testable in isolation.
+#### **Module Responsibilities**
+- **`core/`**: Fundamental system configuration and cross-cutting concerns
+- **`api/`**: HTTP endpoints and request handling - NO business logic
+- **`services/`**: Business logic implementation - domain-specific operations
+- **`models/`**: Data structures and validation - clear separation between DB and API models
+- **`utils/`**: Pure functions and utilities - no side effects
+- **`tests/`**: Comprehensive test coverage with clear organization
 
-## 2. Backend and Data
+### 2. **Import Organization**
+```python
+# Standard library imports (first)
+import asyncio
+import json
+from datetime import datetime
+from typing import List, Optional, Dict, Any
 
-- **Database Schema**: All database changes must be documented via SQL scripts in the `/docs` directory.
-- **Security First**: All new tables that may contain user or sensitive data MUST implement Row-Level Security (RLS) policies. Default to denying access and open up permissions explicitly.
-- **Service Interaction**: Services should interact with the database via the Supabase client (`/src/integrations/supabase/client.ts`). Avoid raw database connections elsewhere.
+# Third-party imports (second)
+import httpx
+from fastapi import FastAPI, Depends, HTTPException
+from pydantic import BaseModel, Field
+from supabase import create_client
 
-## 3. Agents and Routing
+# Local imports (third)
+from app.core.config import settings
+from app.core.database import get_db
+from app.models.database.document import LegalDocument
+from app.services.ai_service import AIService
+```
 
-- **Agent Independence**: Agents (`/src/core-legal-platform/agents`) should be self-contained and not have direct knowledge of other agents.
-- **Telemetry is Not Optional**: All public-facing agent processing methods should be wrapped in a telemetry layer (e.g., `processWithTelemetry`) to log performance metrics. This is crucial for the learning loop.
-- **Routing Logic**: The `MixtureOfExpertsRouter` is the single point of entry for routing queries to agents. Do not bypass this router.
+## 🔧 Code Quality Standards
 
-## 4. Frontend
+### 1. **Type Annotations**
+**MANDATORY**: All functions must have complete type annotations
 
-- **Component Library**: Utilize the existing UI library (`@/components/ui`) for all new UI elements to ensure visual consistency.
-- **Error Handling**: Use `ErrorBoundary` components to gracefully handle rendering errors and provide useful feedback to the user.
+```python
+# ✅ Good
+async def analyze_document(
+    document_id: str,
+    user_id: str,
+    analysis_type: str = "standard"
+) -> DocumentAnalysis:
+    """Analyze a legal document with specified analysis type."""
+    pass
 
-## 5. Testing
+# ❌ Bad
+async def analyze_document(document_id, user_id, analysis_type="standard"):
+    pass
+```
 
-- **Unit Tests**: All new services and complex utility functions should have corresponding unit tests.
-- **Integration Tests**: New, complex features (like the feedback loop) require an integration test file that outlines how the components work together. Place these in `/src/core-legal-platform/tests`.
+### 2. **Error Handling**
+**MANDATORY**: Explicit error handling with custom exceptions
 
----
-*This document is a living standard. It should be updated as the architecture evolves.* 
+```python
+# Custom exceptions
+class DocumentNotFoundError(Exception):
+    """Raised when a requested document is not found."""
+    pass
+
+class AnalysisError(Exception):
+    """Raised when document analysis fails."""
+    pass
+
+# ✅ Good - Explicit error handling
+async def get_document(document_id: str) -> LegalDocument:
+    try:
+        result = await db.fetch_document(document_id)
+        if not result:
+            raise DocumentNotFoundError(f"Document {document_id} not found")
+        return LegalDocument.from_db(result)
+    except DatabaseConnectionError as e:
+        logger.error(f"Database error fetching document {document_id}: {e}")
+        raise AnalysisError("Database connection failed") from e
+
+# ❌ Bad - Silent failures or generic exceptions
+async def get_document(document_id: str):
+    try:
+        return await db.fetch_document(document_id)
+    except:
+        return None
+```
+
+### 3. **Logging Standards**
+**MANDATORY**: Structured logging with appropriate levels
+
+```python
+import logging
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+# ✅ Good - Structured logging
+async def process_document(document: LegalDocument) -> ProcessingResult:
+    logger.info(
+        "Starting document processing",
+        extra={
+            "document_id": document.id,
+            "document_type": document.type,
+            "user_id": document.user_id
+        }
+    )
+    
+    try:
+        result = await ai_service.analyze(document)
+        
+        logger.info(
+            "Document processing completed successfully",
+            extra={
+                "document_id": document.id,
+                "processing_time": result.processing_time,
+                "confidence_score": result.confidence
+            }
+        )
+        
+        return result
+        
+    except AnalysisError as e:
+        logger.error(
+            "Document processing failed",
+            extra={
+                "document_id": document.id,
+                "error": str(e),
+                "error_type": type(e).__name__
+            }
+        )
+        raise
+
+# ❌ Bad - Unstructured logging
+async def process_document(document):
+    print(f"Processing document {document.id}")
+    try:
+        result = await ai_service.analyze(document)
+        print("Done")
+        return result
+    except Exception as e:
+        print(f"Error: {e}")
+        raise
+```
+
+### 4. **Documentation Standards**
+**MANDATORY**: Comprehensive docstrings for all public functions and classes
+
+```python
+# ✅ Good - Complete docstring
+async def analyze_contract_clause(
+    clause_text: str,
+    contract_type: str,
+    jurisdiction: str = "HU"
+) -> ClauseAnalysis:
+    """
+    Analyze a specific contract clause for legal risks and compliance.
+    
+    Args:
+        clause_text: The text content of the clause to analyze
+        contract_type: The type of contract (e.g., 'employment', 'commercial')
+        jurisdiction: The legal jurisdiction code (default: 'HU' for Hungary)
+    
+    Returns:
+        ClauseAnalysis: Analysis results including risk assessment and recommendations
+    
+    Raises:
+        ValueError: If clause_text is empty or invalid
+        AnalysisError: If the AI analysis fails
+        
+    Example:
+        >>> clause = "The employee must work 60 hours per week..."
+        >>> analysis = await analyze_contract_clause(clause, "employment")
+        >>> print(analysis.risk_level)
+        'HIGH'
+    """
+    if not clause_text.strip():
+        raise ValueError("Clause text cannot be empty")
+    
+    # Implementation here...
+    
+# ❌ Bad - No or minimal documentation
+async def analyze_contract_clause(clause_text, contract_type, jurisdiction="HU"):
+    # Analyze clause
+    pass
+```
+
+## 🎯 API Design Standards
+
+### 1. **RESTful Endpoint Design**
+```python
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.models.api.document import DocumentCreateRequest, DocumentResponse
+from app.services.document_service import DocumentService
+
+router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
+
+# ✅ Good - RESTful design with proper status codes
+@router.post(
+    "/",
+    response_model=DocumentResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new legal document",
+    description="Upload and create a new legal document for analysis"
+)
+async def create_document(
+    request: DocumentCreateRequest,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service)
+) -> DocumentResponse:
+    """Create a new legal document."""
+    try:
+        document = await document_service.

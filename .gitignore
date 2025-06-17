@@ -1,62 +1,99 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Dependencies
-node_modules
-dist
-dist-ssr
-*.local
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Environment variables
+# Logs
+*.log
+logs/
+*.log.*
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Database
+*.db
+*.sqlite3
+
+# Temporary files
+.tmp/
+.cache/
+.temp/
+tmp/
+
+# Application specific
+downloads/
+uploads/
+data/
+backups/
+
+# Supabase
+supabase/functions/**/config.toml
+.supabase/
+
+# Environment variables (security)
 .env
 .env.*
 !.env.example
+!.env.template
 
-# Testing
-coverage
-.nyc_output
+# AI model caches
+.transformers_cache/
+.cache/huggingface/
 
-# Build output
-build
-out
-
-# TypeScript
-*.tsbuildinfo
-
-# Vite
-.vite
-
-# Tailwind
-.tailwindcss-cache
-
-# Misc
-.cache
-.temp
-.tmp
-
-# Supabase config
-supabase/functions/**/config.toml
-
-# Supabase - Replace with your project's credentials
-VITE_SUPABASE_URL=https://abjuvmwpjapknuxqrefg.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFianV2bXdwamFwa251eHFyZWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDU2MTAsImV4cCI6MjA2NDQ4MTYxMH0.AP72jjnx6xbHBCfAi7iDDrquZC2TuyGPgNnsdLeFt0Q
-
-# OpenAI - Replace with your API key
-OPENAI_API_KEY=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
+# FastAPI specific (for future use)
+.fastapi_cache/

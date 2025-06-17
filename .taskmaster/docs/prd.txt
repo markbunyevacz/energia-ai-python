@@ -1,0 +1,189 @@
+# Hungarian Legal AI System - Product Requirements Document
+
+## Project Overview
+
+**Product Name:** Magyar Jogi AI Rendszer (Hungarian Legal AI System)
+**Version:** 2.0 (Python Implementation)
+**Target Users:** Legal professionals, law students, government officials, legal researchers
+
+## Vision Statement
+
+Create an enterprise-grade, AI-powered legal assistant system that can understand, analyze, and provide insights on Hungarian legal documents. The system will leverage advanced natural language processing, semantic search, and specialized AI agents to revolutionize legal research and document analysis in Hungary.
+
+## Core Objectives
+
+1. **Comprehensive Legal Document Access**: Provide seamless access to all Hungarian legal documents including laws, regulations, court decisions, and legal commentary
+2. **Intelligent Search & Analysis**: Enable semantic search across legal documents with context-aware results
+3. **AI-Powered Legal Insights**: Generate legal summaries, identify relevant precedents, and provide legal analysis
+4. **Multi-Domain Legal Support**: Support various legal domains (energy law, tax law, labor law, etc.)
+5. **Professional Integration**: Integrate with existing legal workflows and professional tools
+
+## Technical Architecture Requirements
+
+### Backend Infrastructure
+- **Framework**: FastAPI for high-performance REST API
+- **Language**: Python 3.11+ for AI/ML capabilities
+- **Databases**: 
+  - PostgreSQL for structured legal metadata
+  - MongoDB for document storage
+  - Vector database (Weaviate/Qdrant) for semantic search
+  - Redis for caching and session management
+
+### AI/ML Components
+- **Language Models**: Claude 3.5 Sonnet for legal analysis
+- **Vector Embeddings**: Hungarian-optimized embeddings for legal text
+- **Agent Architecture**: Specialized agents for different legal tasks
+- **RAG System**: Retrieval-Augmented Generation for legal queries
+
+### Data Sources
+- **Primary**: njt.hu (Hungarian Legal Database)
+- **Secondary**: Magyar Közlöny (Hungarian Official Gazette)
+- **Court Decisions**: Bírósági Határozatok Gyűjteménye
+- **Commentary**: Legal expert opinions and analysis
+
+## Functional Requirements
+
+### Phase 1: Foundation (Months 1-6)
+1. **Legal Document Crawler**
+   - Implement ELI-compliant crawler for njt.hu
+   - Handle rate limiting and respectful crawling
+   - Support incremental updates
+
+2. **Document Processing Pipeline**
+   - Intelligent chunking respecting legal structure
+   - Metadata extraction (law type, date, authority)
+   - Text normalization and preprocessing
+
+3. **Basic Search System**
+   - Lexical search with legal term awareness
+   - Basic semantic search functionality
+   - Result ranking and relevance scoring
+
+4. **API Infrastructure**
+   - RESTful API with authentication
+   - Rate limiting and usage tracking
+   - Health monitoring and logging
+
+### Phase 2: AI Enhancement (Months 6-12)
+1. **Semantic Search Engine**
+   - Advanced vector similarity search
+   - Cross-reference detection
+   - Citation network analysis
+
+2. **Legal Analysis Agents**
+   - Document summarization agent
+   - Legal precedent finder
+   - Contradiction detection agent
+   - Impact analysis agent
+
+3. **Natural Language Interface**
+   - Hungarian language query processing
+   - Context-aware response generation
+   - Legal terminology recognition
+
+### Phase 3: Advanced Features (Months 12-18)
+1. **Multi-Domain Support**
+   - Domain-specific legal models
+   - Cross-domain legal relationship detection
+   - Specialized legal workflows
+
+2. **Professional Tools Integration**
+   - Document generation templates
+   - Legal research workflows
+   - Citation management
+   - Collaborative features
+
+## User Stories
+
+### Legal Professional
+- "As a lawyer, I want to quickly find all relevant case law for a specific legal issue"
+- "As a legal researcher, I want to identify how a new regulation affects existing contracts"
+- "As a law firm partner, I want to ensure our legal advice is based on the most current law"
+
+### Government Official
+- "As a policy maker, I want to understand the potential impact of proposed legislation"
+- "As a regulatory officer, I want to check for conflicts between different regulations"
+
+### Law Student
+- "As a law student, I want to understand complex legal concepts with AI-powered explanations"
+- "As a researcher, I want to trace the evolution of specific legal principles"
+
+## Success Metrics
+
+### Performance Metrics
+- **Search Latency**: < 200ms for basic searches, < 2s for complex queries
+- **Accuracy**: > 95% for document retrieval, > 90% for legal analysis
+- **Availability**: 99.9% uptime
+- **Scalability**: Support 1000+ concurrent users
+
+### Business Metrics
+- **User Adoption**: 1000+ registered legal professionals within 6 months
+- **Usage**: 10,000+ queries per day
+- **Satisfaction**: > 4.5/5 user rating
+- **Coverage**: Complete Hungarian legal corpus indexed
+
+## Technical Constraints
+
+### Legal Compliance
+- GDPR compliance for user data
+- Hungarian data protection regulations
+- Legal professional confidentiality requirements
+
+### Performance Requirements
+- Handle 100GB+ of legal documents
+- Support real-time legal updates
+- Maintain consistent performance under load
+
+### Integration Requirements
+- RESTful API for third-party integrations
+- Standard authentication protocols (OAuth 2.0)
+- Export capabilities (PDF, JSON, XML)
+
+## Risk Assessment
+
+### Technical Risks
+- **AI Hallucination**: Implement strict fact-checking and source verification
+- **Data Quality**: Establish robust data validation and cleaning processes
+- **Scalability**: Design for horizontal scaling from the start
+
+### Legal Risks
+- **Accuracy Liability**: Implement clear disclaimers and human review processes
+- **Copyright Issues**: Ensure proper licensing for legal content
+- **Professional Liability**: Establish professional review processes
+
+## Implementation Strategy
+
+### Development Methodology
+- Agile development with 2-week sprints
+- Continuous integration/deployment
+- Test-driven development for critical components
+
+### Quality Assurance
+- Automated testing for all API endpoints
+- Legal expert review for AI-generated content
+- Performance testing under realistic loads
+
+### Security Measures
+- End-to-end encryption for sensitive data
+- Multi-factor authentication for professional users
+- Regular security audits and penetration testing
+
+## Future Enhancements
+
+### Advanced AI Features
+- Predictive legal analysis
+- Contract risk assessment
+- Legal writing assistance
+- Multi-language support (EU languages)
+
+### Platform Expansion
+- Mobile applications
+- Integration with legal practice management systems
+- API marketplace for third-party developers
+- European legal system expansion
+
+## Conclusion
+
+The Hungarian Legal AI System represents a significant advancement in legal technology, combining cutting-edge AI with deep legal domain knowledge. Success will be measured not just by technical metrics, but by the real-world impact on legal professionals' efficiency and the quality of legal services in Hungary.
+
+The phased approach ensures manageable development complexity while delivering value at each stage. The foundation phase establishes core capabilities, the enhancement phase adds AI sophistication, and the advanced phase positions the system as a comprehensive legal technology platform. 

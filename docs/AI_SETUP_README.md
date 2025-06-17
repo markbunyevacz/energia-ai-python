@@ -1,6 +1,6 @@
-# AI Model Setup Guide
+# AI Model Setup Guide - Python Backend
 
-This guide explains how to configure and use the real AI APIs in your legal platform.
+This guide explains how to configure and use AI APIs in your Python-based legal platform.
 
 ## 🚀 Quick Start
 
@@ -20,41 +20,41 @@ This guide explains how to configure and use the real AI APIs in your legal plat
 
 3. **Test your configuration:**
    ```bash
-   npm run setup:ai
+   python config.py
    ```
 
 4. **Start the application:**
    ```bash
-   npm run dev
+   python main.py
    ```
 
 ## 🎯 Available Models
 
-The system is configured to use only these specific high-performance models:
+The system is configured to use these high-performance models:
 
-### 1. **GPT-4o Mini (High)** - OpenAI
+### 1. **Claude 4 Sonnet** - Anthropic (Recommended)
+- **Model ID:** `claude-sonnet-4-20250514`
+- **Use Case:** Complex reasoning, legal analysis
+- **Context Window:** 200,000 tokens
+- **Best for:** Legal document analysis, contract review
+
+### 2. **GPT-4o Mini** - OpenAI
 - **Model ID:** `gpt-4o-mini`
 - **Use Case:** General purpose, fast responses
 - **Context Window:** 128,000 tokens
-- **Cost:** $0.00015 input / $0.0006 output per 1K tokens
+- **Best for:** Quick queries, summarization
 
-### 2. **Claude 4 Sonnet Thinking** - Anthropic
-- **Model ID:** `claude-3-5-sonnet-20241022` (will be updated when Claude 4 is released)
-- **Use Case:** Complex reasoning, legal analysis
-- **Context Window:** 200,000 tokens
-- **Cost:** $0.003 input / $0.015 output per 1K tokens
-
-### 3. **Gemini 2.5 Pro (06.25)** - Google
-- **Model ID:** `gemini-2.0-flash-exp` (will be updated when 2.5 Pro is released)
+### 3. **Gemini 2.5 Pro** - Google
+- **Model ID:** `gemini-2.5-pro-exp`
 - **Use Case:** Large context, multimodal tasks
 - **Context Window:** 2,000,000 tokens
-- **Cost:** $0.00125 input / $0.005 output per 1K tokens
+- **Best for:** Large document processing
 
 ### 4. **Deepseek R1 (0528)** - Deepseek
 - **Model ID:** `deepseek-r1`
-- **Use Case:** Cost-effective, powerful reasoning
+- **Use Case:** Cost-effective reasoning
 - **Context Window:** 64,000 tokens
-- **Cost:** $0.0014 input / $0.0028 output per 1K tokens
+- **Best for:** Budget-conscious applications
 
 ## 🔑 Getting API Keys
 
@@ -78,208 +78,305 @@ The system is configured to use only these specific high-performance models:
 2. Create a new API key
 3. Add credits to your account
 
-## 🛠️ Configuration Management
-
-### Using the CLI
-```bash
-# Test all configurations
-npm run setup:ai
-
-# Show configuration only
-npm run setup:ai -- --config-only
-
-# Test services only
-npm run setup:ai -- --test-only
-```
-
-### Using the Web UI
-1. Navigate to `/ai-setup` in your application
-2. Manage API keys in the "API Keys" tab
-3. Add/edit/delete models in the "Models" tab
-4. Test connections in the "Testing" tab
-
-## 💻 Usage Examples
+## 🛠️ Python Configuration
 
 ### Basic Usage
-```typescript
-import { createDefaultAI, createTaskAI, createAIService } from '@/llm/ai-factory';
+```python
+import os
+from openai import OpenAI
+from anthropic import Anthropic
 
-// Use default configured model
-const ai = createDefaultAI();
-const response = await ai.generate('Analyze this contract clause...');
+# Initialize clients
+openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+anthropic_client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 
-// Use task-optimized models
-const legalAI = createTaskAI('analysis');
-const codingAI = createTaskAI('coding');
+# Use OpenAI
+response = openai_client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Analyze this contract clause..."}]
+)
 
-// Use specific models
-const claude = createAIService('claude', 'claude-4-sonnet-thinking');
-const gpt = createAIService('openai', 'gpt-4o-mini-high');
+# Use Anthropic Claude
+response = anthropic_client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1000,
+    messages=[{"role": "user", "content": "Analyze this contract clause..."}]
+)
 ```
 
-### Advanced Configuration
-```typescript
-import { AIService } from '@/llm/ai-service';
+### Configuration Class Example
+```python
+import os
+from dataclasses import dataclass
 
-// Custom configuration
-const customAI = new AIService({
-  provider: 'claude',
-  apiKey: 'your-key',
-  model: 'claude-4-sonnet-thinking',
-  temperature: 0.3,
-  maxTokens: 8000
-});
-
-// Get detailed response with metadata
-const result = await customAI.generateWithMetadata('Your prompt here');
-console.log(result.tokenUsage); // Token usage information
-console.log(result.provider);   // Model provider
+@dataclass
+class AIConfig:
+    openai_api_key: str = os.getenv('OPENAI_API_KEY')
+    anthropic_api_key: str = os.getenv('ANTHROPIC_API_KEY')
+    gemini_api_key: str = os.getenv('GEMINI_API_KEY')
+    deepseek_api_key: str = os.getenv('DEEPSEEK_API_KEY')
+    
+    default_provider: str = os.getenv('DEFAULT_AI_PROVIDER', 'anthropic')
+    default_model: str = os.getenv('DEFAULT_AI_MODEL', 'claude-3-5-sonnet-20241022')
+    
+    def validate(self):
+        """Validate that required API keys are present"""
+        if not self.openai_api_key:
+            print("⚠️  OpenAI API key not found")
+        if not self.anthropic_api_key:
+            print("⚠️  Anthropic API key not found")
+        # Add more validations as needed
 ```
 
-### Task-Specific Models
-```typescript
-// Legal reasoning (uses Claude Sonnet)
-const legalAI = createTaskAI('reasoning');
+### Legal-Specific Prompts
+```python
+LEGAL_PROMPTS = {
+    "contract_analysis": """
+    Analyze the following contract clause for potential risks and issues:
+    
+    Clause: {clause_text}
+    
+    Please provide:
+    1. Risk assessment (High/Medium/Low)
+    2. Key issues identified
+    3. Recommended actions
+    4. Compliance considerations
+    """,
+    
+    "regulatory_check": """
+    Check if the following practice complies with Hungarian energy regulations:
+    
+    Practice: {practice_description}
+    
+    Please provide:
+    1. Compliance status
+    2. Relevant regulations
+    3. Potential violations
+    4. Recommendations
+    """
+}
 
-// Code analysis (uses GPT-4o Mini)
-const codeAI = createTaskAI('coding');
-
-// Document analysis (uses Claude with higher context)
-const analysisAI = createTaskAI('analysis');
-
-// Translation (uses Gemini)
-const translationAI = createTaskAI('translation');
-
-// Creative writing (uses higher temperature)
-const creativeAI = createTaskAI('creative');
+# Usage
+def analyze_contract_clause(clause_text: str) -> str:
+    prompt = LEGAL_PROMPTS["contract_analysis"].format(clause_text=clause_text)
+    
+    response = anthropic_client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=2000,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    return response.content[0].text
 ```
 
 ## 🧪 Testing and Validation
 
-### Automatic Testing
-The setup script automatically tests all configured models:
+### Connection Testing
+```python
+def test_ai_connections():
+    """Test all AI service connections"""
+    results = {}
+    
+    # Test OpenAI
+    try:
+        openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "Hello"}],
+            max_tokens=10
+        )
+        results['openai'] = True
+        print("✅ OpenAI connection successful")
+    except Exception as e:
+        results['openai'] = False
+        print(f"❌ OpenAI connection failed: {e}")
+    
+    # Test Anthropic
+    try:
+        anthropic_client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+        response = anthropic_client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=10,
+            messages=[{"role": "user", "content": "Hello"}]
+        )
+        results['anthropic'] = True
+        print("✅ Anthropic connection successful")
+    except Exception as e:
+        results['anthropic'] = False
+        print(f"❌ Anthropic connection failed: {e}")
+    
+    return results
 
-```bash
-npm run setup:ai
+# Run tests
+if __name__ == "__main__":
+    test_ai_connections()
 ```
 
-### Manual Testing
-```typescript
-import { aiFactory } from '@/llm/ai-factory';
+## 🔧 Advanced Configuration
 
-// Test all services
-const results = await aiFactory.testAllServices();
-console.log(results); // Map of provider -> boolean
+### Environment-Based Configuration
+```python
+import os
+from enum import Enum
 
-// Test specific service
-const claude = aiFactory.createService('claude');
-const isWorking = await claude.testConnection();
+class Environment(Enum):
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
+
+class AISettings:
+    def __init__(self):
+        self.environment = Environment(os.getenv('ENVIRONMENT', 'development'))
+        
+        # Adjust settings based on environment
+        if self.environment == Environment.PRODUCTION:
+            self.max_tokens = 4000
+            self.temperature = 0.3
+            self.timeout = 30
+        else:
+            self.max_tokens = 2000
+            self.temperature = 0.1
+            self.timeout = 10
+    
+    def get_model_config(self, task_type: str):
+        """Get model configuration based on task type"""
+        configs = {
+            "legal_analysis": {
+                "model": "claude-3-5-sonnet-20241022",
+                "temperature": 0.1,
+                "max_tokens": 4000
+            },
+            "summarization": {
+                "model": "gpt-4o-mini",
+                "temperature": 0.3,
+                "max_tokens": 1000
+            },
+            "research": {
+                "model": "gemini-2.0-flash-exp",
+                "temperature": 0.2,
+                "max_tokens": 2000
+            }
+        }
+        return configs.get(task_type, configs["legal_analysis"])
 ```
 
-### Health Checks
-```typescript
-import { aiConfig } from '@/config/ai-config';
+## 🔒 Security Best Practices
 
-// Check configuration
-const validation = aiConfig.validateConfiguration();
-if (!validation.valid) {
-  console.log('Issues:', validation.errors);
-}
+### API Key Management
+```python
+import os
+from cryptography.fernet import Fernet
 
-// Get available providers
-const providers = aiConfig.getAvailableProviders();
-console.log('Available:', providers);
+class SecureAPIKeys:
+    def __init__(self):
+        self.encryption_key = os.getenv('ENCRYPTION_KEY')
+        self.cipher = Fernet(self.encryption_key) if self.encryption_key else None
+    
+    def encrypt_api_key(self, api_key: str) -> str:
+        """Encrypt API key for storage"""
+        if self.cipher:
+            return self.cipher.encrypt(api_key.encode()).decode()
+        return api_key
+    
+    def decrypt_api_key(self, encrypted_key: str) -> str:
+        """Decrypt API key for use"""
+        if self.cipher:
+            return self.cipher.decrypt(encrypted_key.encode()).decode()
+        return encrypted_key
 ```
 
-## 🔧 Customization
+### Rate Limiting
+```python
+import time
+from functools import wraps
 
-### Adding Custom Models
-You can add custom models through the UI or programmatically:
+def rate_limit(calls_per_minute: int):
+    """Decorator to limit API calls per minute"""
+    def decorator(func):
+        calls = []
+        
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            now = time.time()
+            # Remove calls older than 1 minute
+            calls[:] = [call_time for call_time in calls if now - call_time < 60]
+            
+            if len(calls) >= calls_per_minute:
+                sleep_time = 60 - (now - calls[0])
+                print(f"Rate limit reached. Sleeping for {sleep_time:.2f} seconds")
+                time.sleep(sleep_time)
+            
+            calls.append(now)
+            return func(*args, **kwargs)
+        
+        return wrapper
+    return decorator
 
-```typescript
-// Add to AI_MODELS in src/config/ai-config.ts
-export const AI_MODELS = {
-  'my-custom-model': {
-    provider: 'openai',
-    model: 'gpt-4-custom',
-    displayName: 'My Custom Model',
-    contextWindow: 32000,
-    costPer1kTokens: { input: 0.01, output: 0.02 }
-  }
-};
+# Usage
+@rate_limit(calls_per_minute=10)
+def call_ai_api(prompt: str):
+    # Your AI API call here
+    pass
 ```
 
-### Environment Variables
-All configuration can be controlled via environment variables:
+## 📚 Integration Examples
 
-```bash
-# Default provider
-DEFAULT_AI_PROVIDER=claude
-VITE_DEFAULT_AI_PROVIDER=claude
+### FastAPI Integration (Future)
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
-# Default model
-DEFAULT_AI_MODEL=claude-4-sonnet-thinking
-VITE_DEFAULT_AI_MODEL=claude-4-sonnet-thinking
+app = FastAPI()
+
+class AnalysisRequest(BaseModel):
+    text: str
+    analysis_type: str
+
+@app.post("/analyze")
+async def analyze_text(request: AnalysisRequest):
+    try:
+        # AI analysis logic here
+        result = analyze_contract_clause(request.text)
+        return {"analysis": result, "status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 ```
 
-## 📊 Monitoring and Analytics
+### Supabase Integration
+```python
+from supabase import create_client, Client
 
-### Token Usage Tracking
-```typescript
-const result = await ai.generateWithMetadata('Your prompt');
-console.log(`Tokens used: ${result.tokenUsage?.totalTokens}`);
-console.log(`Cost: $${result.tokenUsage?.totalTokens * 0.001}`);
+class AIAnalysisService:
+    def __init__(self):
+        self.supabase: Client = create_client(
+            os.getenv('SUPABASE_URL'),
+            os.getenv('SUPABASE_ANON_KEY')
+        )
+        self.ai_config = AIConfig()
+    
+    def analyze_and_store(self, document_id: str, text: str):
+        """Analyze text and store results in Supabase"""
+        analysis = analyze_contract_clause(text)
+        
+        # Store analysis results
+        result = self.supabase.table('analyses').insert({
+            'document_id': document_id,
+            'analysis_text': analysis,
+            'created_at': 'now()',
+            'model_used': self.ai_config.default_model
+        }).execute()
+        
+        return result
 ```
-
-### Performance Monitoring
-```typescript
-import { aiFactory } from '@/llm/ai-factory';
-
-// Get cache statistics
-const stats = aiFactory.getCacheStats();
-console.log(`Cached services: ${stats.size}`);
-
-// Clear cache if needed
-aiFactory.clearCache();
-```
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-1. **"No API key found"**
-   - Check your `.env` file
-   - Ensure both `API_KEY` and `VITE_API_KEY` variables are set
-   - Restart the development server
-
-2. **"API request failed"**
-   - Verify your API key is valid
-   - Check you have sufficient credits
-   - Test with a simple prompt first
-
-3. **"Model not found"**
-   - Verify the model ID is correct
-   - Check if the model is available in your region
-   - Try a different model from the same provider
-
-### Debug Mode
-Enable debug logging:
-```typescript
-// Enable detailed logging
-console.log('AI Config:', aiConfig.printConfiguration());
-```
-
-### Support
-- Check model availability at provider documentation
-- Verify API key permissions
-- Monitor rate limits and quotas
-
-## 📄 License and Terms
-
-- Ensure you comply with each AI provider's terms of service
-- Monitor usage to avoid unexpected costs
-- Implement proper rate limiting for production use
 
 ---
 
-**Ready to start?** Run `npm run setup:ai` to begin! 
+## 🚀 Next Steps
+
+1. **Set up your API keys** in the `.env` file
+2. **Test connections** with `python config.py`
+3. **Build your AI service layer** using the examples above
+4. **Implement rate limiting** and error handling
+5. **Add monitoring** and logging for production use
+
+For more information, see the main [README.md](../README.md) and [SETUP.md](../SETUP.md) files. 

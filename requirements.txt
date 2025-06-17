@@ -1,2 +1,15 @@
+# Core application dependencies
+python-dotenv==1.0.1
 supabase==1.0.3
-python-dotenv==1.0.1 
+
+# AI & LLM Libraries
+langgraph==0.4.8
+anthropic==0.29.0 # For Claude AI
+
+# Dependency Resolutions
+# Pin httpx to a version compatible with both supabase and langsmith/langchain
+httpx==0.23.3
+
+# Added from the code block
+fastapi
+uvicorn 
