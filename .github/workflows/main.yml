@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'feature/*', 'fix/*' ]
   pull_request:
     branches: [ main, develop ]
 
@@ -103,7 +103,7 @@ jobs:
     name: Build Docker Images
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
 
     steps:
     - name: Checkout code
