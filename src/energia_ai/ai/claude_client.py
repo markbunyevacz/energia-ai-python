@@ -108,7 +108,7 @@ class ClaudeClient:
         lines = analysis_text.split('\n')
         for line in lines:
             line = line.strip()
-            if line.startswith(('•', '-', '*')) or (line and line[0].isdigit() and '.' in line):
+            if line.startswith(('â€¢', '-', '*', '1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.')) or (line and line[0].isdigit() and '.' in line):
                 key_points.append(line)
         
         return key_points
@@ -201,8 +201,8 @@ class ClaudeClient:
             base_prompt += """
             
             Please extract the key legal points from this document. Format as a bullet list:
-            • Point 1
-            • Point 2
+            â€¢ Point 1
+            â€¢ Point 2
             etc.
             
             Focus on actionable items, legal obligations, rights, and important conditions.
