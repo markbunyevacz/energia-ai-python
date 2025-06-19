@@ -136,7 +136,7 @@
     "description": "Implement intelligent chunking algorithms that respect legal document structure (paragraphs, sections, articles) for better processing."
   },
   "12": {
-    "status": "todo",
+    "status": "done",
     "title": "Implement embedding generation pipeline",
     "tags": [
       "embeddings",

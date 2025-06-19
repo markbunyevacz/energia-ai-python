@@ -281,7 +281,7 @@
         "id": 10,
         "title": "Implement Magyar Közlöny monitoring system",
         "description": "Create a monitoring system for Magyar Közlöny publications to detect new legal documents and changes.",
-        "status": "in-progress",
+        "status": "todo",
         "priority": "high",
         "complexity": 6,
         "phase": "Foundation",
@@ -305,13 +305,13 @@
           9
         ],
         "estimated_hours": 8,
-        "updated": "2025-06-18T00:06:32.617867"
+        "updated": "2025-06-19T10:35:52.605057"
       },
       {
         "id": 11,
         "title": "Create legal document chunking system",
         "description": "Implement intelligent chunking algorithms that respect legal document structure (paragraphs, sections, articles) for better processing.",
-        "status": "in-progress",
+        "status": "todo",
         "priority": "high",
         "complexity": 8,
         "phase": "Foundation",
@@ -335,7 +335,7 @@
           9
         ],
         "estimated_hours": 12,
-        "updated": "2025-06-17T23:37:39.494734"
+        "updated": "2025-06-19T10:35:52.954510"
       },
       {
         "id": 12,
@@ -371,7 +371,7 @@
         "id": 13,
         "title": "Create base agent architecture",
         "description": "Implement the foundational agent architecture with base classes and communication protocols for specialized legal AI agents.",
-        "status": "in-progress",
+        "status": "todo",
         "priority": "high",
         "complexity": 8,
         "phase": "Foundation",
@@ -395,13 +395,14 @@
         "dependencies": [
           1
         ],
-        "estimated_hours": 12
+        "estimated_hours": 12,
+        "updated": "2025-06-19T10:35:53.475267"
       },
       {
         "id": 14,
         "title": "Implement Task Understanding Agent",
         "description": "Create the first specialized agent that can understand and parse legal queries and research tasks from users.",
-        "status": "in-progress",
+        "status": "todo",
         "priority": "high",
         "complexity": 7,
         "phase": "Foundation",
@@ -424,7 +425,8 @@
         "dependencies": [
           13
         ],
-        "estimated_hours": 10
+        "estimated_hours": 10,
+        "updated": "2025-06-19T10:35:54.239794"
       },
       {
         "id": 15,
@@ -833,7 +835,7 @@
         "id": 28,
         "title": "Implement security and privacy framework",
         "description": "Create comprehensive security measures and privacy protection for legal document processing and user data.",
-        "status": "in-progress",
+        "status": "todo",
         "priority": "critical",
         "complexity": 8,
         "phase": "Advanced",
@@ -861,7 +863,7 @@
           5
         ],
         "estimated_hours": 16,
-        "updated": "2025-06-18T00:06:06.545405"
+        "updated": "2025-06-19T10:35:54.767239"
       },
       {
         "id": 29,
@@ -1079,7 +1081,7 @@
     ],
     "metadata": {
       "created": "2025-06-17T17:01:50.666Z",
-      "updated": "2025-06-17T22:36:39.337Z",
+      "updated": "2025-06-19T10:35:54.767269",
       "description": "Tasks for master context"
     }
   }
