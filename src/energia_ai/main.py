@@ -80,6 +80,12 @@ async def root():
         "health": "/health"
     }
 
+# Import API routers
+from energia_ai.api.ai.endpoints import router as ai_router
+
+# Include API routers
+app.include_router(ai_router)
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
@@ -87,4 +93,4 @@ if __name__ == "__main__":
         port=settings.port,
         reload=settings.debug,
         log_level="info"
-    )\nfrom energia_ai.api.ai.endpoints import router as ai_router
+    )
