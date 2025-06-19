@@ -281,7 +281,7 @@
         "id": 10,
         "title": "Implement Magyar Közlöny monitoring system",
         "description": "Create a monitoring system for Magyar Közlöny publications to detect new legal documents and changes.",
-        "status": "todo",
+        "status": "in-progress",
         "priority": "high",
         "complexity": 6,
         "phase": "Foundation",
@@ -835,7 +835,7 @@
         "id": 28,
         "title": "Implement security and privacy framework",
         "description": "Create comprehensive security measures and privacy protection for legal document processing and user data.",
-        "status": "todo",
+        "status": "in-progress",
         "priority": "critical",
         "complexity": 8,
         "phase": "Advanced",
@@ -863,7 +863,7 @@
           5
         ],
         "estimated_hours": 16,
-        "updated": "2025-06-19T10:35:54.767239"
+        "updated": "2025-06-19T17:27:17.211Z"
       },
       {
         "id": 29,
@@ -1081,7 +1081,7 @@
     ],
     "metadata": {
       "created": "2025-06-17T17:01:50.666Z",
-      "updated": "2025-06-19T15:16:24.758Z",
+      "updated": "2025-06-19T19:51:51.781Z",
       "description": "Tasks for master context"
     }
   }

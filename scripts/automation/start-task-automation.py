@@ -16,7 +16,7 @@ class TaskAutomationService:
         self.pid_file = self.project_root / ".taskmaster" / "automation.pid"
         self.log_file = self.project_root / ".taskmaster" / "automation.log"
         
-    def start(self, background=True):
+    def start(self, background=True, interval: int = 5):
         """Start the task automation monitor"""
         if self.is_running():
             print("Task automation is already running")
@@ -32,7 +32,8 @@ class TaskAutomationService:
             # Start as background process
             with open(self.log_file, 'w') as log:
                 process = subprocess.Popen([
-                    sys.executable, str(self.monitor_script)
+                    sys.executable, str(self.monitor_script),
+                    "monitor", f"--interval={interval}"
                 ], 
                 cwd=self.project_root,
                 stdout=log,
@@ -49,8 +50,10 @@ class TaskAutomationService:
             print(f"   Use 'python scripts/automation/start-task-automation.py stop' to stop")
         else:
             # Start in foreground
-            subprocess.run([sys.executable, str(self.monitor_script)], 
-                         cwd=self.project_root)
+            subprocess.run([
+                sys.executable, str(self.monitor_script),
+                "monitor", f"--interval={interval}"
+            ], cwd=self.project_root)
     
     def stop(self):
         """Stop the task automation monitor"""
@@ -64,41 +67,30 @@ class TaskAutomationService:
             
             print(f"🛑 Stopping Task Automation Service (PID: {pid})...")
             
-            if sys.platform == "win32":
-                # Windows process termination
-                try:
-                    import psutil
-                    process = psutil.Process(pid)
-                    process.terminate()
-                    process.wait(timeout=5)
-                    print("   ✅ Process terminated gracefully")
-                except (psutil.NoSuchProcess, psutil.AccessDenied):
-                    print("   ⚠️  Process not found or access denied")
-                except psutil.TimeoutExpired:
-                    print("   ⚠️  Process didn't terminate gracefully, force killing...")
-                    process.kill()
-                except ImportError:
-                    # Fallback to basic Windows termination
-                    subprocess.run(['taskkill', '/PID', str(pid), '/F'], 
-                                 capture_output=True)
-            else:
-                # Unix process termination
-                # Try graceful shutdown first
-                os.kill(pid, signal.SIGTERM)
-                
-                # Wait a bit and check if it's still running
-                time.sleep(2)
-                
-                try:
-                    os.kill(pid, 0)  # Check if process still exists
-                    # If we get here, process is still running - force kill
-                    print("   Process didn't respond to SIGTERM, force killing...")
+            try:
+                import psutil
+                process = psutil.Process(pid)
+                # Terminate children first
+                for child in process.children(recursive=True):
+                    child.terminate()
+                process.terminate()
+                process.wait(timeout=5)
+                print("   ✅ Process terminated gracefully")
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                print("   ⚠️  Process not found or access denied")
+            except psutil.TimeoutExpired:
+                print("   ⚠️  Process didn't terminate gracefully, force killing...")
+                process.kill()
+            except ImportError:
+                print("   ⚠️ psutil not found. Trying basic process termination.")
+                if sys.platform == "win32":
+                    subprocess.run(['taskkill', '/PID', str(pid), '/F'], capture_output=True)
+                else:
                     os.kill(pid, signal.SIGTERM)
-                except ProcessLookupError:
-                    pass  # Process already terminated
             
             # Clean up PID file
-            self.pid_file.unlink()
+            if self.pid_file.exists():
+                self.pid_file.unlink()
             print("✅ Task automation stopped")
             
         except Exception as e:
@@ -136,29 +128,27 @@ class TaskAutomationService:
             with open(self.pid_file) as f:
                 pid = int(f.read().strip())
             
-            # Check if process exists (Windows compatible)
-            if sys.platform == "win32":
-                import psutil
-                try:
-                    process = psutil.Process(pid)
-                    return process.is_running()
-                except (psutil.NoSuchProcess, psutil.AccessDenied):
-                    return False
-            else:
-                os.kill(pid, 0)
-                return True
-        except (ValueError, ProcessLookupError, FileNotFoundError, ImportError):
-            # PID file exists but process doesn't - clean up
+            # Check if process exists
+            import psutil
+            try:
+                process = psutil.Process(pid)
+                return process.is_running() and process.status() != psutil.STATUS_ZOMBIE
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                # Stale PID file
+                self.pid_file.unlink(missing_ok=True)
+                return False
+        except (ValueError, FileNotFoundError, ImportError):
+            # PID file exists but process doesn't or psutil not installed
             if self.pid_file.exists():
-                self.pid_file.unlink()
+                self.pid_file.unlink(missing_ok=True)
             return False
     
-    def restart(self):
+    def restart(self, interval: int = 5):
         """Restart the task automation monitor"""
         print("🔄 Restarting Task Automation Service...")
         self.stop()
         time.sleep(1)
-        self.start()
+        self.start(interval=interval)
 
 def main():
     """Main entry point"""
@@ -175,16 +165,22 @@ def main():
         action="store_true",
         help="Run in foreground (only for start action)"
     )
+    parser.add_argument(
+        "-i", "--interval", 
+        type=int, 
+        default=5,
+        help="Monitoring interval in seconds for the start/restart action"
+    )
     
     args = parser.parse_args()
     service = TaskAutomationService()
     
     if args.action == "start":
-        service.start(background=not args.foreground)
+        service.start(background=not args.foreground, interval=args.interval)
     elif args.action == "stop":
         service.stop()
     elif args.action == "restart":
-        service.restart()
+        service.restart(interval=args.interval)
     elif args.action == "status":
         service.status()
 

@@ -11,6 +11,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 import hashlib
 import os
+import psutil
+import argparse
 
 class TaskStatusMonitor:
     def __init__(self, project_root: Path = None):
@@ -328,7 +330,7 @@ class TaskStatusMonitor:
                     for detail in verification["details"]:
                         print(f"      • {detail}")
                 else:
-                    print(f"   ❌ INVALID - Implementation missing (Score: {verification['score']})")
+                    print(f"   [INVALID] Implementation missing (Score: {verification['score']})")
                     print(f"      Missing files: {', '.join(verification['files_missing'])}")
                     
                     # Update task status back to 'todo' if not properly implemented
@@ -644,7 +646,7 @@ except Exception as e:
     
     def monitor(self, interval: int = 5):
         """Main monitoring loop"""
-        print(f"📱 Task Status Monitor started (interval: {interval}s)")
+        print(f"[MONITOR] Task Status Monitor started (interval: {interval}s)")
         print(f"   Project: {self.project_root}")
         print(f"   Tasks file: {self.tasks_file}")
         
@@ -661,7 +663,8 @@ except Exception as e:
                 
                 # Process changes
                 for change in changes:
-                    self.implement_task(change["task_id"], change["task"])
+                    if change.get("change_type") == "started":
+                        self.implement_task(change["task_id"], change["task"])
                 
                 # Save current state
                 self.save_state(current_tasks)
@@ -670,29 +673,53 @@ except Exception as e:
                 time.sleep(interval)
                 
         except KeyboardInterrupt:
-            print("\n🛑 Task Status Monitor stopped")
+            print("\n[STOP] Task Status Monitor stopped")
         except Exception as e:
-            print(f"❌ Monitor error: {e}")
+            print(f"[ERROR] Monitor error: {e}")
 
 def main():
     """Main function"""
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "validate":
-            # Run validation only
-            monitor = TaskStatusMonitor()
-            monitor.validate_completed_tasks()
-            return
-        elif sys.argv[1] == "monitor":
-            # Run monitoring
-            interval = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-            monitor = TaskStatusMonitor()
-            monitor.monitor(interval)
-            return
-    
-    # Default: run validation then monitoring
     monitor = TaskStatusMonitor()
-    monitor.validate_completed_tasks()
-    monitor.monitor()
+    
+    parser = argparse.ArgumentParser(description="Task Status Monitor")
+    parser.add_argument(
+        "command", 
+        nargs='?', 
+        default="monitor", 
+        choices=["monitor", "validate", "implement"],
+        help="Command to execute (monitor, validate, or implement a specific task)"
+    )
+    parser.add_argument(
+        "--task-id",
+        help="The ID of the task to implement"
+    )
+    parser.add_argument(
+        "-i", "--interval", 
+        type=int, 
+        default=5,
+        help="Monitoring interval in seconds"
+    )
+
+    args = parser.parse_args()
+
+    if args.command == "validate":
+        monitor.validate_completed_tasks()
+    elif args.command == "implement":
+        if not args.task_id:
+            print("[ERROR] --task-id is required for the 'implement' command")
+            sys.exit(1)
+        
+        tasks = monitor.get_current_tasks()
+        task_to_implement = tasks.get(args.task_id)
+
+        if task_to_implement:
+            monitor.implement_task(args.task_id, task_to_implement)
+        else:
+            print(f"[ERROR] Task with ID '{args.task_id}' not found.")
+            sys.exit(1)
+    
+    elif args.command == "monitor":
+        monitor.monitor(interval=args.interval)
 
 if __name__ == "__main__":
     main() 

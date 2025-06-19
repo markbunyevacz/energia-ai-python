@@ -124,12 +124,14 @@ class ClaudeClient:
         if context_documents:
             context_text = "\n\n".join(context_documents)
         
+        context_section = f"Context documents:\n{context_text}" if context_text else ""
+        
         prompt = f"""
         You are a Hungarian legal AI assistant. Answer the following legal question based on Hungarian law.
         
         Question: {question}
         
-        {f"Context documents:\n{context_text}" if context_text else ""}
+        {context_section}
         
         Please provide:
         1. A direct answer to the question
