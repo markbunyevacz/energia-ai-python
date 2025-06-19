@@ -7,6 +7,7 @@ from typing import List, Optional, Dict, Any
 import structlog
 
 from ...ai.claude_client import get_claude_client, ClaudeClient
+from ...agents.task_understanding_agent import TaskUnderstandingAgent
 
 logger = structlog.get_logger()
 router = APIRouter(prefix="/ai", tags=["AI Legal Analysis"])
@@ -32,6 +33,10 @@ class LegalQuestionResponse(BaseModel):
     question: str
     model: str
     token_usage: Dict[str, int]
+
+class AgentQueryRequest(BaseModel):
+    query: str = Field(..., description="Natural language query for the agent system.")
+    context: Optional[Dict[str, Any]] = Field(None, description="Optional context for the agent.")
 
 class SummaryRequest(BaseModel):
     document_text: str = Field(..., description="Document text to summarize")
@@ -119,6 +124,22 @@ async def extract_key_points(
         raise HTTPException(
             status_code=500, 
             detail=f"Key point extraction failed: {str(e)}"
+        )
+
+@router.post("/agent-query")
+async def agent_query(request: AgentQueryRequest):
+    """
+    Process a query through the agent system.
+    """
+    try:
+        agent = TaskUnderstandingAgent()
+        result = await agent.execute(request.query, context=request.context)
+        return result
+    except Exception as e:
+        logger.error("Agent query failed", error=str(e), exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Agent query failed: {str(e)}"
         )
 
 @router.get("/health")

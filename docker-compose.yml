@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development
+    command: /bin/sh -c "pip install -e . && init-db && uvicorn src.energia_ai.main:app --host 0.0.0.0 --port 8000 --reload"
     ports:
       - "8000:8000"
     environment:

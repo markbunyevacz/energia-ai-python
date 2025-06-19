@@ -2,6 +2,7 @@ import structlog
 import json
 import re
 from typing import Any, Dict, Optional, List
+import httpx
 
 from energia_ai.agents.base import BaseAgent, AgentResult, AgentConfig
 from energia_ai.ai.claude_client import get_claude_client, ClaudeClient
@@ -141,6 +142,20 @@ class TaskUnderstandingAgent(BaseAgent):
         else:
             return "complex"
 
+    async def _execute_search(self, query: str) -> Dict:
+        """Executes a search query against the local API."""
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(f"http://localhost:8000/api/search/search?query={query}")
+                response.raise_for_status()
+                return response.json()
+            except httpx.HTTPStatusError as e:
+                logger.error(f"HTTP error during search: {e.request.url} - {e.response.status_code}")
+                return {"error": f"Search API returned {e.response.status_code}"}
+            except Exception as e:
+                logger.error(f"Error calling search API: {e}")
+                return {"error": "Failed to connect to search API."}
+
     def _build_enhanced_prompt(self, query: str, domains: List[str], entities: List[Dict], complexity: str) -> str:
         """Build enhanced prompt with Hungarian legal context."""
         return f"""
@@ -241,6 +256,18 @@ The output MUST be only the JSON object, with no other text.
 
             parsed_plan = json.loads(json_text)
             
+            # --- Plan Execution ---
+            final_result = parsed_plan
+            if "steps" in parsed_plan.get("plan", {}):
+                for step in parsed_plan["plan"]["steps"]:
+                    if step.get("agent") == "information_retrieval_agent":
+                        search_query = step.get("query")
+                        if search_query:
+                            logger.info(f"Executing search for: {search_query}")
+                            search_results = await self._execute_search(search_query)
+                            step["result"] = search_results
+                            final_result = search_results # For now, just return the search result directly
+            
             # Add analysis metadata to the result
             parsed_plan["plan"]["metadata"] = {
                 "analysis_timestamp": "2025-01-27T10:00:00Z",
@@ -255,7 +282,7 @@ The output MUST be only the JSON object, with no other text.
             
             return AgentResult(
                 status="completed", 
-                output=parsed_plan,
+                output=final_result,
                 metadata={
                     "domains": domains,
                     "entities_found": len(entities),

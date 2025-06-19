@@ -487,6 +487,26 @@ class NJTCrawler(BaseCrawler):
         
         return True
 
+    async def run_and_save(self, mongo_manager):
+        """
+        Runs the crawler and saves the documents to MongoDB.
+        """
+        self.logger.info("Starting crawler to run and save...")
+        documents = await self.crawl()
+        if documents:
+            self.logger.info(f"Saving {len(documents)} documents to MongoDB.")
+            try:
+                await mongo_manager.connect()
+                # Assuming 'documents' is the collection name
+                result = await mongo_manager.db["documents"].insert_many(documents)
+                self.logger.info(f"Successfully inserted {len(result.inserted_ids)} documents.")
+            except Exception as e:
+                self.logger.error(f"Error saving to MongoDB: {e}", exc_info=True)
+            finally:
+                await mongo_manager.disconnect()
+        else:
+            self.logger.info("No documents to save.")
+
 
 # Usage example
 async def main():

@@ -552,3 +552,46 @@ python .cursor/config-manager.py status
 
 # Initialize complete environment
 python .cursor/startup.py
+
+---
+
+## **7. Kritikus Akcióterv és Hiányosságok Pótlása**
+
+A projekt alapjai (infrastruktúra, Docker) szilárdak, de a komponensek közötti integráció és a funkcionális logika hiányos. Az alábbi feladatok elvégzése kritikus a Phase 1 céljainak eléréséhez.
+
+-   [ ] **CI/CD Pipeline Javítása Python Környezethez:**
+    -   **Leírás:** A jelenlegi GitHub Actions (`.github/workflows/ci.yml`) a korábbi TypeScript projekthez van konfigurálva. Ezt frissíteni kell a Python-specifikus lépésekkel: `ruff` (linting), `mypy` (type checking), és `pytest` (tesztelés).
+    -   **Függőség:** Task 3 (CI/CD) újbóli megnyitása és javítása.
+
+-   [ ] **Adatbázisok Inicializálása és Séma Alkalmazása:**
+    -   **Leírás:** A PostgreSQL és MongoDB konténerek futnak, de az adatbázis sémák nincsenek létrehozva és az alap adatok nincsenek betöltve. Alembic migrációkat kell futtatni a PostgreSQL-hez és a MongoDB séma validációt kell implementálni.
+    -   **Függőség:** Task 4, 5 (DB Setup) kiegészítése.
+
+-   [ ] **Crawler-ek Integrálása a Fő Alkalmazásba:**
+    -   **Leírás:** Az `app/crawlers`-ben található `njt_crawler.py` és `magyar_kozlony_crawler.py` jelenleg nincsenek bekötve. FastAPI végpontokat kell létrehozni a futtatásukhoz, és az eredményeket a MongoDB-be kell menteniük.
+    -   **Függőség:** Task 9, 10 (Crawlers) funkcionális bekötése.
+
+-   [ ] **Alapvető Keresési Funkciók Implementálása:**
+    -   **Leírás:** Létre kell hozni a hibrid keresési logikát. Egy API végpontot kell implementálni, ami a felhasználói kérést továbbítja az Elasticsearch (lexikális) és a Qdrant (szemantikus) felé, majd az eredményeket összefésüli.
+    -   **Függőség:** Task 7, 8 (Vector/Lexical DB) és Task 15 (Search Agent) összekapcsolása.
+
+-   [ ] **Task Understanding Agent Működőképessé Tétele:**
+    -   **Leírás:** A `src/energia_ai/agents/task_understanding_agent.py` vázát fel kell tölteni logikával. Képesnek kell lennie a felhasználói inputot feldolgozni, a keresési szándékot felismerni és továbbítani a kérést a keresési ágensnek.
+    -   **Függőség:** Task 14 (Task Understanding Agent) funkcionális implementálása.
+
+from transformers import AutoTokenizer, AutoModel
+
+tokenizer = AutoTokenizer.from_pretrained("SZTAKI-HLT/hubert-base-cc")
+model = AutoModel.from_pretrained("SZTAKI-HLT/hubert-base-cc")
+
+# Automatic context detection and switching
+python .cursor/config-manager.py auto
+
+# Manual context switching
+python .cursor/config-manager.py switch --context ai-development
+
+# Check current status
+python .cursor/config-manager.py status
+
+# Initialize complete environment
+python .cursor/startup.py

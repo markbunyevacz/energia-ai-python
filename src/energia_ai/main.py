@@ -82,9 +82,13 @@ async def root():
 
 # Import API routers
 from energia_ai.api.ai.endpoints import router as ai_router
+from energia_ai.api.crawlers.endpoints import router as crawler_router
+from energia_ai.api.search.endpoints import router as search_router
 
 # Include API routers
-app.include_router(ai_router)
+app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
+app.include_router(crawler_router, prefix="/api/crawlers", tags=["Crawlers"])
+app.include_router(search_router, prefix="/api/search", tags=["Search"])
 
 if __name__ == "__main__":
     uvicorn.run(

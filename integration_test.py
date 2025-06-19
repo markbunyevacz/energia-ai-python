@@ -288,6 +288,45 @@ async def test_system_integration():
         print(f"❌ Overall System Integration: FAILED - {e}\n")
         return False
 
+async def test_end_to_end_search():
+    """Test the full end-to-end search flow from agent to search results."""
+    print("🔍 Testing End-to-End Search Flow...")
+    
+    try:
+        import httpx
+        
+        # This test assumes the FastAPI server is running.
+        # In a real CI/CD environment, you would start the server in the background.
+        
+        query = "What are the regulations for renewable energy?"
+        request_body = {"query": query}
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post("http://localhost:8000/api/ai/agent-query", json=request_body, timeout=60.0)
+            
+            if response.status_code != 200:
+                print(f"  ❌ Agent query failed with status {response.status_code}")
+                print(f"  Response: {response.text}")
+                return False
+            
+            print("  ✅ Agent query endpoint returned 200 OK")
+            
+            result = response.json()
+            
+            # Check for search results in the response
+            if "output" in result and "semantic_results" in result["output"]:
+                print("  ✅ Search results found in agent response")
+            else:
+                print("  ❌ No search results found in agent response")
+                print(f"  Response: {result}")
+                return False
+
+        print("✅ End-to-End Search Flow: PASSED\n")
+        return True
+    except Exception as e:
+        print(f"❌ End-to-End Search Flow: FAILED - {e}\n")
+        return False
+
 async def run_integration_tests():
     """Run all integration tests"""
     print("🚀 Starting Hungarian Legal AI System Integration Tests\n")
@@ -302,6 +341,7 @@ async def run_integration_tests():
     test_results.append(await test_security_system())
     test_results.append(await test_api_integration())
     test_results.append(await test_system_integration())
+    test_results.append(await test_end_to_end_search())
     
     # Print summary
     print("=" * 60)
@@ -317,7 +357,8 @@ async def run_integration_tests():
         "Magyar Közlöny Monitor",
         "Security Framework",
         "API Integration",
-        "Overall System"
+        "Overall System",
+        "End-to-End Search"
     ]
     
     for i, (name, result) in enumerate(zip(test_names, test_results)):

@@ -72,6 +72,8 @@ Documentation = "https://energia-ai.readthedocs.io/"
 
 [project.scripts]
 energia-ai = "energia_ai.main:main"
+init-db = "scripts.initialize_db:main"
+run-etl = "scripts.etl:run_etl"
 
 [tool.setuptools.packages.find]
 where = ["src"]
