@@ -83,10 +83,10 @@ class ElasticsearchManager:
                             "hungarian_stop": {
                                 "type": "stop",
                                 "stopwords": [
-                                    "a", "az", "és", "vagy", "de", "hogy", "egy", "ez", "az",
-                                    "van", "volt", "lesz", "lehet", "kell", "csak", "még",
-                                    "már", "nem", "igen", "igen", "is", "el", "fel", "le",
-                                    "ki", "be", "meg", "át", "rá", "össze", "szét"
+                                    "a", "az", "Ã©s", "vagy", "de", "hogy", "egy", "ez", "az",
+                                    "van", "volt", "lesz", "lehet", "kell", "csak", "mÃ©g",
+                                    "mÃ¡r", "nem", "igen", "igen", "is", "el", "fel", "le",
+                                    "ki", "be", "meg", "Ã¡t", "rÃ¡", "Ã¶ssze", "szÃ©t"
                                 ]
                             },
                             "hungarian_stemmer": {

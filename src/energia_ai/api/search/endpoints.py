@@ -6,7 +6,7 @@ from structlog.stdlib import get_logger
 
 from src.energia_ai.search.elasticsearch_manager import ElasticsearchManager
 from src.energia_ai.vector_search.qdrant_manager import QdrantManager
-from src.energia_ai.vector_search.embeddings import generate_embedding
+from src.energia_ai.vector_search.embeddings import get_embedding_manager
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -23,7 +23,8 @@ async def search(query: str = Query(..., min_length=3, max_length=300)):
     
     try:
         # Generate embedding for the query for semantic search
-        query_embedding = await generate_embedding(query)
+        embedding_manager = await get_embedding_manager()
+        query_embedding = await embedding_manager.generate_embedding(query)
         
         # Perform semantic search
         semantic_results = await qdrant_manager.search(query_embedding)

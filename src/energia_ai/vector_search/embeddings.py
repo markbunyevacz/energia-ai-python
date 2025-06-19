@@ -9,8 +9,18 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 import structlog
 from ..config.settings import get_settings
+from dataclasses import dataclass
+import dspy
 
 logger = structlog.get_logger()
+
+@dataclass
+class DSPyConfig:
+    model_name: str = 'openai/gpt-4o-mini'
+    temperature: float = 0.7
+    use_local_model: bool = False
+    optimization_enabled: bool = True
+    cache_enabled: bool = True
 
 class EmbeddingManager:
     """Manager for generating document embeddings"""
@@ -188,6 +198,13 @@ class EmbeddingManager:
             logger.error("Text similarity calculation failed", error=str(e))
             return 0.0
 
+class HungarianLegalSignatures:
+    class MagyarJogszabalySignature(dspy.Signature):
+        """Magyar jogszabályok elemzése és értelmezése."""
+        jogszabaly_szoveg = dspy.InputField(desc="Magyar jogszabály szövege")
+        kerdes = dspy.InputField(desc="Konkrét jogi kérdés")
+        valasz = dspy.OutputField(desc="Jogszabály alapú válasz")
+
 # Global embedding manager instance
 _embedding_manager = None
 
@@ -198,3 +215,7 @@ async def get_embedding_manager() -> EmbeddingManager:
         _embedding_manager = EmbeddingManager()
         await _embedding_manager.initialize()
     return _embedding_manager
+
+def optimize_agent(agent, training_data):
+    teleprompter = BootstrapFewShot(metric=accuracy_metric)
+    return teleprompter.compile(agent, trainset=training_data)
